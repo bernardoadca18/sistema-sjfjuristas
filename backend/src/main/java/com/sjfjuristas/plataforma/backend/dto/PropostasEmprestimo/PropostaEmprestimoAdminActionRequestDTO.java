@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -13,13 +12,9 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PropostaEmprestimoAdminActionRequestDTO {
-
-    @NotNull(message = "O ID do status da proposta é obrigatório.")
     private Long statusPropostaId;
-    
     // Opcional, mas obrigatório se negada
-    private String motivoNegacao; 
-
+    private String motivoNegacao;
     // Campos opcionais, preenchidos se o status for "Aprovada"
     private BigDecimal valorAprovado;
     private BigDecimal taxaJurosDiariaEfetiva;

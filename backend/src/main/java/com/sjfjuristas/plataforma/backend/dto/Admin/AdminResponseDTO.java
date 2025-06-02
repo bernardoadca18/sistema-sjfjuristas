@@ -11,15 +11,15 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AdminResponseDTO {
-    @NotNull private UUID id;
-    @NotNull private String nomeCompleto;
-    @NotNull private String email;
-    @NotNull private String telefoneContatoInterno;
-    @NotNull private UUID perfilId;
-    @NotNull private String perfilName;
-    @NotNull private String cargoInterno;
-    @NotNull private String departamento;
-    @NotNull private String matriculaFuncionario;
-    @NotNull private String dataCriacao;
-    @NotNull private boolean ativo;
+    private UUID id;
+    private String nomeCompleto;
+    private String email;
+    private String telefoneContatoInterno;
+    private UUID perfilId;
+    private String perfilName;
+    private String cargoInterno;
+    private String departamento;
+    private String matriculaFuncionario;
+    private String dataCriacao;
+    private boolean ativo;
 }

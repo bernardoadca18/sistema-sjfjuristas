@@ -14,10 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PagamentoParcelaClienteRequestDTO {
-
-    @NotNull(message = "O ID da parcela é obrigatório.")
     private UUID parcelaId;
-    
     // Opcionais, pois o sistema pode obter os dados via webhook do PSP
     private String idTransacaoPsp;
     private BigDecimal valorPago;

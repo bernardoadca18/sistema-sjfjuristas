@@ -1,6 +1,5 @@
 package com.sjfjuristas.plataforma.backend.dto.ComprovantesPagamento;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,10 +12,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ComprovanteUploadRequestDTO {
-
-    @NotNull(message = "O ID da parcela é obrigatório.")
     private UUID parcelaId;
-
-    @NotNull(message = "O arquivo do comprovante é obrigatório.")
     private MultipartFile arquivo;
 }
