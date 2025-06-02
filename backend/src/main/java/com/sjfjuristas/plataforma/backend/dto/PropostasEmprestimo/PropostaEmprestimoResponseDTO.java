@@ -20,13 +20,13 @@ public class PropostaEmprestimoResponseDTO {
     private UUID id;
     private BigDecimal valorSolicitado;
     private String nomeCompletoSolicitante;
-    private String cpfSolicitante;
+    private String cpfSolicitante; // Pode ser parcialmente mascarado
     private String emailSolicitante;
     private String telefoneWhatsappSolicitante;
     private OffsetDateTime dataSolicitacao;
     private String statusPropostaNome;
-    private String analisadoPorAdminNome;
-    private OffsetDateTime dataAnalise;
-    private String motivoNegacao;
+    private String analisadoPorAdminNome; // Opcional
+    private OffsetDateTime dataAnalise; // Opcional
+    private String motivoNegacao; // Opcional
     private List<DocumentoPropostaSummaryDTO> documentos;
 }
