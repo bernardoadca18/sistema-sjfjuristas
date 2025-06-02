@@ -15,7 +15,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "\"ConfiguracoesSistema\"", schema = "s.sjfjuristas", uniqueConstraints = {
+@Table(name = "\"ConfiguracoesSistema\"", schema = "schema_sjfjuristas", uniqueConstraints = {
         @UniqueConstraint(name = "ConfiguracoesSistema_chave_config_uq", columnNames = {"chave_config"})
 })
 public class ConfiguracaoSistema {

@@ -13,7 +13,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "\"PerfisUsuario\"", schema = "s.sjfjuristas", uniqueConstraints = {
+@Table(name = "\"PerfisUsuario\"", schema = "schema_sjfjuristas", uniqueConstraints = {
         @UniqueConstraint(name = "PerfisUsuario_nome_perfil_uq", columnNames = {"nome_perfil"})
 })
 public class PerfilUsuario {

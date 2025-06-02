@@ -14,7 +14,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "\"TiposDocumento\"", schema = "s.sjfjuristas", uniqueConstraints = {
+@Table(name = "\"TiposDocumento\"", schema = "schema_sjfjuristas", uniqueConstraints = {
         @UniqueConstraint(name = "TiposDocumento_nome_documento_uq", columnNames = {"nome_documento"})
 })
 public class TipoDocumento {

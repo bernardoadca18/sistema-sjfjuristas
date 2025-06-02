@@ -6,7 +6,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
-
 import java.time.OffsetDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -15,7 +14,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "\"Administradores\"", schema = "s.sjfjuristas", uniqueConstraints = {
+@Table(name = "\"Administradores\"", schema = "schema_sjfjuristas", uniqueConstraints = {
         @UniqueConstraint(name = "administradores_email_uq", columnNames = {"email"}),
         @UniqueConstraint(name = "Administradores_matricula_funcionario_uq", columnNames = {"matricula_funcionario"})
 })

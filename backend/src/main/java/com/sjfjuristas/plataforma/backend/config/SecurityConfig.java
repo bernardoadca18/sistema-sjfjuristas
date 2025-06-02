@@ -15,31 +15,20 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    // private final JwtAuthFilter jwtAuthFilter; // Criaremos a seguir
-    // private final AuthenticationProvider authenticationProvider; // Criaremos a seguir
+    private final JwtAuthFilter jwtAuthFilter;
+    private final AuthenticationProvider authenticationProvider;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // CSRF (Cross-Site Request Forgery)
                 .csrf(csrf -> csrf.disable())
-                // Regras de autorização para os endpoints
                 .authorizeHttpRequests(auth -> auth
-                        // Endpoints públicos de autenticação
-                        .requestMatchers("/api/auth/**").permitAll() 
-                        // Qualquer outra requisição deve ser autenticada
-                        .anyRequest().authenticated() 
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .anyRequest().authenticated()
                 )
-
-                // Gerenciamento de sessão como STATELESS
-                // O servidor não criará ou manterá sessões HTTP. Cada requisição é independente.
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
-                // Provedor de autenticação personalizado
-                // .authenticationProvider(authenticationProvider)
-
-                // Filtro JWT antes do filtro padrão de autenticação
-                // .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(authenticationProvider)
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         
         return http.build();
     }

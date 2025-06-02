@@ -8,21 +8,24 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import java.util.Collection;
+import java.util.Collections;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "\"Usuarios\"", schema = "s.sjfjuristas", uniqueConstraints = {
+@Table(name = "\"Usuarios\"", schema = "schema_sjfjuristas", uniqueConstraints = {
         @UniqueConstraint(name = "usuarios_cpf_uq", columnNames = {"cpf"}),
         @UniqueConstraint(name = "usuarios_email_uq", columnNames = {"email"})
 })
-public class Usuario {
+public class Usuario implements UserDetails{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "usuario_id", nullable = false)
@@ -117,4 +120,42 @@ public class Usuario {
     @OneToMany(mappedBy = "usuarioIdUsuarios")
     private Set<PropostaEmprestimo> propostasEmprestimos = new LinkedHashSet<>();
 
+    // UserDetails
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        // TODO: etornar os perfis/permissões do usuário.
+
+        return Collections.emptyList();
+    }
+
+    @Override
+    public String getUsername() {
+        return this.email; // O "username" para o Spring Security será o e-mail
+    }
+
+    @Override
+    public String getPassword() {
+        return this.hashSenha;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true; // TODO: lógica para expiração de conta
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true; // TODO: lógica para bloqueio de conta
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true; // TODO: lógica para expiração de credenciais
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return this.ativo; // Usa seu campo 'ativo' para determinar se o usuário está habilitado
+    }
 }

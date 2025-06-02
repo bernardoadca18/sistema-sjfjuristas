@@ -21,7 +21,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "\"PagamentosParcela\"", schema = "s.sjfjuristas", uniqueConstraints = {
+@Table(name = "\"PagamentosParcela\"", schema = "schema_sjfjuristas", uniqueConstraints = {
         @UniqueConstraint(name = "PagamentosParcela_id_transacao_pagamento_psp_uq", columnNames = {"id_transacao_pagamento_psp"})
 })
 public class PagamentoParcela {

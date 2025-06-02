@@ -18,7 +18,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "\"ParcelasEmprestimo\"", schema = "s.sjfjuristas")
+@Table(name = "\"ParcelasEmprestimo\"", schema = "schema_sjfjuristas")
 public class ParcelaEmprestimo {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

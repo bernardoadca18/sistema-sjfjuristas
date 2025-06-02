@@ -9,7 +9,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Getter
 @Setter
 @Entity
-@Table(name = "\"many_Administradores_handle_many_PropostasEmprestimo\"", schema = "s.sjfjuristas")
+@Table(name = "\"many_Administradores_handle_many_PropostasEmprestimo\"", schema = "schema_sjfjuristas")
 public class ManyAdministradoresHandleManyPropostasemprestimo {
     @EmbeddedId
     private ManyAdministradoresHandleManyPropostasemprestimoId id;

@@ -19,7 +19,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "\"Emprestimos\"", schema = "s.sjfjuristas", indexes = {
+@Table(name = "\"Emprestimos\"", schema = "schema_sjfjuristas", indexes = {
         @Index(name = "emprestimos_proposta_id_uq", columnList = "proposta_id_PropostasEmprestimo", unique = true)
 }, uniqueConstraints = {
         @UniqueConstraint(name = "emprestimo_id_transacao_desembolso_psp_uq", columnNames = {"id_transacao_desembolso_psp"}),

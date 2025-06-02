@@ -13,7 +13,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "\"TiposChavePix\"", schema = "s.sjfjuristas", uniqueConstraints = {
+@Table(name = "\"TiposChavePix\"", schema = "schema_sjfjuristas", uniqueConstraints = {
         @UniqueConstraint(name = "pix_nome_tipo_uq", columnNames = {"nome_tipo"})
 })
 public class TipoChavePix {

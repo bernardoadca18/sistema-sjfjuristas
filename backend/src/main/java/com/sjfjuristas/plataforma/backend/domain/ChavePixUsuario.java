@@ -17,7 +17,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "\"ChavesPixUsuario\"", schema = "s.sjfjuristas")
+@Table(name = "\"ChavesPixUsuario\"", schema = "schema_sjfjuristas")
 public class ChavePixUsuario {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

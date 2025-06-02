@@ -17,7 +17,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "\"ComprovantesPagamento\"", schema = "s.sjfjuristas")
+@Table(name = "\"ComprovantesPagamento\"", schema = "schema_sjfjuristas")
 public class ComprovantePagamento {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
