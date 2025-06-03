@@ -5,7 +5,6 @@ import com.sjfjuristas.plataforma.backend.dto.Usuario.AuthResponseDTO;
 import com.sjfjuristas.plataforma.backend.dto.Usuario.ClienteCreateRequestDTO;
 import com.sjfjuristas.plataforma.backend.dto.Usuario.LoginRequestDTO;
 import com.sjfjuristas.plataforma.backend.repository.UsuarioRepository;
-import com.sjfjuristas.plataforma.backend.service.Auth.AuthService;
 import com.sjfjuristas.plataforma.backend.service.Jwt.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,7 +14,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
