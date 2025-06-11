@@ -22,7 +22,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 public class ApplicationConfig 
 {
     @Autowired
-    private UsuarioRepository usuarioRepository; // Injete via construtor
+    private UsuarioRepository usuarioRepository;
 
     @Bean
     public UserDetailsService userDetailsService() {
