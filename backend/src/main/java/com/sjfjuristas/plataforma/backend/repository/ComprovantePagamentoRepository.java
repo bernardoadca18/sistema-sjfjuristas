@@ -10,5 +10,5 @@ import java.util.UUID;
 @Repository
 public interface ComprovantePagamentoRepository extends JpaRepository<ComprovantePagamento, UUID> 
 {
-    List<ComprovantePagamento> findByParcelaIdParcelasEmprestimo(ParcelaEmprestimo parcela);
+    List<ComprovantePagamento> findByParcelaIdParcelasemprestimo(ParcelaEmprestimo parcela);
 }

@@ -13,7 +13,9 @@ services:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
-      - ./schema.sql:/docker-entrypoint-initdb.d/1-init-schema.sql
+      - ./backend/schema.sql:/docker-entrypoint-initdb.d/1-init-schema.sql
+    networks:
+      - sjf-network
 
   pgadmin:
     image: dpage/pgadmin4
@@ -28,7 +30,49 @@ services:
       - pgadmin_data:/var/lib/pgadmin
     depends_on:
       - db
+    networks:
+      - sjf-network
+
+  minio:
+    image: minio/minio:latest
+    container_name: sjfjuristas-minio
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: "12345678"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - sjf-network
+
+  create-bucket:
+    image: minio/mc
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc config host add minio http://minio:9000 admin 12345678;
+      /usr/bin/mc mb minio/propostas-documentos --ignore-existing;
+      /usr/bin/mc policy set public minio/propostas-documentos;
+      exit 0;
+      "
+    networks:
+      - sjf-network
+
+networks:
+  sjf-network:
+    driver: bridge
 
 volumes:
   db_data:
   pgadmin_data:
+  minio_data:

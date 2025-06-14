@@ -13,7 +13,7 @@ import java.util.UUID;
 @Repository
 public interface PagamentoParcelaRepository extends JpaRepository<PagamentoParcela, UUID> {
 
-    List<PagamentoParcela> findByParcelaIdParcelasEmprestimo(ParcelaEmprestimo parcela);
+    List<PagamentoParcela> findByParcelaIdParcelasemprestimo(ParcelaEmprestimo parcela);
 
     List<PagamentoParcela> findByEmprestimoIdEmprestimos(Emprestimo emprestimo);
 

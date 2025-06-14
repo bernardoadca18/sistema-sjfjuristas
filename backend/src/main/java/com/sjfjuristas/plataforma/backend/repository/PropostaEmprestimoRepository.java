@@ -16,5 +16,5 @@ public interface PropostaEmprestimoRepository extends JpaRepository<PropostaEmpr
 
     List<PropostaEmprestimo> findByUsuarioIdUsuarios(Usuario usuario);
 
-    List<PropostaEmprestimo> findByStatusPropostaIdStatusProposta(StatusProposta statusProposta);
+    List<PropostaEmprestimo> findByStatusPropostaIdStatusproposta(StatusProposta statusProposta);
 }

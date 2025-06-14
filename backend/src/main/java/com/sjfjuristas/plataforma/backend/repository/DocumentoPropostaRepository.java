@@ -10,5 +10,5 @@ import java.util.UUID;
 @Repository
 public interface DocumentoPropostaRepository extends JpaRepository<DocumentoProposta, UUID> {
 
-    List<DocumentoProposta> findByPropostaIdPropostasEmprestimo(PropostaEmprestimo proposta);
+    List<DocumentoProposta> findByPropostaIdPropostasemprestimo(PropostaEmprestimo proposta);
 }
