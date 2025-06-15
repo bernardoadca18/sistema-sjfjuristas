@@ -11,24 +11,19 @@ import java.util.UUID;
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, UUID> 
 {
-    Optional<Usuario> findByEmail(String email);
-
-
     Optional<Usuario> findByCpf(String cpf);
+    
+    Optional<Usuario> findByEmail(String email);
 
 
     Optional<Usuario> findByTokenVerificacaoEmail(String token);
 
-
     Optional<Usuario> findByTokenRecuperacaoSenha(String token);
-
 
     @Query("SELECT u FROM Usuario u JOIN FETCH u.perfilIdPerfisusuario WHERE u.email = :email")
     Optional<Usuario> findByEmailWithPerfil(@Param("email") String email);
 
-
     boolean existsByEmail(String email);
-
 
     boolean existsByCpf(String cpf);
 }

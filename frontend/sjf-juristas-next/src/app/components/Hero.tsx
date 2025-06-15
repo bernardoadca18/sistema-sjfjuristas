@@ -1,6 +1,17 @@
+"use client";
+
 import { theme } from '@/config/theme';
 
+
 const Hero = () => {
+
+  const handleScrollToChat = () => {
+    const chatSection = document.getElementById('chat-section');
+    if (chatSection) {
+      chatSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   return (
     <section
       style={{
@@ -15,13 +26,13 @@ const Hero = () => {
       <p className="text-lg mb-10 animate-fade-up">
         Solicite seu empréstimo online sem burocracia e com aprovação rápida.
       </p>
-      <a
-        href="#chat-section"
+      <button
+        onClick={handleScrollToChat}
         style={{ backgroundColor: theme.colors.accent, color: theme.colors.textOnAccent }}
         className="inline-block px-8 py-4 rounded-full font-bold text-lg transition-transform duration-300 hover:scale-105 animate-pulse"
       >
         Solicitar Agora!
-      </a>
+      </button>
     </section>
   );
 };

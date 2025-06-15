@@ -1,7 +1,20 @@
+
+export interface IFormData {
+    loanValue?: number;
+    fullName?: string;
+    cpf?: string;
+    email?: string;
+    whatsapp?: string;
+    documentUpload?: FileList;
+    termsAcceptance?: boolean;
+}
+
 export enum InputType {
     Text = 1,
     Number = 2,
     Date = 3,
+    FileUpload = 4,
+    Checkbox = 5,
 }
 
 export interface Message {
@@ -9,7 +22,7 @@ export interface Message {
     text: string;
     sender: 'user' | 'bot';
     placeholder?: string;
-    message_identifier?: string;
+    message_identifier?: keyof IFormData;
     label ?: string;
     type?: InputType;
     pattern?: string;
@@ -83,20 +96,23 @@ export const conversationSteps : Message[] = [
     },
     {
         id : 6,
-        text: 'Para finalizar, precisamos que você envie alguns documentos:',
         sender: 'bot',
+        text: 'Para finalizar, precisamos que você envie alguns documentos (Ex: RG, CPF e Comprovante de Residência).',
+        message_identifier: "documentUpload",
+        label: "Anexar Documentos",
+        type: InputType.FileUpload,
     },
     {
-        id : 7,
-        text: 'Por favor, leia e aceite nossos Termos de Uso e Política de Privacidade para prosseguir.',
+        id: 7,
         sender: 'bot',
-        message_identifier: "termsAccepted",
-        label: "Termos de Uso e Política de Privacidade",
-        type: InputType.Text
+        text: 'Por favor, leia e aceite nossos [Termos de Uso](/termos) e [Política de Privacidade](/privacidade) para prosseguir.',
+        message_identifier: "termsAcceptance",
+        label: "Eu li e aceito os Termos de Uso e a Política de Privacidade.",
+        type: InputType.Checkbox,
     },
     {
-        id : 8,
+        id: 8,
+        sender: 'bot',
         text: 'Pronto! Sua solicitação foi enviada com sucesso! Em breve entraremos em contato com sua proposta. Obrigado por escolher a SJF Juristas!',
-        sender: 'bot',
     }
 ]

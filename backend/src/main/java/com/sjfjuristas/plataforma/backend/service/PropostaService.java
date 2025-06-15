@@ -4,19 +4,18 @@ import com.sjfjuristas.plataforma.backend.domain.PerfilUsuario;
 import com.sjfjuristas.plataforma.backend.domain.PropostaEmprestimo;
 import com.sjfjuristas.plataforma.backend.domain.StatusProposta;
 import com.sjfjuristas.plataforma.backend.domain.Usuario;
-import com.sjfjuristas.plataforma.backend.dto.PropostasEmprestimo.PropostaEmprestimoCreateLPRequestDTO;
+import com.sjfjuristas.plataforma.backend.dto.PropostasEmprestimo.PropostaRequestDTO;
+import com.sjfjuristas.plataforma.backend.dto.PropostasEmprestimo.PropostaResponseDTO;
 import com.sjfjuristas.plataforma.backend.repository.PerfilUsuarioRepository;
 import com.sjfjuristas.plataforma.backend.repository.PropostaEmprestimoRepository;
 import com.sjfjuristas.plataforma.backend.repository.StatusPropostaRepository;
 import com.sjfjuristas.plataforma.backend.repository.UsuarioRepository;
-
-import jakarta.transaction.Transactional;
-
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.OffsetDateTime;
-import java.util.List;
 
 @Service
 public class PropostaService {
@@ -25,69 +24,63 @@ public class PropostaService {
     private PropostaEmprestimoRepository propostaRepository;
 
     @Autowired
-    private FileStorageService fileStorageService;
-
-    @Autowired
-    private StatusPropostaRepository statusPropostaRepository; 
-
-    @Autowired
     private UsuarioRepository usuarioRepository;
 
     @Autowired
+    private StatusPropostaRepository statusPropostaRepository;
+
+    // Você também precisará do PerfilUsuarioRepository injetado aqui
+    @Autowired
     private PerfilUsuarioRepository perfilUsuarioRepository;
 
-
     @Transactional
-    public void criarProposta(PropostaEmprestimoCreateLPRequestDTO dto, List<MultipartFile> files) {
-        
-        Usuario usuario = usuarioRepository.findByEmail(dto.getEmailSolicitante())
-        .or(() -> usuarioRepository.findByCpf(dto.getCpfSolicitante()))
-        .orElseGet(() -> {
-            PerfilUsuario perfilCliente = perfilUsuarioRepository.findByNomePerfil("Cliente")
-            .orElseThrow(() -> new IllegalStateException("Perfil 'Cliente' não encontrado no banco de dados."));
+    public PropostaResponseDTO criarProposta(PropostaRequestDTO dto, HttpServletRequest request) {
 
+        Usuario usuario = usuarioRepository.findByCpf(dto.getCpf()).orElseGet(() -> {
             Usuario novoUsuario = new Usuario();
-            novoUsuario.setNomeCompleto(dto.getNomeCompletoSolicitante());
-            novoUsuario.setEmail(dto.getEmailSolicitante());
-            novoUsuario.setCpf(dto.getCpfSolicitante());
-            novoUsuario.setTelefoneWhatsapp(dto.getTelefoneWhatsappSolicitante());
-            novoUsuario.setPerfilIdPerfisusuario(perfilCliente);
-            novoUsuario.setAtivo(false);
-            novoUsuario.setEmailVerificado(false);
-
+            novoUsuario.setNomeCompleto(dto.getNomeCompleto());
+            novoUsuario.setCpf(dto.getCpf());
+            novoUsuario.setEmail(dto.getEmail());
+            novoUsuario.setTelefoneWhatsapp(dto.getWhatsapp());
+            // Definir um perfil padrão "Cliente" aqui
+            PerfilUsuario perfilUsuarioCliente = perfilUsuarioRepository.findByNomePerfil("Cliente").get();
+            novoUsuario.setPerfilIdPerfisusuario(perfilUsuarioCliente);
             return usuarioRepository.save(novoUsuario);
         });
-        
-        StatusProposta statusInicial = statusPropostaRepository.findByNomeStatus("Pendente de Análise").orElseThrow(() -> new IllegalStateException("Status 'Pendente de Análise' não encontrado no banco de dados."));
 
-        PropostaEmprestimo proposta = new PropostaEmprestimo();
-        proposta.setValorSolicitado(dto.getValorSolicitado());
-        proposta.setNomeCompletoSolicitante(dto.getNomeCompletoSolicitante());
-        proposta.setCpfSolicitante(dto.getCpfSolicitante());
-        proposta.setEmailSolicitante(dto.getEmailSolicitante());
-        proposta.setTelefoneWhatsappSolicitante(dto.getTelefoneWhatsappSolicitante());
-        proposta.setTermosAceitosLp(dto.getTermosAceitosLp());
-        proposta.setDataSolicitacao(OffsetDateTime.now());
+        StatusProposta statusInicial = statusPropostaRepository.findByNomeStatus("Pendente de Análise")
+                .orElseThrow(() -> new RuntimeException("Status de proposta 'Pendente de Análise' não encontrado."));
 
-        proposta.setStatusPropostaIdStatusproposta(statusInicial);
+        PropostaEmprestimo novaProposta = new PropostaEmprestimo();
+        novaProposta.setValorSolicitado(dto.getValorSolicitado());
+        novaProposta.setNomeCompletoSolicitante(dto.getNomeCompleto());
+        novaProposta.setCpfSolicitante(dto.getCpf());
+        novaProposta.setEmailSolicitante(dto.getEmail());
+        novaProposta.setTelefoneWhatsappSolicitante(dto.getWhatsapp());
+        novaProposta.setTermosAceitosLp(dto.getTermosAceitos());
 
-        proposta.setIpSolicitacao(""); // Placeholder for IP address
-        proposta.setUserAgentSolicitacao("");
-
-        if (dto.getTermosAceitosLp())
-        {
-            proposta.setDataAceiteTermosLp(OffsetDateTime.now());
+        // Dados preenchidos pelo backend
+        novaProposta.setDataSolicitacao(OffsetDateTime.now());
+        if (dto.getTermosAceitos()) {
+            novaProposta.setDataAceiteTermosLp(OffsetDateTime.now());
         }
+        novaProposta.setIpSolicitacao(request.getRemoteAddr());
+        novaProposta.setUserAgentSolicitacao(request.getHeader("User-Agent"));
+        novaProposta.setOrigemCaptacao("LandingPage");
 
-        proposta.setLinkAppEnviado(false);
-        proposta.setOrigemCaptacao("LandingPage");
+        // Associações
+        novaProposta.setStatusPropostaIdStatusproposta(statusInicial);
+        novaProposta.setUsuarioIdUsuarios(usuario);
 
-        proposta.setUsuarioIdUsuarios(usuario);
+        PropostaEmprestimo propostaSalva = propostaRepository.save(novaProposta);
 
-        PropostaEmprestimo savedProposta = propostaRepository.save(proposta);
-
-        for (MultipartFile file : files) {
-            fileStorageService.uploadFile(file, savedProposta.getId().toString());
-        }
+        return new PropostaResponseDTO(
+            propostaSalva.getId(),
+            propostaSalva.getValorSolicitado(),
+            propostaSalva.getNomeCompletoSolicitante(),
+            propostaSalva.getEmailSolicitante(),
+            propostaSalva.getDataSolicitacao(),
+            propostaSalva.getStatusPropostaIdStatusproposta().getNomeStatus()
+        );
     }
 }

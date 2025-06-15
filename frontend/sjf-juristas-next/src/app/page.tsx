@@ -11,6 +11,7 @@ export default function Home() {
       <main className="flex-grow">
         <Hero />
         <Features />
+        <div className={`mb-32`}></div>
         <Chat />
       </main>
       <Footer />
