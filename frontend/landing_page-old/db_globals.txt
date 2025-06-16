@@ -1,2 +1,0 @@
-max_loan_val
-min_loan_val
