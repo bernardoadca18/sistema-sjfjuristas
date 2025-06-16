@@ -38,11 +38,10 @@ export const conversationSteps : Message[] = [
         id : 1,
         text: "Olá! Bem-vindo(a) à SJF Juristas. Para começarmos sua simulação, qual valor de empréstimo você deseja ?",
         sender: 'bot',
-        placeholder: "Ex: 5000",
+        placeholder: "R$ 5.000,00",
         message_identifier: "loanValue",
-        label: "Valor desejado (R$):",
+        label: "Valor desejado:",
         type: InputType.Number,
-        pattern: '^[0-9]+$',
         minLoan: 100,
         maxLoan: 50000,
         errorMessage: 'Por favor, insira um valor válido entre R$100 e R$50.000.'

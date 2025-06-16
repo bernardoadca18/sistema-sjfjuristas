@@ -19,6 +19,9 @@ public class FileStorageService {
     @Value("${minio.bucket.name}")
     private String bucketName;
 
+    @Value("${minio.url}")
+    private String minioUrl;
+
     public String uploadFile(MultipartFile file, String subfolder) {
         try {
             boolean found = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
@@ -27,15 +30,17 @@ public class FileStorageService {
             }
 
             String fileName = subfolder + "/" + UUID.randomUUID() + "-" + file.getOriginalFilename();
+            
             minioClient.putObject(
                     PutObjectArgs.builder().bucket(bucketName).object(fileName).stream(
                             file.getInputStream(), file.getSize(), -1)
                             .contentType(file.getContentType())
                             .build());
 
-            return minioClient.getPresignedObjectUrl(null);
+            return minioUrl + "/" + bucketName + "/" + fileName;
+
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao fazer upload do arquivo: " + e.getMessage());
+            throw new RuntimeException("Erro ao fazer upload do arquivo: " + e.getMessage(), e);
         }
     }
 }

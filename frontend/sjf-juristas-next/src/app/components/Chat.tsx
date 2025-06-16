@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, FormEvent } from 'react';
 import { conversationSteps, Message, InputType, IFormData } from '@/app/utils/conversationSteps';
 import { theme } from '@/config/theme';
-import { PatternFormat } from 'react-number-format';
+import { PatternFormat, NumericFormat } from 'react-number-format';
 import axios from 'axios';
 
 const Chat = () => {
@@ -14,6 +14,8 @@ const Chat = () => {
     
     const [inputValue, setInputValue] = useState('');
     const [formData, setFormData] = useState<IFormData>({});
+
+    const [numericValue, setNumericValue] = useState<number | undefined>();
     
     const [termsAccepted, setTermsAccepted] = useState(false);
     const [files, setFiles] = useState<FileList | null>(null);
@@ -56,37 +58,14 @@ const Chat = () => {
     useEffect(() => {
         // Este efeito roda sempre que 'isChatFinished' ou 'formData' mudar.
         // O bloco 'if' executa apenas quando o chat é finalizado.
-        if (isChatFinished) {
-            
-            sendProposalToApi(formData);
-
-            /*
-            let informacoesDosArquivos = "Nenhum arquivo enviado.";
-            if (formData.documentUpload && formData.documentUpload.length > 0) {
-                
-                informacoesDosArquivos = Array.from(formData.documentUpload).map(file => 
-                    `\n - Nome: ${file.name}, Tamanho: ${(file.size / 1024).toFixed(2)} KB, Tipo: ${file.type}`
-                ).join('');
-            }
-            
-            const dadosFinais = {
-                valorDesejado: formData.loanValue,
-                nomeCompleto: formData.fullName,
-                cpf: formData.cpf,
-                email: formData.email,
-                whatsapp: formData.whatsapp,
-                termosAceitos: formData.termsAcceptance,
-                arquivos: informacoesDosArquivos,
-                objetoFileListOriginal: formData.documentUpload
-            };
-            */
-            // console.log(dadosFinais);
+        if (isChatFinished) {            
+            handleFinalSubmission(formData);
         }
     }, [isChatFinished, formData]);
     ///
 
-    const sendProposalToApi = async (data: IFormData) => {
-        const payload = {
+    const handleFinalSubmission = async (data: IFormData) => {
+        const proposalPayload = {
             valorSolicitado: data.loanValue,
             nomeCompleto: data.fullName,
             cpf: data.cpf,
@@ -95,12 +74,34 @@ const Chat = () => {
             termosAceitos: data.termsAcceptance,
         }
 
-        console.log("Enviando para a API o seguinte payload:", payload);
+        console.log("Enviando para a API o seguinte payload:", proposalPayload);
 
         try
         {
-            const response = await axios.post('http://localhost:8080/api/propostas', payload);
-            console.log('Proposta criada com sucesso! Resposta da API:', response.data);
+            const proposalResponse = await axios.post('http://localhost:8080/api/propostas', proposalPayload);
+            const proposalId = proposalResponse.data.id;
+
+            console.log('Proposta criada com sucesso! Resposta da API:', proposalResponse.data);
+            if (data.documentUpload && data.documentUpload.length > 0 && proposalId)
+            {
+                const fileFormData = new FormData();
+                Array.from(data.documentUpload).forEach(file => {
+                    fileFormData.append('files', file);
+                });
+
+                console.log(`Enviando ${data.documentUpload.length} arquivos para a proposta ID: ${proposalId}`);
+                
+                const fileResponse = await axios.post(
+                    `http://localhost:8080/api/propostas/${proposalId}/documentos`,
+                    fileFormData,
+                    {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    }
+                );
+                console.log('Arquivos enviados com sucesso!', fileResponse.data);
+            }
         }
         catch (error)
         {
@@ -138,6 +139,7 @@ const Chat = () => {
         }
 
         setInputValue('');
+        setNumericValue(undefined);
         setFiles(null);
         setTermsAccepted(false);
         const nextStepIndex = currentStep + 1;
@@ -148,15 +150,15 @@ const Chat = () => {
 
     const handleSendMessage = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!inputValue.trim()) return;
-
         const currentMessageData = conversationSteps[currentStep];
-        let valueToSave : string | number = inputValue; 
-        if (!currentMessageData.mask && currentMessageData.type === InputType.Number) {
-            valueToSave = parseFloat(inputValue.replace(/\D/g, '')) || 0;
-        }
 
-        proceedToNextStep(inputValue, valueToSave);
+        if (currentMessageData.type === InputType.Number) {
+            if (!numericValue) return;
+            proceedToNextStep(inputValue, numericValue);
+        } else {
+            if (!inputValue.trim()) return;
+            proceedToNextStep(inputValue, inputValue);
+        }
     }
 
     const handleFileUpload = (e: FormEvent<HTMLFormElement>) => {
@@ -211,15 +213,42 @@ const Chat = () => {
         const shouldAutoFocus = messages.length > 1;
 
         switch (currentInputData.type) {
-            case InputType.Text:
+            
             case InputType.Number:
+                return (
+                    <form onSubmit={handleSendMessage} className='flex items-center gap-4'>
+                         <NumericFormat
+                            key={currentInputData.id}
+                            value={inputValue}
+                            onValueChange={(values) => {
+                                setInputValue(values.formattedValue); // Para exibir no input
+                                setNumericValue(values.floatValue);   // Para enviar ao backend
+                            }}
+                            prefix='R$ '
+                            thousandSeparator='.'
+                            decimalSeparator=','
+                            decimalScale={2}
+                            fixedDecimalScale
+                            allowNegative={false}
+                            className="flex-1 w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-200 transition"
+                            placeholder={currentInputData.placeholder || 'Digite o valor...'}
+                            required
+                            autoFocus={shouldAutoFocus}
+                         />
+                         <button type='submit' className='p-3 rounded-full hover:bg-yellow-100 focus:outline-none focus:ring-2 focus:bg-yellow-100 focus:ring-offset-2 transition-transform duration-150 ease-in-out transform hover:scale-105 disabled:bg-gray-300 disabled:cursor-not-allowed' disabled={isBotTyping || !numericValue}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                         </button>
+                    </form>
+                 );
+
+            case InputType.Text:
                 return (
                     <form onSubmit={handleSendMessage} className='flex items-center gap-4'>
                         {currentInputData.mask ? (
                             <PatternFormat
-                                id="chat-input" // Adicionando um ID para referência
+                                id="chat-input"
                                 key={currentInputData.id}
-                                format={currentInputData.mask.replace(/0/g, '#')}
+                                format={currentInputData.mask.replace(/[0]/g, '#')}
                                 value={inputValue}
                                 onValueChange={(values) => setInputValue(values.value)}
                                 type='tel'
@@ -233,7 +262,7 @@ const Chat = () => {
                             <input
                                 id="chat-input"
                                 key={currentInputData.id}
-                                type={currentInputData.type === InputType.Number ? 'number' : 'text'}
+                                type={'text'}
                                 value={inputValue}
                                 onChange={(e) => setInputValue(e.target.value)}
                                 className="flex-1 w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-200 transition"
@@ -241,11 +270,10 @@ const Chat = () => {
                                 required
                                 autoFocus = {shouldAutoFocus}
                                 minLength={currentInputData.minlength}
-                                min={currentInputData.minLoan} max={currentInputData.maxLoan}
                             />
                         )}
                         <button type='submit' className='p-3 rounded-full hover:bg-yellow-100 focus:outline-none focus:ring-2 focus:bg-yellow-100 focus:ring-offset-2 transition-transform duration-150 ease-in-out transform hover:scale-105 disabled:bg-gray-300 disabled:cursor-not-allowed' disabled={isBotTyping || !inputValue.trim()}>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                         </button>
                     </form>
                 );
