@@ -38,8 +38,8 @@ public class ChavePixUsuario {
     private Boolean ativaParaDesembolso;
 
     @ColumnDefault("false")
-    @Column(name = "\"FALSE\"")
-    private Boolean falseField;
+    @Column(name = "verificada")
+    private Boolean verificada;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "data_verificacao")

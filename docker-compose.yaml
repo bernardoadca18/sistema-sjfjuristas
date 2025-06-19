@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   db:
     image: postgres:17
@@ -12,8 +10,8 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ../backend/schema.sql:/docker-entrypoint-initdb.d/1-init-schema.sql
-      - ../db/base_info.sql:/docker-entrypoint-initdb.d/2-base-info.sql
+      - ./backend/schema.sql:/docker-entrypoint-initdb.d/1-init-schema.sql
+      - ./db/base_info.sql:/docker-entrypoint-initdb.d/2-base-info.sql
       - db_data:/var/lib/postgresql/data
     networks:
       - sjf-network
@@ -39,7 +37,6 @@ services:
     container_name: sjfjuristas-minio
     restart: unless-stopped
     environment:
-  
       MINIO_ROOT_USER: admin
       MINIO_ROOT_PASSWORD: "12345678"
     ports:
@@ -47,14 +44,7 @@ services:
       - "9001:9001"
     volumes:
       - minio_data:/data
-
     command: server /data --console-address ":9001"
-    healthcheck:
-      test: ["CMD", "mc", "ready", "local"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-      start_period: 5s
     networks:
       - sjf-network
 
@@ -62,7 +52,7 @@ services:
     image: minio/mc
     depends_on:
       minio:
-        condition: service_healthy
+        condition: service_started
     entrypoint: >
       /bin/sh -c "
       /usr/bin/mc config host add minio http://minio:9000 admin 12345678;
@@ -73,12 +63,63 @@ services:
     networks:
       - sjf-network
 
-# --- REDE COMPARTILHADA PARA OS SERVIÇOS ---
+  backend:
+    build: ./backend
+    container_name: sjfjuristas-backend
+    restart: unless-stopped
+    depends_on:
+      - db
+      - minio
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/sjfjuristas
+      - MINIO_URL=http://minio:9000
+    networks:
+      - sjf-network
+
+  frontend:
+    build: ./frontend/sjf-juristas-next
+    container_name: sjfjuristas-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - sjf-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: sjfjuristas-proxy
+    restart: unless-stopped
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "80:80"
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - sjf-network
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: sjfjuristas-ngrok
+    restart: unless-stopped
+    env_file:
+      - .env
+    command:
+      - "http"
+      - "nginx:80"
+      - "--log=stdout"
+    depends_on:
+      - nginx
+    ports:
+      - "4040:4040"
+    networks:
+      - sjf-network
+
 networks:
   sjf-network:
     driver: bridge
 
-# --- VOLUMES PARA PERSISTÊNCIA DE DADOS ---
 volumes:
   db_data:
   pgadmin_data:

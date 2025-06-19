@@ -78,7 +78,10 @@ const Chat = () => {
 
         try
         {
-            const proposalResponse = await axios.post('http://localhost:8080/api/propostas', proposalPayload);
+            //const proposalResponse = await axios.post('http://localhost:8080/api/propostas', proposalPayload);
+            //const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+            // const proposalResponse = await axios.post(`${apiUrl}/api/propostas`, proposalPayload);
+            const proposalResponse = await axios.post(`/api/propostas`, proposalPayload);
             const proposalId = proposalResponse.data.id;
 
             console.log('Proposta criada com sucesso! Resposta da API:', proposalResponse.data);
@@ -92,7 +95,7 @@ const Chat = () => {
                 console.log(`Enviando ${data.documentUpload.length} arquivos para a proposta ID: ${proposalId}`);
                 
                 const fileResponse = await axios.post(
-                    `http://localhost:8080/api/propostas/${proposalId}/documentos`,
+                    `/api/propostas/${proposalId}/documentos`,
                     fileFormData,
                     {
                         headers: {
