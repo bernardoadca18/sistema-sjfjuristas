@@ -6,6 +6,7 @@ import com.sjfjuristas.plataforma.backend.dto.DocumentoProposta.DocumentoPropost
 import com.sjfjuristas.plataforma.backend.repository.DocumentoPropostaRepository;
 import com.sjfjuristas.plataforma.backend.repository.PropostaEmprestimoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,20 +28,24 @@ public class DocumentoPropostaService
     @Autowired
     private PropostaEmprestimoRepository propostaRepository;
 
+    @Value("${minio.bucket.documentos}")
+    private String docsBucketName;
+
 
     @Transactional
     public List<DocumentoPropostaResponseDTO> salvarDocumentos(UUID propostaId, MultipartFile[] files)
     {
-        PropostaEmprestimo proposta = propostaRepository.findById(propostaId)
-                .orElseThrow(() -> new IllegalArgumentException("Proposta com ID " + propostaId + " não encontrada."));
+        PropostaEmprestimo proposta = propostaRepository.findById(propostaId).orElseThrow(() -> new IllegalArgumentException("Proposta com ID " + propostaId + " não encontrada."));
 
         List<DocumentoPropostaResponseDTO> responses = new ArrayList<>();
 
-        for (MultipartFile file : files) {
+        for (MultipartFile file : files)
+        {
             String subfolder = "proposta-" + propostaId.toString();
-            String fileUrl = fileStorageService.uploadFile(file, subfolder);
+            String fileUrl = fileStorageService.uploadFile(docsBucketName, file, subfolder);
 
             DocumentoProposta doc = new DocumentoProposta();
+
             doc.setPropostaIdPropostasemprestimo(proposta);
             doc.setUsuarioIdUsuarios(proposta.getUsuarioIdUsuarios());
             doc.setUrlDocumento(fileUrl);
@@ -50,14 +55,13 @@ public class DocumentoPropostaService
             doc.setDataUpload(OffsetDateTime.now());
             doc.setStatusValidacao("Pendente");
             
-            // O tipo de documento será definido posteriormente pela equipe de análise
             doc.setTipoDocumentoIdTiposdocumento(null);
 
             DocumentoProposta savedDoc = documentoRepository.save(doc);
             
             responses.add(new DocumentoPropostaResponseDTO(
                 savedDoc.getId(),
-                "Não categorizado", // Tipo será definido na análise
+                "Não categorizado",
                 savedDoc.getNomeArquivoOriginal(),
                 savedDoc.getUrlDocumento(),
                 savedDoc.getDataUpload(),

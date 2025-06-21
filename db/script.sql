@@ -1,7 +1,5 @@
--- Garante que o schema exista antes de criar as tabelas
 CREATE SCHEMA IF NOT EXISTS schema_sjfjuristas;
 
--- Definição das tabelas principais
 CREATE TABLE schema_sjfjuristas.perfis_usuario (
     perfil_id uuid NOT NULL,
     nome_perfil varchar(50) NOT NULL,
@@ -289,7 +287,6 @@ CREATE TABLE schema_sjfjuristas.configuracoes_sistema (
     CONSTRAINT configuracoessistema_chave_config_uq UNIQUE (chave_config)
 );
 
--- Tabelas de Associação (Many-to-Many)
 CREATE TABLE schema_sjfjuristas.many_administradores_handle_many_comprovantes_pagamento (
     adminstrador_id_administradores uuid NOT NULL,
     comprovante_id_comprovantes_pagamento uuid NOT NULL,
@@ -322,3 +319,4 @@ CREATE TABLE schema_sjfjuristas.many_administradores_handle_many_propostas_empre
     CONSTRAINT fk_many_admin_prop_prop FOREIGN KEY (proposta_id_propostas_emprestimo) REFERENCES schema_sjfjuristas.propostas_emprestimo(proposta_id)
 );
 
+ALTER TABLE schema_sjfjuristas.parcelas_emprestimo ADD COLUMN pix_data_expiracao timestamp(6) with time zone;

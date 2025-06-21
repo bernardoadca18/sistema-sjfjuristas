@@ -58,6 +58,8 @@ services:
       /usr/bin/mc config host add minio http://minio:9000 admin 12345678;
       /usr/bin/mc mb minio/propostas-documentos --ignore-existing;
       /usr/bin/mc policy set public minio/propostas-documentos;
+      /usr/bin/mc mb minio/pix-qrcodes --ignore-existing;
+      /usr/bin/mc policy set public minio/pix-qrcodes;
       exit 0;
       "
     networks:
