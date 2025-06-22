@@ -41,3 +41,25 @@ INSERT INTO "schema_sjfjuristas"."status_emprestimo" (status_emprestimo_id, nome
 INSERT INTO "schema_sjfjuristas"."perfis_usuario" (perfil_id, nome_perfil) VALUES
 ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Cliente'),
 ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12', 'Administrador');
+
+ALTER TABLE schema_sjfjuristas.propostas_emprestimo
+    ADD COLUMN IF NOT EXISTS valor_ofertado numeric(16,2),
+    ADD COLUMN IF NOT EXISTS taxa_juros_ofertada numeric(16,4),
+    ADD COLUMN IF NOT EXISTS num_parcelas_ofertado integer,
+    ADD COLUMN IF NOT EXISTS data_deposito_prevista date,
+    ADD COLUMN IF NOT EXISTS data_inicio_pagamento_prevista date,
+    ADD COLUMN IF NOT EXISTS origem_ultima_oferta varchar(50),
+    ADD COLUMN IF NOT EXISTS motivo_recusa_cliente text;
+
+-- Adiciona os novos status necessários para o fluxo de negociação.
+-- A cláusula "ON CONFLICT (nome_status) DO NOTHING" impede erros de chave duplicada
+-- caso os status já existam na tabela.
+INSERT INTO schema_sjfjuristas.status_proposta (status_proposta_id, nome_status) VALUES
+('b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a27', 'Contraproposta Enviada'),
+('b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a28', 'Contraproposta Aceita'),
+('b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a29', 'Contraproposta Recusada')
+ON CONFLICT (nome_status) DO NOTHING;
+
+-- Adiciona o campo de expiração do PIX na tabela de parcelas, caso ainda não exista.
+ALTER TABLE schema_sjfjuristas.parcelas_emprestimo
+    ADD COLUMN IF NOT EXISTS pix_data_expiracao timestamp(6) with time zone;

@@ -25,10 +25,6 @@ public class CondicoesAprovadasDTO {
     @Positive(message = "O valor liberado deve ser positivo.")
     private BigDecimal valorLiberado;
 
-    @NotNull(message = "A taxa de juros diária é obrigatória.")
-    @Positive(message = "A taxa de juros deve ser positiva.")
-    private BigDecimal taxaJurosDiaria;
-
     @NotNull(message = "O número de parcelas é obrigatório.")
     @Positive(message = "O número de parcelas deve ser positivo.")
     private Integer numeroTotalParcelas;
@@ -36,4 +32,8 @@ public class CondicoesAprovadasDTO {
     @NotNull(message = "A data do primeiro vencimento é obrigatória.")
     @FutureOrPresent(message = "A data do primeiro vencimento não pode ser no passado.")
     private LocalDate dataPrimeiroVencimento;
+
+    @NotNull(message = "A taxa de juros diária é obrigatória.")
+    @Positive(message = "A taxa de juros deve ser positiva.")
+    private BigDecimal taxaJurosDiaria;
 }

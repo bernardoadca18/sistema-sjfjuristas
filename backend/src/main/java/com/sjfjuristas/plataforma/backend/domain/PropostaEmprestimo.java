@@ -10,6 +10,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -104,4 +105,26 @@ public class PropostaEmprestimo {
     @ManyToMany(mappedBy = "propostasEmprestimos")
     private Set<Administrador> administradores = new LinkedHashSet<>();
 
+    // Campos Contra proposta
+    @Column(name = "valor_ofertado", precision = 16, scale = 2)
+    private BigDecimal valorOfertado;
+
+    @Column(name = "taxa_juros_ofertada", precision = 16, scale = 4)
+    private BigDecimal taxaJurosOfertada;
+
+    @Column(name = "num_parcelas_ofertado")
+    private Integer numParcelasOfertado;
+
+    @Column(name = "data_deposito_prevista")
+    private LocalDate dataDepositoPrevista;
+    
+    @Column(name = "data_inicio_pagamento_prevista")
+    private LocalDate dataInicioPagamentoPrevista;
+
+    @Size(max = 50)
+    @Column(name = "origem_ultima_oferta", length = 50)
+    private String origemUltimaOferta;
+    
+    @Column(name = "motivo_recusa_cliente", length = Integer.MAX_VALUE)
+    private String motivoRecusaCliente;
 }
