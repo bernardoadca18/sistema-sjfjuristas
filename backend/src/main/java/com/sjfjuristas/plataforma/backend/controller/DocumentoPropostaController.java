@@ -7,9 +7,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
-
 
 @RestController
 @RequestMapping("/api/propostas")
@@ -19,14 +20,27 @@ public class DocumentoPropostaController
     @Autowired
     private DocumentoPropostaService documentoPropostaService;
 
-    @PostMapping("/{propostaId}/documentos")
-    public ResponseEntity<List<DocumentoPropostaResponseDTO>> uploadDocumentos(@PathVariable UUID propostaId, @RequestParam("files") MultipartFile[] files) {
-        
-        if (files == null || files.length == 0) {
+    @PostMapping(value = "/{propostaId}/documentos", consumes = "multipart/form-data")
+    public ResponseEntity<Void> uploadDocumentos(
+            @PathVariable UUID propostaId,
+            @RequestParam(value = "doc_frente", required = false) MultipartFile docFrente,
+            @RequestParam(value = "doc_verso", required = false) MultipartFile docVerso,
+            @RequestParam(value = "comprovante_residencia", required = false) MultipartFile compResidencia,
+            @RequestParam(value = "comprovante_renda", required = false) MultipartFile compRenda,
+            @RequestParam(value = "selfie", required = false) MultipartFile selfie) {
+
+        Map<String, MultipartFile> arquivosRecebidos = new HashMap<>();
+        if (docFrente != null) arquivosRecebidos.put("doc_frente", docFrente);
+        if (docVerso != null) arquivosRecebidos.put("doc_verso", docVerso);
+        if (compResidencia != null) arquivosRecebidos.put("comprovante_residencia", compResidencia);
+        if (compRenda != null) arquivosRecebidos.put("comprovante_renda", compRenda);
+        if (selfie != null) arquivosRecebidos.put("selfie", selfie);
+
+        if (arquivosRecebidos.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
-        
-        List<DocumentoPropostaResponseDTO> dtos = documentoPropostaService.salvarDocumentos(propostaId, files);
-        return ResponseEntity.ok(dtos);
+
+        documentoPropostaService.salvarDocumentos(propostaId, arquivosRecebidos);
+        return ResponseEntity.ok().build();
     }
 }

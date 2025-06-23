@@ -18,7 +18,7 @@ const Chat = () => {
     const [numericValue, setNumericValue] = useState<number | undefined>();
     
     const [termsAccepted, setTermsAccepted] = useState(false);
-    const [files, setFiles] = useState<FileList | null>(null);
+    const [file, setFile] = useState<File | null>(null);
 
     const [isAutoScrollActive, setIsAutoScrollActive] = useState(false);
 
@@ -65,6 +65,12 @@ const Chat = () => {
     ///
 
     const handleFinalSubmission = async (data: IFormData) => {
+        /*let formattedDateOfBirth = data.dateOfBirth;
+        if (data.dateOfBirth && data.dateOfBirth.includes('/')) {
+            const parts = data.dateOfBirth.split('/');
+            formattedDateOfBirth = `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }*/
+
         const proposalPayload = {
             valorSolicitado: data.loanValue,
             nomeCompleto: data.fullName,
@@ -72,58 +78,53 @@ const Chat = () => {
             email: data.email,
             whatsapp: data.whatsapp,
             termosAceitos: data.termsAcceptance,
+            dataNascimento: data.dateOfBirth?.replace(/\D/g, ''), 
+            numParcelasPreferido: data.installments
         }
 
         console.log("Enviando para a API o seguinte payload:", proposalPayload);
 
         try
         {
-            //const proposalResponse = await axios.post('http://localhost:8080/api/propostas', proposalPayload);
-            //const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
-            // const proposalResponse = await axios.post(`${apiUrl}/api/propostas`, proposalPayload);
             const proposalResponse = await axios.post(`/api/propostas`, proposalPayload);
             const proposalId = proposalResponse.data.id;
 
-            console.log('Proposta criada com sucesso! Resposta da API:', proposalResponse.data);
-            if (data.documentUpload && data.documentUpload.length > 0 && proposalId)
+            console.log('Proposta criada com sucesso! ID:', proposalId);
+            
+            if (proposalId)
             {
                 const fileFormData = new FormData();
-                Array.from(data.documentUpload).forEach(file => {
-                    fileFormData.append('files', file);
-                });
-
-                console.log(`Enviando ${data.documentUpload.length} arquivos para a proposta ID: ${proposalId}`);
                 
-                const fileResponse = await axios.post(
-                    `/api/propostas/${proposalId}/documentos`,
-                    fileFormData,
-                    {
-                        headers: {
-                            'Content-Type': 'multipart/form-data',
-                        },
-                    }
-                );
-                console.log('Arquivos enviados com sucesso!', fileResponse.data);
+                if (data.docFrente) fileFormData.append('doc_frente', data.docFrente);
+                if (data.docVerso) fileFormData.append('doc_verso', data.docVerso);
+                if (data.comprovanteResidencia) fileFormData.append('comprovante_residencia', data.comprovanteResidencia);
+                if (data.comprovanteRenda) fileFormData.append('comprovante_renda', data.comprovanteRenda);
+                if (data.selfie) fileFormData.append('selfie', data.selfie);
+
+                if (fileFormData.entries().next().value)
+                {
+                    console.log(`Enviando arquivos para a proposta ID: ${proposalId}`);
+                    const fileResponse = await axios.post(
+                        `/api/propostas/${proposalId}/documentos`,
+                        fileFormData,
+                        { headers: { 'Content-Type': 'multipart/form-data' } }
+                    );
+                    console.log('Arquivos enviados com sucesso!', fileResponse.data);
+                }
             }
         }
         catch (error)
         {
-            console.error("Ocorreu um erro ao enviar a proposta:");
-
-            if (axios.isAxiosError(error) && error.response) {
-                console.error('Status do erro:', error.response.status);
-                console.error('Detalhes do erro:', error.response.data);
-            } else if (axios.isAxiosError(error) && error.request) {
-                console.error('Erro de rede ou CORS. Nenhuma resposta recebida.');
-            } else {
-               console.error('Erro inesperado:', error);
+            console.error("Ocorreu um erro ao enviar a proposta:", error);
+            if (axios.isAxiosError(error)) {
+                 console.error('Detalhes do erro:', error.response?.data || error.message);
             }
         }
     }
 
     ///
 
-    const proceedToNextStep = (userResponseText : string, cleanValue: string | number | boolean | FileList | null) => {
+    const proceedToNextStep = (userResponseText : string, cleanValue: string | number | boolean | File | null) => {
         const currentMessageData = conversationSteps[currentStep];
         const messageIdentifier = currentMessageData.message_identifier;
 
@@ -143,8 +144,9 @@ const Chat = () => {
 
         setInputValue('');
         setNumericValue(undefined);
-        setFiles(null);
+        setFile(null);
         setTermsAccepted(false);
+
         const nextStepIndex = currentStep + 1;
         setCurrentStep(nextStepIndex);
         triggerNextBotMessage(nextStepIndex);
@@ -155,10 +157,13 @@ const Chat = () => {
         e.preventDefault();
         const currentMessageData = conversationSteps[currentStep];
 
-        if (currentMessageData.type === InputType.Number) {
+        if (currentMessageData.type === InputType.Number)
+        {
             if (!numericValue) return;
             proceedToNextStep(inputValue, numericValue);
-        } else {
+        }
+        else
+        {
             if (!inputValue.trim()) return;
             proceedToNextStep(inputValue, inputValue);
         }
@@ -166,17 +171,16 @@ const Chat = () => {
 
     const handleFileUpload = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        const currentMessageData = conversationSteps[currentStep];
+        const isOptional = currentMessageData.label?.includes("(Opcional)");
 
-        if (!files || files.length === 0)
+        if (!file && !isOptional)
         {
-            alert("Por favor, selecione pelo menos um arquivo.");
+            alert("Por favor, selecione um arquivo.");
             return;
         }
-
-        //TODO: Upload dos arquivos pro servidor
-
-        const fileNames = Array.from(files).map(f => f.name).join(', ');
-        proceedToNextStep(`Arquivos enviados: ${fileNames}`, files);
+        const responseText = file ? `Arquivo enviado: ${file.name}` : "Pular etapa opcional";
+        proceedToNextStep(responseText, file);
     }
 
     const handleTermsAcceptance = (e: FormEvent<HTMLFormElement>) => {
@@ -206,21 +210,22 @@ const Chat = () => {
         }, 0);
     }
 
-    const currentInputData = conversationSteps[currentStep];
-
-    //
-
     const renderInputArea = () => {
-        if (isChatFinished || !currentInputData || !currentInputData.type) return null;
+        if (isChatFinished || !conversationSteps[currentStep] || !conversationSteps[currentStep].type) return null;
 
+        const currentInputData = conversationSteps[currentStep];
         const shouldAutoFocus = messages.length > 1;
 
         switch (currentInputData.type) {
             
             case InputType.Number:
-                return (
-                    <form onSubmit={handleSendMessage} className='flex items-center gap-4'>
-                         <NumericFormat
+                const isCurrencyVal = (currentInputData.message_identifier === 'loanValue');
+                let correctComponent = null;
+
+                if (isCurrencyVal)
+                {
+                    correctComponent = (
+                        <NumericFormat
                             key={currentInputData.id}
                             value={inputValue}
                             onValueChange={(values) => {
@@ -238,6 +243,32 @@ const Chat = () => {
                             required
                             autoFocus={shouldAutoFocus}
                          />
+                    );
+                }
+                else
+                {
+                    correctComponent = (
+                        <NumericFormat
+                            key={currentInputData.id}
+                            value={inputValue}
+                            onValueChange={(values) => {
+                                setInputValue(values.formattedValue); // Para exibir no input
+                                setNumericValue(values.floatValue);   // Para enviar ao backend
+                            }}
+                            allowNegative={false}
+                            className="flex-1 w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-200 transition"
+                            placeholder={currentInputData.placeholder || 'Digite o valor...'}
+                            required
+                            autoFocus={shouldAutoFocus}
+                         />
+                    );
+                }
+
+                return (
+                    <form onSubmit={handleSendMessage} className='flex items-center gap-4'>
+                         {
+                            correctComponent
+                         }
                          <button type='submit' className='p-3 rounded-full hover:bg-yellow-100 focus:outline-none focus:ring-2 focus:bg-yellow-100 focus:ring-offset-2 transition-transform duration-150 ease-in-out transform hover:scale-105 disabled:bg-gray-300 disabled:cursor-not-allowed' disabled={isBotTyping || !numericValue}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                          </button>
@@ -285,18 +316,22 @@ const Chat = () => {
             case InputType.FileUpload:
                 return (
                     <form onSubmit={handleFileUpload} className='flex flex-col sm:flex-row items-center gap-4'>
-                        <label className="relative cursor-pointer bg-gray-100 border border-gray-300 rounded-full px-4 py-2 text-center w-full sm:w-auto">
-                            <span>{files ? `${files.length} arquivo(s)` : currentInputData.label || 'Selecionar Arquivos'}</span>
+                        <label className="relative cursor-pointer bg-gray-100 border border-gray-300 rounded-full px-4 py-2 text-center w-full sm:w-auto hover:bg-gray-200 transition">
+                            <span>{file ? file.name : currentInputData.label || 'Selecionar Arquivo'}</span>
                             <input 
                                 type="file" 
-                                multiple 
                                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                onChange={(e) => setFiles(e.target.files)}
+                                onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}
                             />
                         </label>
-                         <button type='submit' className='w-full sm:w-auto px-6 py-2 rounded-full bg-yellow-400 text-black font-semibold hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-300 disabled:bg-gray-300 disabled:cursor-not-allowed' disabled={isBotTyping || !files || files.length === 0}>
+                         <button type='submit' className='w-full sm:w-auto px-6 py-2 rounded-full bg-yellow-400 text-black font-semibold hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-300 disabled:bg-gray-300 disabled:cursor-not-allowed' disabled={isBotTyping || (!file && !currentInputData.label?.includes("(Opcional)"))}>
                             Confirmar Envio
                          </button>
+                         {currentInputData.label?.includes("(Opcional)") && !file && (
+                             <button type='button' onClick={() => proceedToNextStep("Pular etapa opcional", null)} className='w-full sm:w-auto px-6 py-2 rounded-full bg-gray-200 text-black font-semibold hover:bg-gray-300'>
+                                Pular
+                             </button>
+                         )}
                     </form>
                 );
             

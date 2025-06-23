@@ -35,8 +35,8 @@ public class PropostaAdminController
         Emprestimo emprestimoCriado = emprestimoService.criarEmprestimoEGerarParcelas(propostaId, condicoes);
         
 
-        // EmprestimoAdminResponseDTO response = ...
+        EmprestimoAdminResponseDTO response = new EmprestimoAdminResponseDTO(emprestimoCriado);
         
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

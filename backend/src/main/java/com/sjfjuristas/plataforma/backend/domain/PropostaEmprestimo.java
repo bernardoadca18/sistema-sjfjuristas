@@ -40,6 +40,12 @@ public class PropostaEmprestimo {
     @Column(name = "cpf_solicitante", nullable = false, length = 14)
     private String cpfSolicitante;
 
+    @Column(name = "data_nascimento_solicitante")
+    private LocalDate dataNascimentoSolicitante;
+
+    @Column(name = "num_parcelas_preferido")
+    private Integer numParcelasPreferido;
+
     @Size(max = 255)
     @NotNull
     @Column(name = "email_solicitante", nullable = false)

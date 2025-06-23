@@ -41,15 +41,24 @@ public class PropostaService {
 
         Usuario usuario = usuarioRepository.findByCpf(dto.getCpf()).orElseGet(() -> {
             Usuario novoUsuario = new Usuario();
+
             novoUsuario.setNomeCompleto(dto.getNomeCompleto());
             novoUsuario.setCpf(dto.getCpf());
             novoUsuario.setEmail(dto.getEmail());
             novoUsuario.setTelefoneWhatsapp(dto.getWhatsapp());
-            // Definir um perfil padrão "Cliente" aqui
-            PerfilUsuario perfilUsuarioCliente = perfilUsuarioRepository.findByNomePerfil("Cliente").get();
+            novoUsuario.setDataNascimento(dto.getDataNascimento());
+
+            
+            PerfilUsuario perfilUsuarioCliente = perfilUsuarioRepository.findByNomePerfil("Cliente").orElseThrow(() -> new RuntimeException("Perfil 'Cliente' não encontrado."));
             novoUsuario.setPerfilIdPerfisusuario(perfilUsuarioCliente);
             return usuarioRepository.save(novoUsuario);
         });
+
+        if (usuario.getDataNascimento() == null)
+        {
+            usuario.setDataNascimento(dto.getDataNascimento());
+            usuarioRepository.save(usuario);
+        }
 
         StatusProposta statusInicial = statusPropostaRepository.findByNomeStatus("Pendente de Análise").orElseThrow(() -> new RuntimeException("Status de proposta 'Pendente de Análise' não encontrado."));
 
