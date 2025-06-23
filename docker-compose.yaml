@@ -10,8 +10,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./backend/schema.sql:/docker-entrypoint-initdb.d/1-init-schema.sql
-      - ./db/base_info.sql:/docker-entrypoint-initdb.d/2-base-info.sql
+      - ./db/script.sql:/docker-entrypoint-initdb.d/init.sql
       - db_data:/var/lib/postgresql/data
     networks:
       - sjf-network
@@ -45,21 +44,30 @@ services:
     volumes:
       - minio_data:/data
     command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - sjf-network
 
   create-bucket:
     image: minio/mc
     depends_on:
-      minio:
-        condition: service_started
+      - minio
     entrypoint: >
       /bin/sh -c "
-      /usr/bin/mc config host add minio http://minio:9000 admin 12345678;
+      echo 'Esperando o Minio ficar pronto...';
+      until /usr/bin/mc alias set minio http://minio:9000 admin 12345678; do
+          echo '...ainda esperando' && sleep 1;
+      done;
+      echo 'Minio pronto! Criando buckets...';
       /usr/bin/mc mb minio/propostas-documentos --ignore-existing;
-      /usr/bin/mc policy set public minio/propostas-documentos;
+      /usr/bin/mc anonymous set public minio/propostas-documentos;
       /usr/bin/mc mb minio/pix-qrcodes --ignore-existing;
-      /usr/bin/mc policy set public minio/pix-qrcodes;
+      /usr/bin/mc anonymous set public minio/pix-qrcodes;
+      echo 'Buckets criados e políticas aplicadas com sucesso!';
       exit 0;
       "
     networks:
@@ -71,7 +79,7 @@ services:
     restart: unless-stopped
     depends_on:
       - db
-      - minio
+      - create-bucket
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/sjfjuristas
       - MINIO_URL=http://minio:9000
