@@ -69,6 +69,8 @@ public class PropostaService {
         novaProposta.setEmailSolicitante(dto.getEmail());
         novaProposta.setTelefoneWhatsappSolicitante(dto.getWhatsapp());
         novaProposta.setTermosAceitosLp(dto.getTermosAceitos());
+        novaProposta.setDataNascimentoSolicitante(dto.getDataNascimento());
+        novaProposta.setNumParcelasPreferido(dto.getNumParcelasPreferido());
 
         // Dados preenchidos pelo backend
         novaProposta.setDataSolicitacao(OffsetDateTime.now());

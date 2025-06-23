@@ -33,14 +33,15 @@ public class EmprestimoService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    @Autowired
-    private ConfiguracaoService configuracaoService;
+    //@Autowired
+    //private ConfiguracaoService configuracaoService;
 
     @Transactional
     public Emprestimo criarEmprestimoEGerarParcelas(UUID propostaId, CondicoesAprovadasDTO condicoes) 
     {
         
-        BigDecimal taxaJurosDiaria = configuracaoService.getTaxaJurosDiaria();
+        //BigDecimal taxaJurosDiaria = configuracaoService.getTaxaJurosDiaria();
+        BigDecimal taxaJurosDiaria =  condicoes.getTaxaJurosDiaria();
         
         PropostaEmprestimo proposta = propostaRepository.findById(propostaId)
                 .orElseThrow(() -> new IllegalArgumentException("Proposta não encontrada."));
