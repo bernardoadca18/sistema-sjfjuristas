@@ -1,25 +1,23 @@
 package com.sjfjuristas.plataforma.backend.service;
 
-import com.sjfjuristas.plataforma.backend.domain.PerfilUsuario;
-import com.sjfjuristas.plataforma.backend.domain.PropostaEmprestimo;
-import com.sjfjuristas.plataforma.backend.domain.StatusProposta;
-import com.sjfjuristas.plataforma.backend.domain.Usuario;
+import com.sjfjuristas.plataforma.backend.domain.*;
 import com.sjfjuristas.plataforma.backend.dto.PropostasEmprestimo.ContrapropostaAdminRequestDTO;
+import com.sjfjuristas.plataforma.backend.dto.PropostasEmprestimo.PropostaHistoricoResponseDTO;
 import com.sjfjuristas.plataforma.backend.dto.PropostasEmprestimo.PropostaRequestDTO;
 import com.sjfjuristas.plataforma.backend.dto.PropostasEmprestimo.PropostaResponseDTO;
-import com.sjfjuristas.plataforma.backend.repository.PerfilUsuarioRepository;
-import com.sjfjuristas.plataforma.backend.repository.PropostaEmprestimoRepository;
-import com.sjfjuristas.plataforma.backend.repository.StatusPropostaRepository;
-import com.sjfjuristas.plataforma.backend.repository.UsuarioRepository;
+import com.sjfjuristas.plataforma.backend.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.UUID;
-import com.sjfjuristas.plataforma.backend.domain.Ocupacao;
-import com.sjfjuristas.plataforma.backend.repository.OcupacaoRepository;
+import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import com.sjfjuristas.plataforma.backend.dto.PropostasEmprestimo.RespostaClienteDTO;
 
 
@@ -40,6 +38,9 @@ public class PropostaService
 
     @Autowired
     private OcupacaoRepository ocupacaoRepository;
+
+    @Autowired
+    private PropostaHistoricoRepository propostaHistoricoRepository;
 
     @Transactional
     public PropostaResponseDTO criarProposta(PropostaRequestDTO dto, HttpServletRequest request) {
@@ -131,14 +132,20 @@ public class PropostaService
     {
         PropostaEmprestimo proposta = propostaRepository.findById(propostaId).orElseThrow(() -> new EntityNotFoundException("Proposta não encontrada"));
 
+        String statusAnterior = proposta.getStatusPropostaIdStatusproposta().getNomeStatus();
+
         proposta.setValorOfertado(dto.getValorOfertado());
         proposta.setTaxaJurosOfertada(dto.getTaxaJurosOfertada());
         proposta.setNumParcelasOfertado(dto.getNumParcelasOfertado());
         proposta.setDataDepositoPrevista(dto.getDataDepositoPrevista());
         proposta.setDataInicioPagamentoPrevista(dto.getDataInicioPagamentoPrevista());
         proposta.setOrigemUltimaOferta("ADMIN");
+
+        String novoStatusNome = "Contraproposta Enviada";
         
-        atualizarStatus(propostaId, "Contraproposta Enviada");
+        atualizarStatus(propostaId, novoStatusNome);
+
+        criarRegistroHistorico(proposta, "ADMIN", novoStatusNome, null, "Envio de contraproposta pelo admin.");
         
         // TODO: Enviar notificação para o cliente
         
@@ -150,8 +157,11 @@ public class PropostaService
     {
         PropostaEmprestimo proposta = propostaRepository.findById(propostaId).orElseThrow(() -> new EntityNotFoundException("Proposta não encontrada"));
         
+        String novoStatusNome = "Negada";
         proposta.setMotivoNegacao(motivo);
-        atualizarStatus(propostaId, "Negada");
+        criarRegistroHistorico(proposta, "ADMIN", novoStatusNome, motivo, "Proposta negada pelo administrador.");
+
+        atualizarStatus(propostaId, novoStatusNome);
 
         // TODO: Implementar o envio de notificação para o cliente sobre a recusa.
         
@@ -163,26 +173,102 @@ public class PropostaService
     public PropostaEmprestimo processarRespostaCliente(UUID propostaId, RespostaClienteDTO resposta)
     {
         PropostaEmprestimo proposta = propostaRepository.findById(propostaId).orElseThrow(() -> new EntityNotFoundException("Proposta não encontrada"));
+        String novoStatusNome = "";
+        String observacao = "";
 
         switch (resposta.getAcaoCliente())
         {
             case ACEITAR:
-                atualizarStatus(propostaId, "Contraproposta Aceita");
+                novoStatusNome = "Contraproposta Aceita";
+                observacao = "Cliente aceitou a contraproposta.";
+                
                 break;
             case RECUSAR:
+                novoStatusNome = "Contraproposta Recusada";
                 proposta.setMotivoRecusaCliente(resposta.getMotivoRecusa());
-                atualizarStatus(propostaId, "Contraproposta Recusada");
+                observacao = "Cliente recusou a contraproposta.";
+
                 break;
             case CONTRAPROPOR:
+                novoStatusNome = "Pendente de Análise";
                 proposta.setValorOfertado(resposta.getValorContrapropostaOpt().orElseThrow(() -> new IllegalArgumentException("Valor da contraproposta é obrigatório.")));
                 proposta.setNumParcelasOfertado(resposta.getNumParcelasContrapropostaOpt().orElseThrow(() -> new IllegalArgumentException("Número de parcelas da contraproposta é obrigatório.")));
                 proposta.setOrigemUltimaOferta("CLIENTE");
-                atualizarStatus(propostaId, "Pendente de Análise");
+                observacao = "Cliente enviou uma nova contraproposta.";
+                
                 break;
             default:
                 throw new IllegalArgumentException("Ação inválida.");
         }
 
+        criarRegistroHistorico(proposta, "CLIENTE", novoStatusNome, resposta.getMotivoRecusa(), observacao);
+        atualizarStatus(propostaId, novoStatusNome);
+
         return propostaRepository.save(proposta);
+    }
+
+    private void criarRegistroHistorico(PropostaEmprestimo proposta, String ator, String statusNovo, String motivoRecusa, String observacoes) {
+        PropostaHistorico historico = new PropostaHistorico();
+        historico.setProposta(proposta);
+        historico.setAtorAlteracao(ator);
+        historico.setDataAlteracao(OffsetDateTime.now());
+
+        // Captura o estado ANTES da alteração
+        PropostaEmprestimo estadoAnterior = propostaRepository.findById(proposta.getId()).orElse(proposta);
+        historico.setStatusAnterior(estadoAnterior.getStatusPropostaIdStatusproposta().getNomeStatus());
+        historico.setValorAnterior(estadoAnterior.getValorOfertado());
+        historico.setNumParcelasAnterior(estadoAnterior.getNumParcelasOfertado());
+        historico.setTaxaJurosAnterior(estadoAnterior.getTaxaJurosOfertada());
+
+        // Captura o estado NOVO
+        historico.setStatusNovo(statusNovo);
+        historico.setValorNovo(proposta.getValorOfertado());
+        historico.setNumParcelasNovo(proposta.getNumParcelasOfertado());
+        historico.setTaxaJurosNova(proposta.getTaxaJurosOfertada());
+
+        historico.setMotivoRecusa(motivoRecusa);
+        historico.setObservacoes(observacoes);
+
+        propostaHistoricoRepository.save(historico);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PropostaHistoricoResponseDTO> getHistoricoProposta(UUID propostaId, Pageable pageable)
+    {
+        if (!propostaRepository.existsById(propostaId))
+        {
+            throw new EntityNotFoundException("Proposta não encontrada");
+        }
+        
+        Page<PropostaHistorico> paginaHistorico = propostaHistoricoRepository.findByPropostaIdOrderByDataAlteracaoDesc(propostaId, pageable);
+
+        return paginaHistorico.map(h -> PropostaHistoricoResponseDTO.builder()
+        .id(h.getId())
+        .dataAlteracao(h.getDataAlteracao())
+        .atorAlteracao(h.getAtorAlteracao())
+        .statusAnterior(h.getStatusAnterior())
+        .statusNovo(h.getStatusNovo())
+        .valorAnterior(h.getValorAnterior())
+        .valorNovo(h.getValorNovo())
+        .numParcelasAnterior(h.getNumParcelasAnterior())
+        .numParcelasNovo(h.getNumParcelasNovo())
+        .taxaJurosAnterior(h.getTaxaJurosAnterior())
+        .taxaJurosNova(h.getTaxaJurosNova())
+        .motivoRecusa(h.getMotivoRecusa())
+        .observacoes(h.getObservacoes())
+        .build());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PropostaHistoricoResponseDTO> getHistoricoPropostaCliente(UUID propostaId, UUID clienteId, Pageable pageable)
+    {
+        PropostaEmprestimo proposta = propostaRepository.findById(propostaId).orElseThrow(() -> new EntityNotFoundException("Proposta não encontrada"));
+
+        if (!proposta.getUsuarioIdUsuarios().getId().equals(clienteId))
+        {
+            throw new org.springframework.security.access.AccessDeniedException("Acesso negado.");
+        }
+
+        return getHistoricoProposta(propostaId, pageable);
     }
 }

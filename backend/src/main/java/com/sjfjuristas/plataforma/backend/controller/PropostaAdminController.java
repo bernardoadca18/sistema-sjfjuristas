@@ -5,6 +5,7 @@ import com.sjfjuristas.plataforma.backend.domain.PropostaEmprestimo;
 import com.sjfjuristas.plataforma.backend.dto.Emprestimos.CondicoesAprovadasDTO;
 import com.sjfjuristas.plataforma.backend.dto.Emprestimos.EmprestimoAdminResponseDTO;
 import com.sjfjuristas.plataforma.backend.dto.PropostasEmprestimo.ContrapropostaAdminRequestDTO;
+import com.sjfjuristas.plataforma.backend.dto.PropostasEmprestimo.PropostaHistoricoResponseDTO;
 import com.sjfjuristas.plataforma.backend.dto.PropostasEmprestimo.PropostaResponseDTO;
 import com.sjfjuristas.plataforma.backend.service.EmprestimoService;
 import com.sjfjuristas.plataforma.backend.service.PropostaService;
@@ -13,6 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.domain.Sort;
 import java.util.UUID;
 
 @RestController
@@ -60,5 +65,12 @@ public class PropostaAdminController
     {
         propostaService.negarProposta(propostaId, motivo);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{propostaId}/historico")
+    public ResponseEntity<Page<PropostaHistoricoResponseDTO>> getHistoricoPropostaAdmin(@PathVariable UUID propostaId, @PageableDefault(page = 0, size = 10, sort = "dataAlteracao", direction = Sort.Direction.DESC) Pageable pageable)
+    {
+        Page<PropostaHistoricoResponseDTO> historico = propostaService.getHistoricoProposta(propostaId, pageable);
+        return ResponseEntity.ok(historico);
     }
 }

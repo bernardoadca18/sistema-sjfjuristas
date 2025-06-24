@@ -2,6 +2,9 @@ package com.sjfjuristas.plataforma.backend.service;
 
 import com.sjfjuristas.plataforma.backend.domain.*;
 import com.sjfjuristas.plataforma.backend.repository.*;
+
+import jakarta.persistence.EntityNotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +15,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import com.sjfjuristas.plataforma.backend.dto.Emprestimos.EmprestimoClienteResponseDTO;
 
 @Service
 public class EmprestimoService {
@@ -125,4 +131,15 @@ public class EmprestimoService {
         BigDecimal denominador = umMaisIPotN.subtract(BigDecimal.ONE);
         return valorPrincipal.multiply(numerador).divide(denominador, 2, RoundingMode.HALF_UP);
     }
+
+    public Page<EmprestimoClienteResponseDTO> getEmprestimosDoCliente(UUID clienteId, Pageable pageable)
+    {
+        Usuario usuario = usuarioRepository.findById(clienteId).orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
+
+        Page<Emprestimo> emprestimosPage = emprestimoRepository.findByUsuarioIdUsuarios(usuario, pageable);
+        
+        return emprestimosPage.map(EmprestimoClienteResponseDTO::new);
+    }
+
+    
 }

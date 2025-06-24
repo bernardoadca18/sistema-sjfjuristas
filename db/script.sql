@@ -511,3 +511,22 @@ ALTER TABLE schema_sjfjuristas.propostas_emprestimo
     ADD COLUMN IF NOT EXISTS proposito_emprestimo VARCHAR(255),
     ADD COLUMN IF NOT EXISTS estado_civil VARCHAR(50),
     ADD COLUMN IF NOT EXISTS possui_imovel_veiculo BOOLEAN;
+
+CREATE TABLE schema_sjfjuristas.propostas_historico (
+    historico_id uuid NOT NULL DEFAULT gen_random_uuid(),
+    proposta_id_propostas_emprestimo uuid NOT NULL,
+    data_alteracao timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP,
+    ator_alteracao varchar(50) NOT NULL, -- 'ADMIN' ou 'CLIENTE'
+    status_anterior varchar(100),
+    status_novo varchar(100),
+    valor_anterior numeric(16,2),
+    valor_novo numeric(16,2),
+    num_parcelas_anterior integer,
+    num_parcelas_novo integer,
+    taxa_juros_anterior numeric(16,4),
+    taxa_juros_nova numeric(16,4),
+    motivo_recusa text,
+    observacoes text,
+    PRIMARY KEY (historico_id),
+    CONSTRAINT fk_historico_proposta FOREIGN KEY (proposta_id_propostas_emprestimo) REFERENCES schema_sjfjuristas.propostas_emprestimo(proposta_id) ON DELETE CASCADE
+);

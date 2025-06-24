@@ -1,5 +1,6 @@
 package com.sjfjuristas.plataforma.backend.dto.Emprestimos;
 
+import com.sjfjuristas.plataforma.backend.domain.Emprestimo;
 import com.sjfjuristas.plataforma.backend.dto.ParcelaEmprestimo.ParcelaEmprestimoSummaryDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,4 +30,20 @@ public class EmprestimoClienteResponseDTO {
     private BigDecimal saldoDevedorAtual;
     private LocalDate dataInicioCobrancaParcelas;
     private ParcelaEmprestimoSummaryDTO proximaParcela; // Opcional
+
+    public EmprestimoClienteResponseDTO(Emprestimo entity)
+    {
+        this.id = entity.getId();
+        this.valorContratado = entity.getValorContratado();
+        this.valorLiberado = entity.getValorLiberado();
+        this.taxaJurosDiariaEfetiva = entity.getTaxaJurosDiariaEfetiva();
+        this.numeroTotalParcelas = entity.getNumeroTotalParcelas();
+        this.valorParcelaDiaria = entity.getValorParcelaDiaria();
+        this.dataContratacao = entity.getDataContratacao();
+        this.dataPrimeiroVencimento = entity.getDataPrimeiroVencimento();
+        this.dataUltimoVencimento = entity.getDataUltimoVencimento();
+        this.statusEmprestimoNome = entity.getStatusEmprestimoIdStatusemprestimo().getNomeStatus();
+        this.saldoDevedorAtual = entity.getSaldoDevedorAtual();
+        this.dataInicioCobrancaParcelas = entity.getDataInicioCobrancaParcelas();
+    }
 }

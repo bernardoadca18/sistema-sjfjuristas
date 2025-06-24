@@ -8,10 +8,13 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Repository
 public interface EmprestimoRepository extends JpaRepository<Emprestimo, UUID> {
     List<Emprestimo> findByUsuarioIdUsuarios(Usuario usuario);
+    Page<Emprestimo> findByUsuarioIdUsuarios(Usuario usuario, Pageable pageable);
     List<Emprestimo> findByStatusEmprestimoIdStatusemprestimo(StatusEmprestimo statusEmprestimo);
     Optional<Emprestimo> findByPropostaIdPropostasemprestimo_Id(UUID id);
 }
