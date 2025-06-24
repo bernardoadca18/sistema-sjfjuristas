@@ -1,9 +1,13 @@
-export interface IFormData {
+export interface IFormData
+{
     loanValue?: number;
     fullName?: string;
     cpf?: string;
     dateOfBirth?: string;
     installments?: number;
+    occupationId?: string;
+    otherOccupation?: string;
+    monthlyIncome?: number;
     email?: string;
     whatsapp?: string;
     docFrente?: File;
@@ -14,15 +18,18 @@ export interface IFormData {
     termsAcceptance?: boolean;
 }
 
-export enum InputType {
+export enum InputType
+{
     Text = 1,
     Number = 2,
     Date = 3,
     FileUpload = 4,
     Checkbox = 5,
+    Select = 6,
 }
 
-export interface Message {
+export interface Message
+{
     id: number;
     text: string;
     sender: 'user' | 'bot';
@@ -82,6 +89,24 @@ export const conversationSteps: Message[] = [
         min: 30,
         max: 180,
         errorMessage: "Por favor, escolha um número de parcelas entre 30 e 180."
+    },
+    {
+        id: 4.1,
+        text: 'Legal! Agora, nos diga qual é a sua ocupação principal. Se não encontrar na lista, selecione "Outros".',
+        sender: 'bot',
+        message_identifier: "occupationId",
+        label: "Selecione sua ocupação",
+        type: InputType.Select,
+    },
+    {
+        id: 4.2,
+        text: 'Por favor, informe sua receita mensal total (incluindo salários, aluguéis, etc.).',
+        sender: 'bot',
+        placeholder: "R$ 2.000,00",
+        message_identifier: "monthlyIncome",
+        type: InputType.Number,
+        min: 0,
+        errorMessage: 'Por favor, insira um valor válido.'
     },
     {
         id: 5,

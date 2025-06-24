@@ -19,11 +19,10 @@ public class PropostaController {
     private PropostaService propostaService;
 
     @PostMapping
-    public ResponseEntity<PropostaResponseDTO> receberProposta(
-            @Valid @RequestBody PropostaRequestDTO propostaDTO,
-            HttpServletRequest request
-    ) {
+    public ResponseEntity<PropostaResponseDTO> receberProposta( @Valid @RequestBody PropostaRequestDTO propostaDTO, HttpServletRequest request ) 
+    {
         PropostaResponseDTO propostaCriadaDTO = propostaService.criarProposta(propostaDTO, request);
+        
         return ResponseEntity.status(HttpStatus.CREATED).body(propostaCriadaDTO);
     }
 }

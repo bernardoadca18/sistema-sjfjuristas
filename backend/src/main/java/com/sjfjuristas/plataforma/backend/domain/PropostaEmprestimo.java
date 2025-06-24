@@ -111,7 +111,6 @@ public class PropostaEmprestimo {
     @ManyToMany(mappedBy = "propostasEmprestimos")
     private Set<Administrador> administradores = new LinkedHashSet<>();
 
-    // Campos Contra proposta
     @Column(name = "valor_ofertado", precision = 16, scale = 2)
     private BigDecimal valorOfertado;
 
@@ -133,4 +132,15 @@ public class PropostaEmprestimo {
     
     @Column(name = "motivo_recusa_cliente", length = Integer.MAX_VALUE)
     private String motivoRecusaCliente;
+
+    
+    @Column(name = "remuneracao_mensal_solicitante", precision = 16, scale = 2)
+    private BigDecimal remuneracaoMensalSolicitante;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ocupacao_id_ocupacoes")
+    private Ocupacao ocupacao;
+
+    @Column(name = "outra_ocupacao_solicitante")
+    private String outraOcupacaoSolicitante;
 }

@@ -11,19 +11,19 @@ import com.sjfjuristas.plataforma.backend.repository.PerfilUsuarioRepository;
 import com.sjfjuristas.plataforma.backend.repository.PropostaEmprestimoRepository;
 import com.sjfjuristas.plataforma.backend.repository.StatusPropostaRepository;
 import com.sjfjuristas.plataforma.backend.repository.UsuarioRepository;
-
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.OffsetDateTime;
 import java.util.UUID;
+import com.sjfjuristas.plataforma.backend.domain.Ocupacao;
+import com.sjfjuristas.plataforma.backend.repository.OcupacaoRepository;
 
 @Service
-public class PropostaService {
-
+public class PropostaService
+{
     @Autowired
     private PropostaEmprestimoRepository propostaRepository;
 
@@ -35,6 +35,9 @@ public class PropostaService {
 
     @Autowired
     private PerfilUsuarioRepository perfilUsuarioRepository;
+
+    @Autowired
+    private OcupacaoRepository ocupacaoRepository;
 
     @Transactional
     public PropostaResponseDTO criarProposta(PropostaRequestDTO dto, HttpServletRequest request) {
@@ -61,8 +64,9 @@ public class PropostaService {
         }
 
         StatusProposta statusInicial = statusPropostaRepository.findByNomeStatus("Pendente de Análise").orElseThrow(() -> new RuntimeException("Status de proposta 'Pendente de Análise' não encontrado."));
-
+        Ocupacao ocupacao = ocupacaoRepository.findById(dto.getOcupacaoId()).orElseThrow(() -> new IllegalArgumentException("Ocupação com ID " + dto.getOcupacaoId() + " não encontrada."));
         PropostaEmprestimo novaProposta = new PropostaEmprestimo();
+        
         novaProposta.setValorSolicitado(dto.getValorSolicitado());
         novaProposta.setNomeCompletoSolicitante(dto.getNomeCompleto());
         novaProposta.setCpfSolicitante(dto.getCpf());
@@ -71,6 +75,13 @@ public class PropostaService {
         novaProposta.setTermosAceitosLp(dto.getTermosAceitos());
         novaProposta.setDataNascimentoSolicitante(dto.getDataNascimento());
         novaProposta.setNumParcelasPreferido(dto.getNumParcelasPreferido());
+        novaProposta.setRemuneracaoMensalSolicitante(dto.getRemuneracaoMensal());
+        novaProposta.setOcupacao(ocupacao);
+
+        if ("Outros".equalsIgnoreCase(ocupacao.getNomeOcupacao()))
+        {
+            novaProposta.setOutraOcupacaoSolicitante(dto.getOutraOcupacao());
+        }
 
         // Dados preenchidos pelo backend
         novaProposta.setDataSolicitacao(OffsetDateTime.now());

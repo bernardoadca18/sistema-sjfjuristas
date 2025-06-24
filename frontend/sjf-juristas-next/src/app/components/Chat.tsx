@@ -6,24 +6,53 @@ import { theme } from '@/config/theme';
 import { PatternFormat, NumericFormat } from 'react-number-format';
 import axios from 'axios';
 
+interface Occupation
+{
+    id: string;
+    nome: string;
+}
+
 const Chat = () => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [currentStep, setCurrentStep] = useState(0);
     const [isBotTyping, setIsBotTyping] = useState(false);
     const [isChatFinished, setIsChatFinished] = useState(false);
-    
     const [inputValue, setInputValue] = useState('');
     const [formData, setFormData] = useState<IFormData>({});
-
     const [numericValue, setNumericValue] = useState<number | undefined>();
-    
     const [termsAccepted, setTermsAccepted] = useState(false);
     const [file, setFile] = useState<File | null>(null);
-
     const [isAutoScrollActive, setIsAutoScrollActive] = useState(false);
-
     const chatEndRef = useRef<HTMLDivElement>(null);
+    const [occupations, setOccupations] = useState<Occupation[]>([]);
+    const [selectedOccupation, setSelectedOccupation] = useState('');
+    const [otherOccupation, setOtherOccupation] = useState('');
 
+
+    const fetchOccupations = async () => {
+        try
+        {
+            const response = await axios.get('/api/ocupacoes');
+
+            const sortedOccupations = response.data.sort((a: Occupation, b: Occupation) => {
+                if (a.nome === 'Outros') return -1;
+                if (b.nome === 'Outros') return 1;
+                return a.nome.localeCompare(b.nome);
+            });
+            setOccupations(sortedOccupations);
+        }
+        catch (error)
+        {
+            console.error("Erro ao buscar ocupações:", error);
+        }
+    };
+
+    useEffect(() => {
+        const currentMessageData = conversationSteps[currentStep];
+        if (currentMessageData && currentMessageData.type === InputType.Select) {
+            fetchOccupations();
+        }
+    }, [currentStep]);
 
     useEffect(() => {
         if (isAutoScrollActive) {
@@ -54,23 +83,14 @@ const Chat = () => {
     }, [currentStep]);
 
 
-    // F
     useEffect(() => {
-        // Este efeito roda sempre que 'isChatFinished' ou 'formData' mudar.
-        // O bloco 'if' executa apenas quando o chat é finalizado.
         if (isChatFinished) {            
             handleFinalSubmission(formData);
         }
     }, [isChatFinished, formData]);
-    ///
+
 
     const handleFinalSubmission = async (data: IFormData) => {
-        /*let formattedDateOfBirth = data.dateOfBirth;
-        if (data.dateOfBirth && data.dateOfBirth.includes('/')) {
-            const parts = data.dateOfBirth.split('/');
-            formattedDateOfBirth = `${parts[2]}-${parts[1]}-${parts[0]}`;
-        }*/
-
         const proposalPayload = {
             valorSolicitado: data.loanValue,
             nomeCompleto: data.fullName,
@@ -79,7 +99,10 @@ const Chat = () => {
             whatsapp: data.whatsapp,
             termosAceitos: data.termsAcceptance,
             dataNascimento: data.dateOfBirth?.replace(/\D/g, ''), 
-            numParcelasPreferido: data.installments
+            numParcelasPreferido: data.installments,
+            remuneracaoMensal: data.monthlyIncome,
+            ocupacaoId: data.occupationId,
+            outraOcupacao: data.otherOccupation,
         }
 
         console.log("Enviando para a API o seguinte payload:", proposalPayload);
@@ -122,22 +145,26 @@ const Chat = () => {
         }
     }
 
-    ///
-
-    const proceedToNextStep = (userResponseText : string, cleanValue: string | number | boolean | File | null) => {
+    const proceedToNextStep = (userResponseText : string, cleanValue: string | number | boolean | File | null | Record<string, string | undefined>) => {
         const currentMessageData = conversationSteps[currentStep];
         const messageIdentifier = currentMessageData.message_identifier;
 
-        if (messageIdentifier) {
-            let displayText = userResponseText;
-
-            if (currentMessageData.mask) {
-                displayText = userResponseText; 
+        if (messageIdentifier)
+        {
+            if (typeof cleanValue === 'object' && cleanValue !== null && !(cleanValue instanceof File))
+            {
+                setFormData(prevData => ({ ...prevData, ...cleanValue }));
             }
-            setFormData(prevData => ({ ...prevData, [messageIdentifier]: cleanValue }));
-            const userMessage: Message = { id: Date.now(), text: displayText, sender: 'user' };
+            else
+            {
+                setFormData(prevData => ({ ...prevData, [messageIdentifier]: cleanValue }));
+            }
+    
+            const userMessage: Message = { id: Date.now(), text: userResponseText, sender: 'user' };
             setMessages(prev => [...prev, userMessage]);
-        } else {
+        }
+        else
+        {
             const userMessage: Message = { id: Date.now(), text: userResponseText, sender: 'user' };
             setMessages(prev => [...prev, userMessage]);
         }
@@ -146,12 +173,38 @@ const Chat = () => {
         setNumericValue(undefined);
         setFile(null);
         setTermsAccepted(false);
+        setSelectedOccupation('');
+        setOtherOccupation('');
 
         const nextStepIndex = currentStep + 1;
         setCurrentStep(nextStepIndex);
         triggerNextBotMessage(nextStepIndex);
     }
 
+    const handleSelectSubmit = (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const occupation = occupations.find(o => o.id === selectedOccupation);
+        if (!occupation) return;
+
+        if (occupation.nome === 'Outros' && !otherOccupation.trim())
+        {
+            alert('Por favor, especifique sua ocupação.');
+            return;
+        }
+
+        setFormData(prevData => ({
+            ...prevData,
+            occupationId: occupation.id,
+            otherOccupation: occupation.nome === 'Outros' ? otherOccupation : undefined,
+        }));
+        
+        const displayText = occupation.nome === 'Outros' ? `Outros: ${otherOccupation}` : occupation.nome;
+        proceedToNextStep(displayText, { occupationId: occupation.id, otherOccupation: otherOccupation });
+        
+        // Limpa os estados
+        setSelectedOccupation('');
+        setOtherOccupation('');
+    };
 
     const handleSendMessage = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -219,7 +272,7 @@ const Chat = () => {
         switch (currentInputData.type) {
             
             case InputType.Number:
-                const isCurrencyVal = (currentInputData.message_identifier === 'loanValue');
+                const isCurrencyVal = (currentInputData.message_identifier === 'loanValue' || currentInputData.message_identifier === 'monthlyIncome');
                 let correctComponent = null;
 
                 if (isCurrencyVal)
@@ -311,8 +364,7 @@ const Chat = () => {
                         </button>
                     </form>
                 );
-            
-            // LÓGICA DO FILE UPLOAD RESTAURADA
+
             case InputType.FileUpload:
                 return (
                     <form onSubmit={handleFileUpload} className='flex flex-col sm:flex-row items-center gap-4'>
@@ -334,8 +386,7 @@ const Chat = () => {
                          )}
                     </form>
                 );
-            
-            // LÓGICA DO CHECKBOX RESTAURADA
+
             case InputType.Checkbox:
                 return (
                     <form onSubmit={handleTermsAcceptance} className="flex flex-col sm:flex-row items-center gap-4 p-2">
@@ -349,6 +400,39 @@ const Chat = () => {
                             <span className="text-sm">{currentInputData.label}</span>
                         </label>
                         <button type='submit' className='w-full sm:w-auto px-6 py-2 rounded-full bg-yellow-400 text-black font-semibold hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-300 disabled:bg-gray-300 disabled:cursor-not-allowed' disabled={isBotTyping || !termsAccepted}>
+                            Confirmar
+                        </button>
+                    </form>
+                );
+
+            case InputType.Select:
+                return (
+                    <form onSubmit={handleSelectSubmit} className='flex flex-col items-stretch gap-4'>
+                        <select
+                            value={selectedOccupation}
+                            onChange={(e) => setSelectedOccupation(e.target.value)}
+                            className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-200 transition"
+                            required
+                        >
+                            <option value="" disabled>{currentInputData.label || 'Selecione uma opção'}</option>
+                            {occupations.map(occ => (
+                                <option key={occ.id} value={occ.id}>{occ.nome}</option>
+                            ))}
+                        </select>
+                        
+                        {/* Campo condicional para "Outros" */}
+                        {selectedOccupation && occupations.find(o => o.id === selectedOccupation)?.nome === 'Outros' && (
+                            <input
+                                type="text"
+                                value={otherOccupation}
+                                onChange={(e) => setOtherOccupation(e.target.value)}
+                                placeholder="Por favor, especifique sua ocupação"
+                                className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-200 transition"
+                                required
+                            />
+                        )}
+
+                        <button type='submit' className='px-6 py-2 rounded-full bg-yellow-400 text-black font-semibold hover:bg-yellow-500 disabled:bg-gray-300' disabled={isBotTyping || !selectedOccupation}>
                             Confirmar
                         </button>
                     </form>

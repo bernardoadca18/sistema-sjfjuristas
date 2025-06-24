@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
+import java.util.UUID;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
@@ -45,4 +45,13 @@ public class PropostaRequestDTO {
     @Min(value = 30, message = "O número mínimo de parcelas é 30.")
     @Max(value = 180, message = "O número máximo de parcelas é 180.")
     private Integer numParcelasPreferido;
+
+    @NotNull(message = "A remuneração mensal é obrigatória.")
+    @Positive(message = "A remuneração mensal deve ser um valor positivo.")
+    private BigDecimal remuneracaoMensal;
+
+    @NotNull(message = "A ocupação é obrigatória.")
+    private UUID ocupacaoId;
+
+    private String outraOcupacao;
 }
