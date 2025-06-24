@@ -20,6 +20,8 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 import com.sjfjuristas.plataforma.backend.domain.Ocupacao;
 import com.sjfjuristas.plataforma.backend.repository.OcupacaoRepository;
+import com.sjfjuristas.plataforma.backend.dto.PropostasEmprestimo.RespostaClienteDTO;
+
 
 @Service
 public class PropostaService
@@ -151,7 +153,36 @@ public class PropostaService
         proposta.setMotivoNegacao(motivo);
         atualizarStatus(propostaId, "Negada");
 
+        // TODO: Implementar o envio de notificação para o cliente sobre a recusa.
+        
         
         propostaRepository.save(proposta);
+    }
+
+    @Transactional
+    public PropostaEmprestimo processarRespostaCliente(UUID propostaId, RespostaClienteDTO resposta)
+    {
+        PropostaEmprestimo proposta = propostaRepository.findById(propostaId).orElseThrow(() -> new EntityNotFoundException("Proposta não encontrada"));
+
+        switch (resposta.getAcaoCliente())
+        {
+            case ACEITAR:
+                atualizarStatus(propostaId, "Contraproposta Aceita");
+                break;
+            case RECUSAR:
+                proposta.setMotivoRecusaCliente(resposta.getMotivoRecusa());
+                atualizarStatus(propostaId, "Contraproposta Recusada");
+                break;
+            case CONTRAPROPOR:
+                proposta.setValorOfertado(resposta.getValorContrapropostaOpt().orElseThrow(() -> new IllegalArgumentException("Valor da contraproposta é obrigatório.")));
+                proposta.setNumParcelasOfertado(resposta.getNumParcelasContrapropostaOpt().orElseThrow(() -> new IllegalArgumentException("Número de parcelas da contraproposta é obrigatório.")));
+                proposta.setOrigemUltimaOferta("CLIENTE");
+                atualizarStatus(propostaId, "Pendente de Análise");
+                break;
+            default:
+                throw new IllegalArgumentException("Ação inválida.");
+        }
+
+        return propostaRepository.save(proposta);
     }
 }

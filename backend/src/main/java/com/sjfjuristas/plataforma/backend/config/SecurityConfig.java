@@ -21,16 +21,21 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                //.csrf(csrf -> csrf.disable())
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/api/propostas/**", "/api/ocupacoes/**").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+        http.csrf(AbstractHttpConfigurer::disable).authorizeHttpRequests(auth -> auth
+
+            // Endpoints públicos
+            .requestMatchers("/api/auth/**", "/api/propostas/**", "/api/ocupacoes/**", "/api/cliente/**", "/api/admin/**").permitAll()
+            
+            // Endpoints de Administrador (exemplo, ajuste os perfis se necessário)
+            //.requestMatchers("/api/admin/**").hasAuthority("Administrador")
+            // Endpoints de Cliente
+            //.requestMatchers("/api/cliente/**").hasAuthority("Cliente")
+            // Qualquer outra requisição precisa estar autenticada
+            
+            .anyRequest().authenticated())
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authenticationProvider(authenticationProvider)
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         
         return http.build();
     }

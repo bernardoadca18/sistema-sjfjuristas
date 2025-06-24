@@ -39,4 +39,26 @@ public class PropostaAdminController
         
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    @PostMapping("/{propostaId}/contraproposta")
+    public ResponseEntity<PropostaResponseDTO> enviarContrapropostaAdmin(@PathVariable UUID propostaId, @Valid @RequestBody ContrapropostaAdminRequestDTO dto)
+    {
+        PropostaEmprestimo propostaAtualizada = propostaService.salvarContrapropostaAdmin(propostaId, dto);
+        PropostaResponseDTO response = new PropostaResponseDTO(
+            propostaAtualizada.getId(),
+            propostaAtualizada.getValorOfertado(),
+            propostaAtualizada.getNomeCompletoSolicitante(),
+            propostaAtualizada.getEmailSolicitante(),
+            propostaAtualizada.getDataSolicitacao(),
+            propostaAtualizada.getStatusPropostaIdStatusproposta().getNomeStatus()
+        );
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{propostaId}/negar")
+    public ResponseEntity<Void> negarProposta(@PathVariable UUID propostaId, @RequestBody String motivo)
+    {
+        propostaService.negarProposta(propostaId, motivo);
+        return ResponseEntity.ok().build();
+    }
 }

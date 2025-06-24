@@ -67,7 +67,7 @@ public class Usuario implements UserDetails{
 
     @ColumnDefault("true")
     @Column(name = "ativo")
-    private Boolean ativo;
+    private Boolean ativo = true;
 
     @Size(max = 255)
     @Column(name = "token_recuperacao_senha")
@@ -78,7 +78,7 @@ public class Usuario implements UserDetails{
 
     @ColumnDefault("false")
     @Column(name = "email_verificado")
-    private Boolean emailVerificado;
+    private Boolean emailVerificado = false;
 
     @Size(max = 255)
     @Column(name = "token_verificacao_email")
@@ -156,6 +156,6 @@ public class Usuario implements UserDetails{
 
     @Override
     public boolean isEnabled() {
-        return this.ativo; // Usa seu campo 'ativo' para determinar se o usuário está habilitado
+        return this.ativo;
     }
 }

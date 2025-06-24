@@ -63,6 +63,10 @@ public class EmprestimoService {
         
         novoEmprestimo.setValorContratado(condicoes.getValorContratado());
         novoEmprestimo.setValorLiberado(condicoes.getValorLiberado());
+
+        BigDecimal taxaJurosMensal = taxaJurosDiaria.max(new BigDecimal("30")).setScale(4, RoundingMode.HALF_UP);
+        novoEmprestimo.setTaxaJurosMensalEfetiva(taxaJurosMensal);
+        
         novoEmprestimo.setTaxaJurosDiariaEfetiva(taxaJurosDiaria);
         novoEmprestimo.setNumeroTotalParcelas(condicoes.getNumeroTotalParcelas());
         novoEmprestimo.setDataPrimeiroVencimento(condicoes.getDataPrimeiroVencimento());
