@@ -506,3 +506,8 @@ INSERT INTO schema_sjfjuristas.ocupacoes (nome_ocupacao) VALUES
 ('Web Designer'),
 ('Outros')
 ON CONFLICT (nome_ocupacao) DO NOTHING;
+
+ALTER TABLE schema_sjfjuristas.propostas_emprestimo
+    ADD COLUMN IF NOT EXISTS proposito_emprestimo VARCHAR(255),
+    ADD COLUMN IF NOT EXISTS estado_civil VARCHAR(50),
+    ADD COLUMN IF NOT EXISTS possui_imovel_veiculo BOOLEAN;

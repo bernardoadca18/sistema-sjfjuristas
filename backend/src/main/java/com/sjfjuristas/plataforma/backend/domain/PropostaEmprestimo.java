@@ -8,7 +8,6 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -143,4 +142,13 @@ public class PropostaEmprestimo {
 
     @Column(name = "outra_ocupacao_solicitante")
     private String outraOcupacaoSolicitante;
+
+    @Column(name = "proposito_emprestimo")
+    private String propositoEmprestimo;
+
+    @Column(name = "estado_civil")
+    private String estadoCivil;
+
+    @Column(name = "possui_imovel_veiculo")
+    private Boolean possuiImovelVeiculo;
 }

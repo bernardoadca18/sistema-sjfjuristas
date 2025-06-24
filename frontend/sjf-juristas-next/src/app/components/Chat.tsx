@@ -28,6 +28,10 @@ const Chat = () => {
     const [selectedOccupation, setSelectedOccupation] = useState('');
     const [otherOccupation, setOtherOccupation] = useState('');
 
+    const [propositoEmprestimo, setPropositoEmprestimo] = useState('');
+    const [estadoCivil, setEstadoCivil] = useState('');
+
+
 
     const fetchOccupations = async () => {
         try
@@ -103,6 +107,9 @@ const Chat = () => {
             remuneracaoMensal: data.monthlyIncome,
             ocupacaoId: data.occupationId,
             outraOcupacao: data.otherOccupation,
+            propositoEmprestimo: data.propositoEmprestimo,
+            estadoCivil: data.estadoCivil,
+            possuiImovelVeiculo: data.possuiImovelVeiculo,
         }
 
         console.log("Enviando para a API o seguinte payload:", proposalPayload);
@@ -145,7 +152,7 @@ const Chat = () => {
         }
     }
 
-    const proceedToNextStep = (userResponseText : string, cleanValue: string | number | boolean | File | null | Record<string, string | undefined>) => {
+    const proceedToNextStep = (userResponseText : string, cleanValue: string | number | boolean | File | null | Record<string, string | undefined> | { [x: string]: boolean; }) => {
         const currentMessageData = conversationSteps[currentStep];
         const messageIdentifier = currentMessageData.message_identifier;
 
@@ -175,6 +182,8 @@ const Chat = () => {
         setTermsAccepted(false);
         setSelectedOccupation('');
         setOtherOccupation('');
+        setEstadoCivil('');
+        setPropositoEmprestimo('');
 
         const nextStepIndex = currentStep + 1;
         setCurrentStep(nextStepIndex);
@@ -183,28 +192,57 @@ const Chat = () => {
 
     const handleSelectSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const occupation = occupations.find(o => o.id === selectedOccupation);
-        if (!occupation) return;
+        
+        const currentIdentifier = conversationSteps[currentStep].message_identifier;
 
-        if (occupation.nome === 'Outros' && !otherOccupation.trim())
+        if(currentIdentifier === 'occupationId')
         {
-            alert('Por favor, especifique sua ocupação.');
+            const occupation = occupations.find(o => o.id === selectedOccupation);
+            if (!occupation) return;
+
+            if (occupation.nome === 'Outros' && !otherOccupation.trim())
+            {
+                alert('Por favor, especifique sua ocupação.');
+                return;
+            }
+
+            const displayText = occupation.nome === 'Outros' ? `Outros: ${otherOccupation}` : occupation.nome;
+            proceedToNextStep(displayText, { occupationId: occupation.id, otherOccupation: otherOccupation });
+        }
+        else if (currentIdentifier === 'estadoCivil')
+        {
+            if (!estadoCivil) return;
+            proceedToNextStep(estadoCivil, { [currentIdentifier]: estadoCivil });
+        }
+        else if (currentIdentifier === 'propositoEmprestimo')
+        {
+            if (!propositoEmprestimo) return;
+            proceedToNextStep(propositoEmprestimo, { [currentIdentifier]: propositoEmprestimo });
+        }
+        else
+        {
+            console.error("Identificador de mensagem desconhecido:", currentIdentifier);
             return;
         }
-
-        setFormData(prevData => ({
-            ...prevData,
-            occupationId: occupation.id,
-            otherOccupation: occupation.nome === 'Outros' ? otherOccupation : undefined,
-        }));
-        
-        const displayText = occupation.nome === 'Outros' ? `Outros: ${otherOccupation}` : occupation.nome;
-        proceedToNextStep(displayText, { occupationId: occupation.id, otherOccupation: otherOccupation });
         
         // Limpa os estados
         setSelectedOccupation('');
         setOtherOccupation('');
+        setEstadoCivil('');
+        setPropositoEmprestimo('');
     };
+
+    const handleRadioSubmit = (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        if (!inputValue) return;
+        const booleanValue = inputValue.toLowerCase() === 'sim';
+        const currentIdentifier = conversationSteps[currentStep].message_identifier;
+
+       if(currentIdentifier) {
+            proceedToNextStep(inputValue, { [currentIdentifier]: booleanValue });
+        }
+    }
 
     const handleSendMessage = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -406,22 +444,42 @@ const Chat = () => {
                 );
 
             case InputType.Select:
+                const currentIdentifier = currentInputData.message_identifier;
+                let value: string = '';
+                let onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void = () => {};
+                let options: (Occupation | string)[] = [];
+
+                if (currentIdentifier === 'occupationId') {
+                    value = selectedOccupation;
+                    onChange = (e) => setSelectedOccupation(e.target.value);
+                    options = occupations;
+                } else if (currentIdentifier === 'estadoCivil') {
+                    value = estadoCivil;
+                    onChange = (e) => setEstadoCivil(e.target.value);
+                    options = currentInputData.options || [];
+                } else if (currentIdentifier === 'propositoEmprestimo') {
+                    value = propositoEmprestimo;
+                    onChange = (e) => setPropositoEmprestimo(e.target.value);
+                    options = currentInputData.options || [];
+                }
+
                 return (
                     <form onSubmit={handleSelectSubmit} className='flex flex-col items-stretch gap-4'>
                         <select
-                            value={selectedOccupation}
-                            onChange={(e) => setSelectedOccupation(e.target.value)}
+                            value={value}
+                            onChange={onChange}
                             className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-200 transition"
                             required
                         >
                             <option value="" disabled>{currentInputData.label || 'Selecione uma opção'}</option>
-                            {occupations.map(occ => (
-                                <option key={occ.id} value={occ.id}>{occ.nome}</option>
-                            ))}
+                            {options.map(opt => {
+                                const optValue = typeof opt === 'object' ? opt.id : opt;
+                                const optLabel = typeof opt === 'object' ? opt.nome : opt;
+                                return <option key={optValue} value={optValue}>{optLabel}</option>
+                            })}
                         </select>
-                        
-                        {/* Campo condicional para "Outros" */}
-                        {selectedOccupation && occupations.find(o => o.id === selectedOccupation)?.nome === 'Outros' && (
+
+                        {currentIdentifier === 'occupationId' && selectedOccupation && occupations.find(o => o.id === selectedOccupation)?.nome === 'Outros' && (
                             <input
                                 type="text"
                                 value={otherOccupation}
@@ -432,9 +490,33 @@ const Chat = () => {
                             />
                         )}
 
-                        <button type='submit' className='px-6 py-2 rounded-full bg-yellow-400 text-black font-semibold hover:bg-yellow-500 disabled:bg-gray-300' disabled={isBotTyping || !selectedOccupation}>
+                        <button type='submit' className='px-6 py-2 rounded-full bg-yellow-400 text-black font-semibold hover:bg-yellow-500 disabled:bg-gray-300' disabled={isBotTyping || !value}>
                             Confirmar
                         </button>
+                    </form>
+                );
+
+            case InputType.Radio:
+                return (
+                    <form onSubmit={handleRadioSubmit} className='flex flex-col sm:flex-row items-center justify-center gap-4 p-2'>
+                        <div className="flex gap-4">
+                            {
+                                currentInputData.options?.map((option) => (
+                                    <label key={option} className={`flex items-center gap-2 cursor-pointer p-3 rounded-lg border-2 transition-all ${inputValue === option ? 'border-yellow-400 bg-yellow-50' : 'border-gray-300'}`}>
+                                        <input
+                                            type="radio"
+                                            name={currentInputData.message_identifier}
+                                            value={option}
+                                            checked={inputValue === option}
+                                            onChange={(e) => setInputValue(e.target.value)}
+                                            className="h-4 w-4 text-yellow-500 focus:ring-yellow-400"
+                                        />
+                                        <span className="font-semibold">{option}</span>
+                                    </label>
+                                ))
+                            }
+                        </div>
+                        <button type='submit' className='w-full sm:w-auto px-6 py-2 rounded-full bg-yellow-400 text-black font-semibold hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-300 disabled:bg-gray-300 disabled:cursor-not-allowed' disabled={!inputValue}>Confirmar</button>
                     </form>
                 );
             

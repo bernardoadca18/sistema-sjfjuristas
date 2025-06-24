@@ -8,10 +8,8 @@ import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Data
@@ -54,4 +52,7 @@ public class PropostaRequestDTO {
     private UUID ocupacaoId;
 
     private String outraOcupacao;
+    private String propositoEmprestimo;
+    private String estadoCivil;
+    private Boolean possuiImovelVeiculo;
 }

@@ -77,6 +77,9 @@ public class PropostaService
         novaProposta.setNumParcelasPreferido(dto.getNumParcelasPreferido());
         novaProposta.setRemuneracaoMensalSolicitante(dto.getRemuneracaoMensal());
         novaProposta.setOcupacao(ocupacao);
+        novaProposta.setPropositoEmprestimo(dto.getPropositoEmprestimo());
+        novaProposta.setEstadoCivil(dto.getEstadoCivil());
+        novaProposta.setPossuiImovelVeiculo(dto.getPossuiImovelVeiculo());
 
         if ("Outros".equalsIgnoreCase(ocupacao.getNomeOcupacao()))
         {

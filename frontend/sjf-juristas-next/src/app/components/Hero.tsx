@@ -29,7 +29,7 @@ const Hero = () => {
       <button
         onClick={handleScrollToChat}
         style={{ backgroundColor: theme.colors.accent, color: theme.colors.textOnAccent }}
-        className="inline-block px-8 py-4 rounded-full font-bold text-lg transition-transform duration-300 hover:scale-105 animate-pulse"
+        className="inline-block px-8 py-4 rounded-full font-bold text-lg transition-transform duration-300 hover:scale-105 animate-pulse cursor-pointer"
       >
         Solicitar Agora!
       </button>

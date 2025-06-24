@@ -16,6 +16,9 @@ export interface IFormData
     comprovanteRenda?: File;
     selfie?: File;
     termsAcceptance?: boolean;
+    propositoEmprestimo?: string;
+    estadoCivil?: string;
+    possuiImovelVeiculo?: boolean;
 }
 
 export enum InputType
@@ -26,6 +29,7 @@ export enum InputType
     FileUpload = 4,
     Checkbox = 5,
     Select = 6,
+    Radio = 7,
 }
 
 export interface Message
@@ -44,6 +48,7 @@ export interface Message
     errorMessage?: string;
     minlength?: number;
     maxlength?: number;
+    options?: string[];
 }
 
 export const conversationSteps: Message[] = [
@@ -107,6 +112,46 @@ export const conversationSteps: Message[] = [
         type: InputType.Number,
         min: 0,
         errorMessage: 'Por favor, insira um valor válido.'
+    },
+    {
+        id: 4.3,
+        text: 'Qual o propósito do seu empréstimo? Isso nos ajuda a entender melhor suas necessidades.',
+        sender: 'bot',
+        message_identifier: "propositoEmprestimo",
+        type: InputType.Select,
+        label: "Selecione o propósito",
+        options: [
+            'Quitar dívidas',
+            'Investir no meu negócio',
+            'Reforma ou construção',
+            'Compra de veículo',
+            'Despesas médicas',
+            'Educação',
+            'Outros'
+        ]
+    },
+    {
+        id: 4.4,
+        text: 'Qual o seu estado civil?',
+        sender: 'bot',
+        message_identifier: "estadoCivil",
+        type: InputType.Select,
+        label: "Selecione o estado civil",
+        options: [
+            'Solteiro(a)',
+            'Casado(a)',
+            'Divorciado(a)',
+            'Viúvo(a)',
+            'União Estável'
+        ]
+    },
+    {
+        id: 4.5,
+        text: 'Você possui imóvel ou veículo próprio quitado?',
+        sender: 'bot',
+        message_identifier: "possuiImovelVeiculo",
+        type: InputType.Radio,
+        options: ['Sim', 'Não']
     },
     {
         id: 5,
