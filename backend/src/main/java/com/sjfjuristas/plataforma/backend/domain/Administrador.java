@@ -106,5 +106,4 @@ public class Administrador {
             joinColumns = @JoinColumn(name = "adminstrador_id_Administradores"),
             inverseJoinColumns = @JoinColumn(name = "proposta_id_PropostasEmprestimo"))
     private Set<PropostaEmprestimo> propostasEmprestimos = new LinkedHashSet<>();
-
 }

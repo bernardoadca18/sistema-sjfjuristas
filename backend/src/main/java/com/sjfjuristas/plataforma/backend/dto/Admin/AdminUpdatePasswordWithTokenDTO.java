@@ -4,13 +4,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Builder;
 import lombok.AllArgsConstructor;
-import java.util.UUID;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AdminUpdatePasswordRequestDTO
+public class AdminUpdatePasswordWithTokenDTO
 {
-    private String email;
+    private String token;
+    private String novaSenha;
+    private String confirmarNovaSenha;
 }
