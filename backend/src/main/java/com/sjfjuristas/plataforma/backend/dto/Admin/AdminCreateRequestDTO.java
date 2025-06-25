@@ -10,13 +10,13 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AdminCreateRequestDTO {
+public class AdminCreateRequestDTO
+{
     private String nomeCompleto;
     private String email;
     private String senha;
     private String confirmarSenha;
     private String telefoneContatoInterno;
-    private UUID perfilId;
     private String cargoInterno;
     private String departamento;
     private String matriculaFuncionario;

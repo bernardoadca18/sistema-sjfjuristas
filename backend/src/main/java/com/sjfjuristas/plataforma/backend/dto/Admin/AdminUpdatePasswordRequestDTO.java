@@ -10,12 +10,9 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AdminUpdateRequestDTO
+public class AdminUpdatePasswordRequestDTO
 {
-    private String nomeCompleto;
-    private String telefoneContatoInterno;
-    private String cargoInterno;
-    private String departamento;
-    private String matriculaFuncionario;
-    private boolean ativo;
+    private String senhaAtual;
+    private String novaSenha;
+    private String confirmarNovaSenha;
 }
