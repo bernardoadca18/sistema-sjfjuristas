@@ -28,8 +28,8 @@ public class TipoDocumentoCRUDController
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping
-    public ResponseEntity<List<TipoDocumentoResponseDTO>> getAllTiposDocumento()
+    @GetMapping("/non-paged")
+    public ResponseEntity<List<TipoDocumentoResponseDTO>> getAllTiposDocumentoNonPaged()
     {
         List<TipoDocumentoResponseDTO> response = tipoDocumentoCRUDService.getAllTiposDocumento();
         return ResponseEntity.ok(response);
@@ -42,7 +42,7 @@ public class TipoDocumentoCRUDController
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{nomeDocumento}")
+    @GetMapping("/nome-documento/{nomeDocumento}")
     public ResponseEntity<TipoDocumentoResponseDTO> getTipoDocumentoByNomeDocumento(@PathVariable String nomeDocumento)
     {
         TipoDocumentoResponseDTO response = tipoDocumentoCRUDService.getTipoDocumentoByTipoDocumento(nomeDocumento);

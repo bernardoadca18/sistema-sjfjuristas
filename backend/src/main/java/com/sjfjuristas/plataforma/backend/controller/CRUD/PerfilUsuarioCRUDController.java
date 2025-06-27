@@ -29,8 +29,8 @@ public class PerfilUsuarioCRUDController
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping
-    public ResponseEntity<List<PerfilUsuarioResponseDTO>> getAllPerfisUsuario()
+    @GetMapping("/non-paged")
+    public ResponseEntity<List<PerfilUsuarioResponseDTO>> getAllPerfisUsuarioNonPaged()
     {
         List<PerfilUsuarioResponseDTO> response = perfilUsuarioCRUDService.getAllPerfisUsuarios();
         return ResponseEntity.ok(response);
@@ -43,7 +43,7 @@ public class PerfilUsuarioCRUDController
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{nomePerfil}")
+    @GetMapping("/nome-perfil/{nomePerfil}")
     public ResponseEntity<PerfilUsuarioResponseDTO> getPerfilUsuarioByNomePerfil(@PathVariable String nomePerfil)
     {
         PerfilUsuarioResponseDTO response = perfilUsuarioCRUDService.getPerfilUsuarioByNomePerfil(nomePerfil);

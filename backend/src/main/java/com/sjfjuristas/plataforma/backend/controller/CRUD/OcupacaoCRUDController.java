@@ -28,8 +28,8 @@ public class OcupacaoCRUDController
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping
-    public ResponseEntity<List<OcupacaoResponseDTO>> getAllOcupacoes()
+    @GetMapping("/non-paged")
+    public ResponseEntity<List<OcupacaoResponseDTO>> getAllOcupacoesNonPaged()
     {
         List<OcupacaoResponseDTO> response = ocupacaoCRUDService.getAllOcupacoes();
         return ResponseEntity.ok(response);

@@ -28,8 +28,8 @@ public class TipoChavePixCRUDController
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping 
-    public ResponseEntity<List<TipoChavePixResponseDTO>> getAllTiposChavePix()
+    @GetMapping ("/non-paged")
+    public ResponseEntity<List<TipoChavePixResponseDTO>> getAllTiposChavePixNonPaged()
     {
         List<TipoChavePixResponseDTO> response = tipoChavePixCRUDService.getAllTiposChavePix();
         return ResponseEntity.ok(response);
@@ -42,7 +42,7 @@ public class TipoChavePixCRUDController
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{nomeTipo}")
+    @GetMapping("/nome-tipo/{nomeTipo}")
     public ResponseEntity<TipoChavePixResponseDTO> getTipoChavePixByNomeTipo(@PathVariable String nomeTipo)
     {
         TipoChavePixResponseDTO response = tipoChavePixCRUDService.getTipoChavePixByNomeTipo(nomeTipo);
@@ -63,7 +63,7 @@ public class TipoChavePixCRUDController
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<TipoChavePixResponseDTO> deleteTipoChavePix(@PathVariable UUID id)
     {
         tipoChavePixCRUDService.deleteTipoChavePix(id);

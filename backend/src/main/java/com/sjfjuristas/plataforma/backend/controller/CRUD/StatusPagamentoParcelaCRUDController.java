@@ -28,8 +28,8 @@ public class StatusPagamentoParcelaCRUDController
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping
-    public ResponseEntity<List<StatusPagamentoParcelaResponseDTO>> getAllStatusPagamentoParcela()
+    @GetMapping("/non-paged")
+    public ResponseEntity<List<StatusPagamentoParcelaResponseDTO>> getAllStatusPagamentoParcelaNonPaged()
     {
         List<StatusPagamentoParcelaResponseDTO> response = statusPagamentoParcelaCRUDService.getAllStatusPagamentoParcela();
         return ResponseEntity.ok(response);
@@ -42,7 +42,7 @@ public class StatusPagamentoParcelaCRUDController
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{nomeStatus}")
+    @GetMapping("/nome-status/{nomeStatus}")
     public ResponseEntity<StatusPagamentoParcelaResponseDTO> getStatusPagamentoParcelaByNomeStatus(@PathVariable String nomeStatus)
     {
         StatusPagamentoParcelaResponseDTO response = statusPagamentoParcelaCRUDService.getStatusPagamentoParcelaByNomeStatus(nomeStatus);

@@ -28,8 +28,8 @@ public class StatusPropostaCRUDController
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping
-    public ResponseEntity<List<StatusPropostaResponseDTO>> getAllStatusProposta()
+    @GetMapping("/non-paged")
+    public ResponseEntity<List<StatusPropostaResponseDTO>> getAllStatusPropostaNonPaged()
     {
         List<StatusPropostaResponseDTO> response = statusPropostaCRUDService.getAllStatusProposta();
         return ResponseEntity.ok(response);
@@ -42,7 +42,7 @@ public class StatusPropostaCRUDController
         return ResponseEntity.ok(response);
     }
     
-    @GetMapping("/{nomeStatus}")
+    @GetMapping("/nome-status/{nomeStatus}")
     public ResponseEntity<StatusPropostaResponseDTO> getStatusPropostaByNomeStatus(@PathVariable String nomeStatus)
     {
         StatusPropostaResponseDTO response = statusPropostaCRUDService.getStatusPropostaByNomeStatus(nomeStatus);
