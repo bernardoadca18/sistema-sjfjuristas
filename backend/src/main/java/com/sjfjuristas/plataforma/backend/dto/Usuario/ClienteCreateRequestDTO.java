@@ -9,7 +9,8 @@ import lombok.AllArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ClienteCreateRequestDTO {
+public class ClienteCreateRequestDTO
+{
     private String nomeCompleto;
     private String cpf;
     private String email;

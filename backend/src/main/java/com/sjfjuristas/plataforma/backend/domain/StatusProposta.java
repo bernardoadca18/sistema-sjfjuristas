@@ -16,7 +16,8 @@ import java.util.UUID;
 @Table(name = "\"StatusProposta\"", schema = "schema_sjfjuristas", uniqueConstraints = {
         @UniqueConstraint(name = "statusproposta_nome_status_uq", columnNames = {"nome_status"})
 })
-public class StatusProposta {
+public class StatusProposta
+{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "status_proposta_id", nullable = false)

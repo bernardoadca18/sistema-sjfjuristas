@@ -1,13 +1,9 @@
 package com.sjfjuristas.plataforma.backend.service.CRUD;
 
-
 import com.sjfjuristas.plataforma.backend.domain.Administrador;
 import com.sjfjuristas.plataforma.backend.dto.Admin.AdminUpdatePasswordRequestDTO;
 import com.sjfjuristas.plataforma.backend.dto.Admin.AdminUpdatePasswordWithOldPasswordDTO;
 import com.sjfjuristas.plataforma.backend.dto.Admin.AdminUpdatePasswordWithTokenDTO;
-import com.sjfjuristas.plataforma.backend.dto.Usuario.PasswordResetRequestDTO;
-import com.sjfjuristas.plataforma.backend.dto.Usuario.PasswordSetNewWithTokenDTO;
-import com.sjfjuristas.plataforma.backend.dto.Usuario.PasswordUpdateRequestDTO;
 import com.sjfjuristas.plataforma.backend.repository.AdministradorRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;

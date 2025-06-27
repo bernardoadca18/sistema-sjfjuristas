@@ -11,7 +11,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChavePixCreateRequestDTO {
+public class ChavePixCreateRequestDTO
+{
     private UUID tipoChavePixId;
     private String valorChave;
 }

@@ -4,9 +4,9 @@ import com.sjfjuristas.plataforma.backend.dto.Admin.AdminCreateRequestDTO;
 import com.sjfjuristas.plataforma.backend.dto.Admin.AdminResponseDTO;
 import com.sjfjuristas.plataforma.backend.dto.Admin.AdminUpdateRequestDTO;
 import com.sjfjuristas.plataforma.backend.service.CRUD.AdminCRUDService;
+
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.graphql.GraphQlProperties.Http;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;

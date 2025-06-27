@@ -12,9 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -132,7 +130,7 @@ public class PropostaService
     {
         PropostaEmprestimo proposta = propostaRepository.findById(propostaId).orElseThrow(() -> new EntityNotFoundException("Proposta não encontrada"));
 
-        String statusAnterior = proposta.getStatusPropostaIdStatusproposta().getNomeStatus();
+        //String statusAnterior = proposta.getStatusPropostaIdStatusproposta().getNomeStatus();
 
         proposta.setValorOfertado(dto.getValorOfertado());
         proposta.setTaxaJurosOfertada(dto.getTaxaJurosOfertada());

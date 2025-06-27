@@ -13,7 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.domain.Sort;
-import java.util.List;
 import java.util.UUID;
 import com.sjfjuristas.plataforma.backend.domain.Usuario;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

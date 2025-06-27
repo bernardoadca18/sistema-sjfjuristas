@@ -3,20 +3,15 @@ package com.sjfjuristas.plataforma.backend.service;
 import com.sjfjuristas.plataforma.backend.domain.DocumentoProposta;
 import com.sjfjuristas.plataforma.backend.domain.PropostaEmprestimo;
 import com.sjfjuristas.plataforma.backend.domain.TipoDocumento;
-import com.sjfjuristas.plataforma.backend.dto.DocumentoProposta.DocumentoPropostaResponseDTO;
 import com.sjfjuristas.plataforma.backend.repository.DocumentoPropostaRepository;
 import com.sjfjuristas.plataforma.backend.repository.PropostaEmprestimoRepository;
 import com.sjfjuristas.plataforma.backend.repository.TipoDocumentoRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
