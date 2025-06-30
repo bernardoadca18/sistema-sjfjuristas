@@ -25,7 +25,8 @@ import java.util.Collections;
         @UniqueConstraint(name = "usuarios_cpf_uq", columnNames = {"cpf"}),
         @UniqueConstraint(name = "usuarios_email_uq", columnNames = {"email"})
 })
-public class Usuario implements UserDetails{
+public class Usuario implements UserDetails
+{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "usuario_id", nullable = false)

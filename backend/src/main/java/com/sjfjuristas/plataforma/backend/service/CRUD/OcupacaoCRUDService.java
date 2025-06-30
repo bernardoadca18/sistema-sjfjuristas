@@ -6,11 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.sjfjuristas.plataforma.backend.dto.CRUD.OcupacaoRequestDTO;
 import com.sjfjuristas.plataforma.backend.dto.CRUD.OcupacaoResponseDTO;
 import com.sjfjuristas.plataforma.backend.repository.OcupacaoRepository;
 import com.sjfjuristas.plataforma.backend.domain.Ocupacao;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class OcupacaoCRUDService

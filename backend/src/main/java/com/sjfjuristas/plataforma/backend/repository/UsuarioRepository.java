@@ -1,15 +1,19 @@
 package com.sjfjuristas.plataforma.backend.repository;
 
 import com.sjfjuristas.plataforma.backend.domain.Usuario;
+
+import org.springdoc.core.converters.models.Pageable;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 @Repository
-public interface UsuarioRepository extends JpaRepository<Usuario, UUID> 
+public interface UsuarioRepository extends JpaRepository<Usuario, UUID>, JpaSpecificationExecutor<Usuario>
 {
     Optional<Usuario> findByCpf(String cpf);
     
@@ -26,4 +30,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, UUID>
     boolean existsByEmail(String email);
 
     boolean existsByCpf(String cpf);
+
+    Page<Usuario> findByNomeCompletoContainingIgnoreCase(String nomeCompleto, Pageable pageable);
 }
