@@ -63,8 +63,11 @@ public class UsuarioCRUDService
     {
         UsuarioResponseDTO dto = new UsuarioResponseDTO();
 
-        BigDecimal rendaMensal = propostaEmprestimoRepository.findTopByUsuarioIdOrderByDataPropostaDesc(usuario.getId()).map(PropostaEmprestimo::getRemuneracaoMensalSolicitante).orElseThrow(() -> new RuntimeException("Valor não encontrado"));
-        Ocupacao ocupacao = propostaEmprestimoRepository.findTopByUsuarioIdOrderByDataPropostaDesc(usuario.getId()).map(PropostaEmprestimo::getOcupacao).orElseThrow(() -> new RuntimeException("Valor não encontrado"));
+        //BigDecimal rendaMensal = propostaEmprestimoRepository.findTopByUsuarioIdOrderByDataPropostaDesc(usuario.getId()).map(PropostaEmprestimo::getRemuneracaoMensalSolicitante).orElseThrow(() -> new RuntimeException("Valor não encontrado"));
+        //Ocupacao ocupacao = propostaEmprestimoRepository.findTopByUsuarioIdOrderByDataPropostaDesc(usuario.getId()).map(PropostaEmprestimo::getOcupacao).orElseThrow(() -> new RuntimeException("Valor não encontrado"));
+        BigDecimal rendaMensal = propostaEmprestimoRepository.findTopByUsuarioIdUsuarios_IdOrderByDataSolicitacaoDesc(usuario.getId()).map(PropostaEmprestimo::getRemuneracaoMensalSolicitante).orElseThrow(() -> new RuntimeException("Valor não encontrado"));
+        Ocupacao ocupacao = propostaEmprestimoRepository.findTopByUsuarioIdUsuarios_IdOrderByDataSolicitacaoDesc(usuario.getId()).map(PropostaEmprestimo::getOcupacao).orElseThrow(() -> new RuntimeException("Valor não encontrado"));
+        
         OcupacaoResponseDTO ocupacaoDto = new OcupacaoResponseDTO(ocupacao);
 
         dto.setId(usuario.getId());

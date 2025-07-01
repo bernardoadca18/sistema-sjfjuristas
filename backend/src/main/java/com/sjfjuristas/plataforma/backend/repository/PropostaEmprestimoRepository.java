@@ -9,5 +9,6 @@ import java.util.UUID;
 @Repository
 public interface PropostaEmprestimoRepository extends JpaRepository<PropostaEmprestimo, UUID> 
 {
-    Optional<PropostaEmprestimo> findTopByUsuarioIdOrderByDataPropostaDesc(UUID usuarioId);
+    //Optional<PropostaEmprestimo> findTopByUsuarioIdOrderByDataPropostaDesc(UUID usuarioId);
+    Optional<PropostaEmprestimo> findTopByUsuarioIdUsuarios_IdOrderByDataSolicitacaoDesc(UUID usuarioId);
 }

@@ -108,7 +108,7 @@ services:
       - backend
     networks:
       - sjf-network
-
+  # dev
   ngrok:
     image: ngrok/ngrok:latest
     container_name: sjfjuristas-ngrok
