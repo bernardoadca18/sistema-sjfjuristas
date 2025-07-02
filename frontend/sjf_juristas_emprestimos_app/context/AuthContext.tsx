@@ -4,15 +4,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 interface User {
-  nomeUsuario: string;
-  token: string;
-  usuarioId: number;
+    nomeUsuario: string;
+    token: string;
+    usuarioId: number;
 }
 
 interface OnboardingData {
-  usuarioId: number;
-  nomeCompleto: string;
-  email: string;
+    usuarioId: number;
+    nomeCompleto: string;
+    email: string;
 }
 
 interface AuthContextType {
@@ -105,7 +105,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
         catch (error: any)
         {
-            return { success: false, error: error.response?.data || "Erro ao verificar dados." };
+            const errorMessage = error.response?.data?.error || "Erro ao verificar dados. Tente novamente.";
+            return { success: false, error: errorMessage };
         }
     }
 
