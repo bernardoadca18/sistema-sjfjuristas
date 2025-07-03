@@ -11,6 +11,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import com.sjfjuristas.plataforma.backend.exceptions.RegistrationConflictException;
+import com.sjfjuristas.plataforma.backend.exceptions.UserNotFoundException;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,8 +27,8 @@ public class GlobalExceptionHandler {
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     /**
-     * NOVO: Captura erros de desserialização do corpo da requisição.
-     * Isso acontece ANTES da validação, quando o formato dos dados está incorreto (ex: texto onde deveria ser número).
+     * Captura erros de desserialização do corpo da requisição.
+     * Isso acontece antes da validação, quando o formato dos dados está incorreto (ex: texto onde deveria ser número).
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Map<String, String>> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
@@ -85,5 +88,23 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleAllExceptions(Exception ex) {
         log.error("Erro inesperado no servidor", ex);
         return new ResponseEntity<>(Map.of("error", "Ocorreu um erro interno inesperado."), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleUserNotFound(UserNotFoundException ex) {
+        log.warn("Tentativa de acesso com usuário não encontrado: {}", ex.getMessage());
+        return new ResponseEntity<>(Map.of("error", ex.getMessage()), HttpStatus.NOT_FOUND);
+    }
+
+    //@ExceptionHandler({IllegalStateException.class, IllegalArgumentException.class})
+    //public ResponseEntity<Map<String, String>> handleBusinessExceptionsEntity(RuntimeException ex) {
+    //    log.warn("Erro de regra de negócio: {}", ex.getMessage());
+    //    return new ResponseEntity<>(Map.of("error", ex.getMessage()), HttpStatus.BAD_REQUEST);
+    //}
+
+    @ExceptionHandler(RegistrationConflictException.class)
+    public ResponseEntity<Map<String, String>> handleRegistrationConflict(RegistrationConflictException ex) {
+        log.warn("Conflito de cadastro: {}", ex.getMessage());
+        return new ResponseEntity<>(Map.of("error", ex.getMessage()), HttpStatus.CONFLICT);
     }
 }

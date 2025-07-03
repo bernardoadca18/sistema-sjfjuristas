@@ -1,13 +1,13 @@
 package com.sjfjuristas.plataforma.backend.service.Auth;
 
-import com.sjfjuristas.exceptions.RegistrationConflictException;
-import com.sjfjuristas.exceptions.UserNotFoundException;
 import com.sjfjuristas.plataforma.backend.domain.Usuario;
 import com.sjfjuristas.plataforma.backend.dto.Usuario.AuthResponseDTO;
 import com.sjfjuristas.plataforma.backend.dto.Usuario.ClienteCreateRequestDTO;
 import com.sjfjuristas.plataforma.backend.dto.Usuario.LoginRequestDTO;
 import com.sjfjuristas.plataforma.backend.dto.Usuario.PreCadastroCheckDTO;
 import com.sjfjuristas.plataforma.backend.dto.Usuario.PreCadastroInfoDTO;
+import com.sjfjuristas.plataforma.backend.exceptions.RegistrationConflictException;
+import com.sjfjuristas.plataforma.backend.exceptions.UserNotFoundException;
 import com.sjfjuristas.plataforma.backend.dto.Usuario.FinalizarCadastroDTO;
 import com.sjfjuristas.plataforma.backend.repository.UsuarioRepository;
 import com.sjfjuristas.plataforma.backend.service.Jwt.JwtService;

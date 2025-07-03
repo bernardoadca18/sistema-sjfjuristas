@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"extensions.disabled": [
+			"redhat.java",
+			"vscjava.vscode-gradle",
+			"vscjava.vscode-java-debug",
+			"vscjava.vscode-java-dependency",
+			"vscjava.vscode-java-pack",
+			"vscjava.vscode-java-test",
+			"Oracle.oracle-java"
+		]
+	}
+	
+}

@@ -1,7 +1,8 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
+import { Colors } from '@/constants/Colors';
 
 const LoginScreen : React.FC = () => {
     const [email, setEmail] = useState('');
@@ -31,25 +32,31 @@ const LoginScreen : React.FC = () => {
             <Text style={styles.title}>Bem-vindo à SJF Juristas</Text>
             <TextInput style={styles.input} placeholder="E-mail" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
             <TextInput style={styles.input} placeholder="Senha" value={senha} onChangeText={setSenha} secureTextEntry />
-            <Button title={isLoading ? "Entrando..." : "Entrar"} onPress={handleLogin} disabled={isLoading} />
+            <TouchableOpacity style={[styles.button, isLoading && styles.buttonDisabled]} onPress={handleLogin} disabled={isLoading}>
+                <Text style={styles.buttonText}>{isLoading ? "Entrando..." : "Entrar"}</Text>
+            </TouchableOpacity>
 
             <View style={styles.separator}/>
 
             <Text style={styles.subtitle}>É seu primeiro acesso ?</Text>
             <TouchableOpacity onPress={() => router.push('/(auth)/pre-cadastro')}>
-                <Text>Finalizar meu Cadastro</Text>
+                <Text style={styles.link}>Finalizar meu Cadastro</Text>
             </TouchableOpacity>
         </View>
     )
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: 20, backgroundColor: '#fff' },
-  title: { fontSize: 28, fontWeight: 'bold', textAlign: 'center', marginBottom: 30 },
-  subtitle: { fontSize: 16, textAlign: 'center', color: 'gray', marginBottom: 10 },
-  input: { height: 50, borderColor: '#ccc', borderWidth: 1, borderRadius: 8, paddingHorizontal: 15, marginBottom: 15 },
-  separator: { height: 1, width: '80%', backgroundColor: '#eee', marginVertical: 30, alignSelf: 'center' },
-  link: { color: '#007AFF', fontSize: 16, textAlign: 'center', fontWeight: 'bold' }
+    container: { flex: 1, justifyContent: 'center', padding: 20, backgroundColor: Colors.light.background },
+    title: { fontSize: 28, fontWeight: 'bold', textAlign: 'center', marginBottom: 30, color: Colors.light.primaryDark },
+    subtitle: { fontSize: 16, textAlign: 'center', color: Colors.light.textSecondary, marginBottom: 10 },
+    input: { height: 50, borderColor: Colors.light.border, borderWidth: 1, borderRadius: 8, paddingHorizontal: 15, marginBottom: 15, backgroundColor: Colors.light.card, color: Colors.light.text, fontSize: 16, },
+    separator: { height: 1, width: '80%', backgroundColor: Colors.light.border, marginVertical: 30, alignSelf: 'center' },
+    link: { color: Colors.light.primary, fontSize: 16, textAlign: 'center', fontWeight: 'bold' },
+    button: { backgroundColor: Colors.light.primary, paddingVertical: 15, borderRadius: 8, alignItems: 'center', },
+    buttonDisabled: { backgroundColor: Colors.light.primaryLight, },
+    buttonText: { color: Colors.light.textOnPrimary, fontSize: 16, fontWeight: 'bold', },
+    buttonEntrar: {alignSelf: 'center', backgroundColor: Colors.light.primary, paddingVertical: 15, borderRadius: 8, alignItems: 'center', textAlign: 'center'}
 });
 
 export default LoginScreen;
