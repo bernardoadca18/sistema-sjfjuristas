@@ -4,6 +4,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,6 +17,7 @@ import org.springframework.data.domain.Sort;
 
 import com.sjfjuristas.plataforma.backend.domain.Usuario;
 import com.sjfjuristas.plataforma.backend.dto.Emprestimos.EmprestimoClienteResponseDTO;
+import com.sjfjuristas.plataforma.backend.dto.ParcelaEmprestimo.ParcelaEmprestimoResponseDTO;
 import com.sjfjuristas.plataforma.backend.service.EmprestimoService;
 
 @RestController
@@ -31,6 +33,20 @@ public class EmprestimoClienteController
         UUID clienteId = usuarioLogado.getId();
         
         Page<EmprestimoClienteResponseDTO> pagina = emprestimoService.getEmprestimosDoCliente(clienteId, pageable);
+        return ResponseEntity.ok(pagina);
+    }
+
+    @GetMapping("/{emprestimoId}")
+    public ResponseEntity<EmprestimoClienteResponseDTO> getMeuEmprestimoPorId(@AuthenticationPrincipal Usuario usuarioLogado, @PathVariable UUID emprestimoId)
+    {
+        EmprestimoClienteResponseDTO dto = emprestimoService.getEmprestimoDoCliente(emprestimoId, usuarioLogado.getId());
+        return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/{emprestimoId}/parcelas")
+    public ResponseEntity<Page<ParcelaEmprestimoResponseDTO>> getParcelasDoMeuEmprestimo( @AuthenticationPrincipal Usuario usuarioLogado, @PathVariable UUID emprestimoId, Pageable pageable) 
+    {
+        Page<ParcelaEmprestimoResponseDTO> pagina = emprestimoService.getParcelasDoEmprestimo(emprestimoId, usuarioLogado.getId(), pageable);
         return ResponseEntity.ok(pagina);
     }
 }

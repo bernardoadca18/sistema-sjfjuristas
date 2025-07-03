@@ -33,8 +33,8 @@ public class SecurityConfig {
             // Endpoints de Cliente
             //.requestMatchers("/api/cliente/**").hasAuthority("Cliente")
             // Qualquer outra requisição precisa estar autenticada
-            .requestMatchers("/swagger-ui.html","/swagger-ui/**","/v3/api-docs/**","/v3/api-docs").permitAll()
-            
+            .requestMatchers("/swagger-ui.html","/swagger-ui/**","/v3/api-docs/**","/v3/api-docs", "/api/swagger-ui.html","/api/swagger-ui/**","/api/v3/api-docs/**","/api/v3/api-docs").permitAll()
+            .requestMatchers("/ws/**").permitAll()
             .anyRequest().authenticated())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authenticationProvider(authenticationProvider)

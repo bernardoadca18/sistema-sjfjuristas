@@ -11,8 +11,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.UUID;
 
 @Service
-public class FileStorageService {
-
+public class FileStorageService
+{
     @Autowired
     private MinioClient minioClient;
 
@@ -33,8 +33,10 @@ public class FileStorageService {
             String fileName = folderPath + UUID.randomUUID() + "-" + file.getOriginalFilename();
 
             minioClient.putObject(
-                    PutObjectArgs.builder().bucket(bucketName).object(fileName).stream(
-                            file.getInputStream(), file.getSize(), -1)
+                    PutObjectArgs.builder()
+                            .bucket(bucketName)
+                            .object(fileName)
+                            .stream(file.getInputStream(), file.getSize(), -1)
                             .contentType(file.getContentType())
                             .build());
 

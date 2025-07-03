@@ -549,6 +549,7 @@ const Chat = () => {
                                 : 'rounded-br-none'
                                 }`}
                                 style={ msg.sender === 'bot' ?
+                                    
                                 {
                                     color: theme.colors.text,
                                     background: theme.colors.background

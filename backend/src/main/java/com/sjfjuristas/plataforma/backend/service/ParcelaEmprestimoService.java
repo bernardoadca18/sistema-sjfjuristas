@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.sjfjuristas.plataforma.backend.domain.ParcelaEmprestimo;
+import com.sjfjuristas.plataforma.backend.dto.ParcelaEmprestimo.ParcelaEmprestimoResponseDTO;
 import com.sjfjuristas.plataforma.backend.repository.ParcelaEmprestimoRepository;
 import com.sjfjuristas.plataforma.backend.util.ByteArrayMultipartFile;
 import jakarta.transaction.Transactional;
@@ -39,13 +40,26 @@ public class ParcelaEmprestimoService
     private String chavePixEmpresa;
 
     @Transactional
-    public ParcelaEmprestimo gerarPixParaParcela(UUID parcelaId)
+    public ParcelaEmprestimoResponseDTO gerarPixParaParcela(UUID parcelaId, UUID usuarioId)
     {
         ParcelaEmprestimo parcela = parcelaRepository.findById(parcelaId).orElseThrow(() -> new RuntimeException("Parcela não encontrada"));
+
+        if (!parcela.getEmprestimoIdEmprestimos().getUsuarioIdUsuarios().getId().equals(usuarioId))
+        {
+            throw new org.springframework.security.access.AccessDeniedException("Acesso negado a esta parcela.");
+        }
+
+        if (parcela.getPixCopiaCola() != null && parcela.getPixDataExpiracao().isAfter(OffsetDateTime.now()))
+        {
+            return new ParcelaEmprestimoResponseDTO(parcela);
+        }
+
         String descricao = "Pagamento da parcela " + parcela.getNumeroParcela();
         BigDecimal valorParcela =  parcela.getValorTotalParcela();
 
-        return gerarEPersistirPix(parcela, valorParcela, descricao);
+        ParcelaEmprestimo parcelaEmprestimo = gerarEPersistirPix(parcela, valorParcela, descricao);
+
+        return new ParcelaEmprestimoResponseDTO(parcelaEmprestimo);
     }
 
     private ParcelaEmprestimo gerarEPersistirPix(ParcelaEmprestimo parcela, BigDecimal valor, String descricao) {

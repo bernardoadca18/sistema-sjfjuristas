@@ -67,6 +67,8 @@ services:
       /usr/bin/mc anonymous set public minio/propostas-documentos;
       /usr/bin/mc mb minio/pix-qrcodes --ignore-existing;
       /usr/bin/mc anonymous set public minio/pix-qrcodes;
+      /usr/bin/mc mb minio/comprovantes --ignore-existing
+
       echo 'Buckets criados e políticas aplicadas com sucesso!';
       exit 0;
       "
