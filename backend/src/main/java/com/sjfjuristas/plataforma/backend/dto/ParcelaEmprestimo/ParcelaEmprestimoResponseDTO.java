@@ -1,14 +1,15 @@
 package com.sjfjuristas.plataforma.backend.dto.ParcelaEmprestimo;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
 import com.sjfjuristas.plataforma.backend.domain.ParcelaEmprestimo;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
@@ -30,7 +31,7 @@ public class ParcelaEmprestimoResponseDTO {
         this.numeroParcela = entity.getNumeroParcela();
         this.dataVencimento = entity.getDataVencimento();
         this.valorTotalParcela = entity.getValorTotalParcela();
-        this.statusPagamentoParcelaNome = "Pendente";
+        this.statusPagamentoParcelaNome = entity.getStatusPagamentoParcelaIdStatuspagamentoparcela().getNomeStatus();
         this.pixCopiaCola = entity.getPixCopiaCola();
         this.pixQrCodeBase64 = entity.getPixQrCodeBase64();
     }

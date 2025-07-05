@@ -1,18 +1,28 @@
 package com.sjfjuristas.plataforma.backend.domain;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
 import java.time.OffsetDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
+
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -31,7 +41,7 @@ public class ChavePixUsuario {
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "data_cadastro")
-    private OffsetDateTime dataCadastro;
+    private OffsetDateTime dataCadastro = OffsetDateTime.now();
 
     @ColumnDefault("false")
     @Column(name = "ativa_para_desembolso")
@@ -39,7 +49,7 @@ public class ChavePixUsuario {
 
     @ColumnDefault("false")
     @Column(name = "verificada")
-    private Boolean verificada;
+    private Boolean verificada = false;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "data_verificacao")

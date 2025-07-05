@@ -1,19 +1,28 @@
 package com.sjfjuristas.plataforma.backend.service;
 
-import com.sjfjuristas.plataforma.backend.domain.ComprovantePagamento;
-import com.sjfjuristas.plataforma.backend.domain.ParcelaEmprestimo;
-import com.sjfjuristas.plataforma.backend.repository.ComprovantePagamentoRepository;
-import com.sjfjuristas.plataforma.backend.repository.ParcelaEmprestimoRepository;
-import jakarta.persistence.EntityNotFoundException;
+import java.io.IOException;
+import java.time.OffsetDateTime;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.time.OffsetDateTime;
-import java.util.UUID;
+import com.sjfjuristas.plataforma.backend.domain.ComprovantePagamento;
+import com.sjfjuristas.plataforma.backend.domain.Emprestimo;
+import com.sjfjuristas.plataforma.backend.domain.PagamentoParcela;
+import com.sjfjuristas.plataforma.backend.domain.ParcelaEmprestimo;
+import com.sjfjuristas.plataforma.backend.dto.PagamentosParcela.PagamentoParcelaResponseDTO;
+import com.sjfjuristas.plataforma.backend.repository.ComprovantePagamentoRepository;
+import com.sjfjuristas.plataforma.backend.repository.EmprestimoRepository;
+import com.sjfjuristas.plataforma.backend.repository.PagamentoParcelaRepository;
+import com.sjfjuristas.plataforma.backend.repository.ParcelaEmprestimoRepository;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class PagamentoService
@@ -26,6 +35,12 @@ public class PagamentoService
 
     @Autowired
     private FileStorageService fileStorageService;
+
+    @Autowired
+    private PagamentoParcelaRepository pagamentoParcelaRepository;
+
+    @Autowired
+    private EmprestimoRepository emprestimoRepository;
 
     @Value("${minio.bucket.comprovantes}")
     private String comprovanteBucketName;
@@ -56,5 +71,13 @@ public class PagamentoService
         comprovanteRepository.save(comprovante);
 
         // TODO: Criar uma notificação para o Admin sobre o novo comprovante.
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PagamentoParcelaResponseDTO> getPagamentosPorEmprestimo(UUID emprestimoId, Pageable pageable)
+    {   
+        Emprestimo emprestimo = emprestimoRepository.findById(emprestimoId).orElseThrow(() -> new EntityNotFoundException("Empréstimo não encontrado."));
+        Page<PagamentoParcela> pagamentosPage = pagamentoParcelaRepository.findByEmprestimoIdEmprestimos(emprestimo, pageable);
+        return pagamentosPage.map(PagamentoParcelaResponseDTO::new);
     }
 }

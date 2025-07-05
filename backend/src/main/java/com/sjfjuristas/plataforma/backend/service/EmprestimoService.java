@@ -1,14 +1,5 @@
 package com.sjfjuristas.plataforma.backend.service;
 
-import com.sjfjuristas.plataforma.backend.domain.*;
-import com.sjfjuristas.plataforma.backend.repository.*;
-
-import jakarta.persistence.EntityNotFoundException;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import com.sjfjuristas.plataforma.backend.dto.Emprestimos.CondicoesAprovadasDTO;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -16,10 +7,30 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.sjfjuristas.plataforma.backend.domain.Emprestimo;
+import com.sjfjuristas.plataforma.backend.domain.ParcelaEmprestimo;
+import com.sjfjuristas.plataforma.backend.domain.PropostaEmprestimo;
+import com.sjfjuristas.plataforma.backend.domain.StatusEmprestimo;
+import com.sjfjuristas.plataforma.backend.domain.StatusPagamentoParcela;
+import com.sjfjuristas.plataforma.backend.domain.Usuario;
+import com.sjfjuristas.plataforma.backend.dto.Emprestimos.CondicoesAprovadasDTO;
 import com.sjfjuristas.plataforma.backend.dto.Emprestimos.EmprestimoClienteResponseDTO;
 import com.sjfjuristas.plataforma.backend.dto.ParcelaEmprestimo.ParcelaEmprestimoResponseDTO;
+import com.sjfjuristas.plataforma.backend.repository.EmprestimoRepository;
+import com.sjfjuristas.plataforma.backend.repository.ParcelaEmprestimoRepository;
+import com.sjfjuristas.plataforma.backend.repository.PropostaEmprestimoRepository;
+import com.sjfjuristas.plataforma.backend.repository.StatusEmprestimoRepository;
+import com.sjfjuristas.plataforma.backend.repository.StatusPagamentoParcelaRepository;
+import com.sjfjuristas.plataforma.backend.repository.UsuarioRepository;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class EmprestimoService {
