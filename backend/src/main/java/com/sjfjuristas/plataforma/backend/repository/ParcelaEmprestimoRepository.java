@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.sjfjuristas.plataforma.backend.domain.Emprestimo;
@@ -28,4 +29,23 @@ public interface ParcelaEmprestimoRepository extends JpaRepository<ParcelaEmpres
         LIMIT 1
         """, nativeQuery=true)
     Optional<ParcelaEmprestimo> findProximaParcelaPendente(UUID emprestimoId, String statusNome);
+
+    @Query(value = """
+        SELECT p.numeroParcela FROM ParcelaEmprestimo p
+        WHERE p.emprestimoIdEmprestimos = :emprestimo
+        AND p.statusPagamentoParcelaIdStatuspagamentoparcela.nomeStatus NOT IN ('Pago', 'Pago com Atraso')
+        ORDER BY p.numeroParcela ASC
+        LIMIT 1
+        """)
+    Optional<Integer> findNumeroDaPrimeiraParcelaNaoPaga(@Param("emprestimo") Emprestimo emprestimo);
+
+    @Query(value = """
+        SELECT p FROM ParcelaEmprestimo p
+        WHERE p.emprestimoIdEmprestimos = :emprestimo
+        AND p.numeroParcela IN :numeros
+        ORDER BY p.numeroParcela ASC
+        """)
+    List<ParcelaEmprestimo> findByEmprestimoAndNumeroParcelaIn(@Param("emprestimo") Emprestimo emprestimo, @Param("numeros") List<Integer> numeros);
+
+    long countByEmprestimoIdEmprestimos(Emprestimo emprestimo);
 }

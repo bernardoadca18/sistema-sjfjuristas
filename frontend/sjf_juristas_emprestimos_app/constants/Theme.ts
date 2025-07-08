@@ -1,5 +1,6 @@
 export const theme = {
-    colors: {
+    colors: 
+    {
         primary: '#DAA520',
         primaryDark: '#B8860B',
         primaryLight: '#FAFAD2',
@@ -11,9 +12,19 @@ export const theme = {
         textOnPrimary: '#FFFFFF',
         textOnAccent: '#3B2700',
         border: '#DEE2E6',
-        backButton: '#6c757d'
+        backButton: '#6c757d',
+        
+        pendenteConteinerBackground: '#FFEAD2',
+        pendenteText: '#B45309',
+        pagoConteinerBackground: '#D1FAE5',
+        pagoText: '#166534',
+        atrasadoConteinerBackground: '#FEE2E2',
+        atrasadoText: '#991B1B',
+        pagoComAtrasoConteinerBackground: '#FFEAD2',
+        pagoComAtrasoText: '#B45309',
     },
-    spacing: {
+    spacing: 
+    {
         small: '10px',
         medium: '20px',
         large: '30px',

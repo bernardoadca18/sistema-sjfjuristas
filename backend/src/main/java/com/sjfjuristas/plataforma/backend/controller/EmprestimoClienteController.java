@@ -8,13 +8,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.Param;
 
+import com.sjfjuristas.plataforma.backend.domain.ParcelaEmprestimo;
 import com.sjfjuristas.plataforma.backend.domain.Usuario;
 import com.sjfjuristas.plataforma.backend.dto.Emprestimos.EmprestimoClienteResponseDTO;
 import com.sjfjuristas.plataforma.backend.dto.ParcelaEmprestimo.ParcelaEmprestimoResponseDTO;
@@ -48,5 +51,14 @@ public class EmprestimoClienteController
     {
         Page<ParcelaEmprestimoResponseDTO> pagina = emprestimoService.getParcelasDoEmprestimo(emprestimoId, usuarioLogado.getId(), pageable);
         return ResponseEntity.ok(pagina);
+    }
+
+    @GetMapping("/{emprestimoId}/widget-parcelas")
+    public ResponseEntity<List<ParcelaEmprestimoResponseDTO>> getParcelasForWidget(@PathVariable UUID id)
+    {
+        List<ParcelaEmprestimo> parcelas = emprestimoService.getParcelasParaWidget(id);
+        List<ParcelaEmprestimoResponseDTO> dtos = parcelas.stream().map(ParcelaEmprestimoResponseDTO::new).toList();
+
+        return ResponseEntity.ok(dtos);
     }
 }

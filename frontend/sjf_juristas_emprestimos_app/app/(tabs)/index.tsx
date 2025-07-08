@@ -2,8 +2,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ActivityIndicator, ScrollView, RefreshControl } from 'react-native';
 import EmprestimoWidget from '@/components/ui/EmprestimoWidget';
 import { Colors } from '@/constants/Colors';
-import { getEmprestimosAtivos, getPagamentos, getParcelas, getProximaParcela } from '@/services/emprestimoService';
-import { Emprestimo, Pagamento, Parcela } from '@/types/Emprestimo';
+import { getEmprestimosAtivos, getParcelasForWidget, getProximaParcela } from '@/services/emprestimoService';
+import { Emprestimo, Parcela } from '@/types/Emprestimo';
 
 
 const HomeScreen: React.FC = () => {
@@ -11,7 +11,7 @@ const HomeScreen: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [proximaParcela, setProximaParcela] = useState<Parcela | null>();
-    const [pagamentos, setPagamentos] = useState<Pagamento[] | null>();
+    const [pagamentos, setPagamentos] = useState<Parcela[] | null>();
     //const [parcelasEmprestimo, setParcelasEmprestimo] = useState<Parcela[] | null>();
 
     const fetchEmprestimoData = useCallback(async () => {
@@ -44,7 +44,7 @@ const HomeScreen: React.FC = () => {
 
                 try
                 {
-                  const pagamentos = await getPagamentos(primeiroEmprestimo.id);
+                  const pagamentos = await getParcelasForWidget(primeiroEmprestimo.id);
                   console.log("[DEBUG] Pagamentos recebidos:", JSON.stringify(pagamentos, null, 2));
                   setPagamentos(pagamentos);
                 }
@@ -112,7 +112,7 @@ const HomeScreen: React.FC = () => {
         <Text style={styles.errorText}>{error}</Text>
       }
 
-      if (emprestimo && proximaParcela && pagamentos)
+      if (emprestimo && proximaParcela)
       {
         return <EmprestimoWidget emprestimo={emprestimo} proximaParcela={proximaParcela} pagamentos={pagamentos}/>;
       }

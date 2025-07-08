@@ -1,43 +1,19 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
 import { Colors } from "@/constants/Colors";
-import { Emprestimo, Pagamento, Parcela } from "@/types/Emprestimo";
+import { Emprestimo, Parcela } from "@/types/Emprestimo";
 import { Link } from 'expo-router';
+import formatDate from "@/utils/formatData";
+import formatCurrency from "@/utils/formatCurrency";
+import PagamentoWidget from "./PagamentoWidget";
 
 interface EmprestimoWidgetProps {
     emprestimo: Emprestimo;
     proximaParcela?: Parcela;
-    pagamentos?: Pagamento[]; 
+    pagamentos?: Parcela[] | null; 
 }
 
 const EmprestimoWidget : React.FC<EmprestimoWidgetProps> = ( { emprestimo, proximaParcela, pagamentos } ) => {
-    const formatCurrency = (value : number) => {
-        if (value === undefined || value === null)
-        {
-            return 'R$ -'; 
-        }
-
-        return `R$ ${value.toFixed(2).replace('.', ',')}`;
-    }
-
-    const formatDate = (date : string) => {
-        let newDate = '';
-        newDate += date[date.length - 2];
-        newDate += date[date.length - 1];
-        newDate += '/';
-        newDate += date[date.length - 5];
-        newDate += date[date.length - 4];
-        newDate += '/';
-        newDate += date[0];
-        newDate += date[1];
-        newDate += date[2];
-        newDate += date[3];
-
-        // AAAA-MM-DD -> DD/MM/AAAA
-
-        return newDate;
-    }
-
     return (
         <ScrollView style={styles.container}>
             <View style={styles.card}>
@@ -83,15 +59,16 @@ const EmprestimoWidget : React.FC<EmprestimoWidgetProps> = ( { emprestimo, proxi
 
             <View style={styles.card}>
                 <Text style={styles.titleText}>Últimos Pagamentos</Text>
-                <Text style={styles.lastPaymentsText}>
-                    {
-                        pagamentos ? (
-                            pagamentos.map((pagamento, id) => {
-                                return <></>
-                            })
-                        ) : (<></>)
-                    }
-                </Text>
+                {
+                    pagamentos ? (
+                        pagamentos.map((pagamento, id) => {
+                            return <PagamentoWidget pagamento={pagamento} key={id}></PagamentoWidget>
+                        })
+                    ) : (<></>)
+                }
+                <TouchableOpacity style={styles.buttonSecondary}>
+                    <Text style= {styles.linkText}>Ver Histórico Completo</Text>
+                </TouchableOpacity>
             </View>
         </ScrollView>
     )

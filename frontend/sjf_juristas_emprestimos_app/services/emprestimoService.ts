@@ -40,6 +40,19 @@ export const getParcelas = async (emprestimoId: string): Promise<Parcela[]> => {
     }
 };
 
+export const getParcelasForWidget = async (emprestimoId : string) : Promise<Parcela[]> => {
+    try
+    {
+        const response = await api.get(`/emprestimos/${emprestimoId}/widget-parcelas`);
+        return response.data;
+    }
+    catch (error)
+    {
+        console.error(`Erro ao buscar parcelas do empréstimo ${emprestimoId}:`, error);
+        throw error;
+    }
+}
+
 export const gerarPixParaParcela = async (parcelaId: string): Promise<Parcela> => {
     try 
     {

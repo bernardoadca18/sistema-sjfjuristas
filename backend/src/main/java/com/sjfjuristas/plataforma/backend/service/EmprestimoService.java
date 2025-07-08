@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,8 @@ import com.sjfjuristas.plataforma.backend.repository.UsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
-public class EmprestimoService {
+public class EmprestimoService
+{
     @Autowired
     private EmprestimoRepository emprestimoRepository;
 
@@ -52,27 +54,19 @@ public class EmprestimoService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    //@Autowired
-    //private ConfiguracaoService configuracaoService;
-
     @Transactional
     public Emprestimo criarEmprestimoEGerarParcelas(UUID propostaId, CondicoesAprovadasDTO condicoes) 
     {
         BigDecimal taxaJurosDiariaPercentual =  condicoes.getTaxaJurosDiaria();
         BigDecimal taxaJurosDiariaDecimal = taxaJurosDiariaPercentual.divide(new BigDecimal("100"), 8, RoundingMode.HALF_UP);
         
-        PropostaEmprestimo proposta = propostaRepository.findById(propostaId)
-                .orElseThrow(() -> new IllegalArgumentException("Proposta não encontrada."));
+        PropostaEmprestimo proposta = propostaRepository.findById(propostaId).orElseThrow(() -> new IllegalArgumentException("Proposta não encontrada."));
         
         Usuario usuario = proposta.getUsuarioIdUsuarios();
 
         StatusEmprestimo statusInicialEmprestimo = statusEmprestimoRepository.findByNomeStatus("Pendente Desembolso").orElseThrow(() -> new IllegalStateException("Status 'Pendente Desembolso' não encontrado."));
 
-        BigDecimal valorParcelaDiaria = calcularValorParcela(
-            condicoes.getValorContratado(),
-            taxaJurosDiariaDecimal,
-            condicoes.getNumeroTotalParcelas()
-        );
+        BigDecimal valorParcelaDiaria = calcularValorParcela( condicoes.getValorContratado(), taxaJurosDiariaDecimal, condicoes.getNumeroTotalParcelas() );
 
         Emprestimo novoEmprestimo = new Emprestimo();
         novoEmprestimo.setPropostaIdPropostasemprestimo(proposta);
@@ -191,5 +185,34 @@ public class EmprestimoService {
         Page<ParcelaEmprestimo> parcelas = parcelaRepository.findByEmprestimoIdEmprestimosOrderByNumeroParcelaAsc(emprestimo, pageable);
         
         return parcelas.map(ParcelaEmprestimoResponseDTO::new);
+    }
+
+    @Transactional
+    public List<ParcelaEmprestimo> getParcelasParaWidget(UUID emprestimoId)
+    {
+        Emprestimo emprestimo = emprestimoRepository.findById(emprestimoId).orElseThrow(() -> new IllegalArgumentException("Empréstimo não encontrado."));
+
+        Optional<Integer> numeroParcelaFocoOpt = parcelaRepository.findNumeroDaPrimeiraParcelaNaoPaga(emprestimo);
+
+        if (numeroParcelaFocoOpt.isEmpty())
+        {
+            long totalParcelas = parcelaRepository.countByEmprestimoIdEmprestimos(emprestimo);
+            List<Integer> numerosParaBuscar = List.of((int)totalParcelas - 2, (int)totalParcelas - 1, (int)totalParcelas);
+            return parcelaRepository.findByEmprestimoAndNumeroParcelaIn(emprestimo, numerosParaBuscar);
+        }
+
+        int numeroParcelaFoco = numeroParcelaFocoOpt.get();
+        List<Integer> numerosParaBuscar = new ArrayList<>();
+
+        if (numeroParcelaFoco == 1)
+        {
+            numerosParaBuscar.addAll(List.of(1, 2, 3));
+        }
+        else
+        {
+            numerosParaBuscar.addAll(List.of(numeroParcelaFoco - 1, numeroParcelaFoco, numeroParcelaFoco + 1));
+        }
+
+        return parcelaRepository.findByEmprestimoAndNumeroParcelaIn(emprestimo, numerosParaBuscar);
     }
 }
