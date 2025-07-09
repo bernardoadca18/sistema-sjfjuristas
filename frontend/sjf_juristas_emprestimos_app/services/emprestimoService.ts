@@ -1,5 +1,6 @@
 import api from './api';
 import { Emprestimo, Pagamento, Parcela } from '../types/Emprestimo';
+import { Page } from '@/types/Page';
 
 export const getEmprestimosAtivos = async (): Promise<Emprestimo[]> => {
     try 
@@ -27,13 +28,32 @@ export const getEmprestimoDetalhes = async (emprestimoId: string): Promise<Empre
     }
 };
 
-export const getParcelas = async (emprestimoId: string): Promise<Parcela[]> => {
+
+
+export const getParcelas = async (emprestimoId: string, page: number = 0, size: number = 100): Promise<Parcela[]> => {
     try 
     {
-        const response = await api.get(`/cliente/emprestimos/${emprestimoId}/parcelas`);
+        const response = await api.get(`/cliente/emprestimos/${emprestimoId}/parcelas`, {
+            params: { page, size, sort: 'numeroParcela,asc' }
+        });
         return response.data.content;
     } 
     catch (error) 
+    {
+        console.error(`Erro ao buscar parcelas do empréstimo ${emprestimoId}:`, error);
+        throw error;
+    }
+};
+
+export const getParcelasPaged = async (emprestimoId: string, page: number = 0, size: number = 10): Promise<Page<Parcela>> => {
+    try
+    {
+        const response = await api.get(`/emprestimos/${emprestimoId}/parcelas`, {
+            params: { page, size, sort: 'numeroParcela,asc' }
+        });
+        return response.data;
+    }
+    catch (error)
     {
         console.error(`Erro ao buscar parcelas do empréstimo ${emprestimoId}:`, error);
         throw error;

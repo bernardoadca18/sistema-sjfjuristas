@@ -15,15 +15,17 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ParcelaEmprestimoResponseDTO {
-
+public class ParcelaEmprestimoResponseDTO
+{
     private UUID id;
     private Integer numeroParcela;
     private LocalDate dataVencimento;
     private BigDecimal valorTotalParcela;
     private String statusPagamentoParcelaNome;
-    private String pixCopiaCola; // Opcional
-    private String pixQrCodeBase64; // Opcional
+    private String pixCopiaCola;
+    private String pixQrCodeBase64;
+    private BigDecimal valorPrincipal;
+    private BigDecimal valorJuros;
 
     public ParcelaEmprestimoResponseDTO(ParcelaEmprestimo entity)
     {
@@ -34,5 +36,7 @@ public class ParcelaEmprestimoResponseDTO {
         this.statusPagamentoParcelaNome = entity.getStatusPagamentoParcelaIdStatuspagamentoparcela().getNomeStatus();
         this.pixCopiaCola = entity.getPixCopiaCola();
         this.pixQrCodeBase64 = entity.getPixQrCodeBase64();
+        this.valorPrincipal = entity.getValorPrincipalAmortizado();
+        this.valorJuros = entity.getValorJuros();
     }
 }

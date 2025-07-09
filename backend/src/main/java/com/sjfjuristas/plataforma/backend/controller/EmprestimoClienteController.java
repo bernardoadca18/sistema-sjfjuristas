@@ -54,9 +54,9 @@ public class EmprestimoClienteController
     }
 
     @GetMapping("/{emprestimoId}/widget-parcelas")
-    public ResponseEntity<List<ParcelaEmprestimoResponseDTO>> getParcelasForWidget(@PathVariable UUID id)
+    public ResponseEntity<List<ParcelaEmprestimoResponseDTO>> getParcelasForWidget(@PathVariable UUID emprestimoId)
     {
-        List<ParcelaEmprestimo> parcelas = emprestimoService.getParcelasParaWidget(id);
+        List<ParcelaEmprestimo> parcelas = emprestimoService.getParcelasParaWidget(emprestimoId);
         List<ParcelaEmprestimoResponseDTO> dtos = parcelas.stream().map(ParcelaEmprestimoResponseDTO::new).toList();
 
         return ResponseEntity.ok(dtos);

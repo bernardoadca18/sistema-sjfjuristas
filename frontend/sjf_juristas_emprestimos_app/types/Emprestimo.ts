@@ -1,11 +1,12 @@
-export interface Emprestimo {
+export interface Emprestimo
+{
     id: string;
     valorContratado: number;
     valorLiberado: number;
     taxaJurosDiariaEfetiva: number;
     numeroTotalParcelas: number;
     valorParcelaDiaria: number;
-    dataContratacao: string; // Formato de data ISO 8601
+    dataContratacao: string;
     dataPrimeiroVencimento: string;
     dataUltimoVencimento: string;
     statusEmprestimoNome: string;
@@ -13,17 +14,21 @@ export interface Emprestimo {
     dataInicioCobrancaParcelas: string;
     proximaParcela: Parcela | null;
 }
-export interface Parcela {
+export interface Parcela
+{
     id: string;
     numeroParcela: number;
-    dataVencimento: string; // Formato "YYYY-MM-DD"
+    dataVencimento: string;
     valorTotalParcela: number;
     statusPagamentoParcelaNome: string;
     pixCopiaCola? : string;
     pixQrCodeBase64? : string;
+    valorPrincipal: number;
+    valorJuros: number;
 }
 
-export interface Pagamento {
+export interface Pagamento
+{
     id: string;
     dataPagamentoEfetivo: string;
     valorPago: number;

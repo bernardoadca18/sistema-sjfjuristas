@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-nati
 import { Colors } from "@/constants/Colors";
 import { Emprestimo, Parcela } from "@/types/Emprestimo";
 import { Link } from 'expo-router';
-import formatDate from "@/utils/formatData";
+import formatDate from "@/utils/formatDate";
 import formatCurrency from "@/utils/formatCurrency";
 import PagamentoWidget from "./PagamentoWidget";
 
@@ -58,7 +58,7 @@ const EmprestimoWidget : React.FC<EmprestimoWidgetProps> = ( { emprestimo, proxi
             </Link>
 
             <View style={styles.card}>
-                <Text style={styles.titleText}>Últimos Pagamentos</Text>
+                <Text style={styles.pageTitle}>Últimos Pagamentos</Text>
                 {
                     pagamentos ? (
                         pagamentos.map((pagamento, id) => {
@@ -70,6 +70,25 @@ const EmprestimoWidget : React.FC<EmprestimoWidgetProps> = ( { emprestimo, proxi
                     <Text style= {styles.linkText}>Ver Histórico Completo</Text>
                 </TouchableOpacity>
             </View>
+            
+            <View style={styles.card}>
+                <Text style={styles.pageTitle}>
+                    Chave PIX para Recebimento
+                </Text>
+                <Text style={styles.text}>
+                    {
+                        "Confirme ou atualize sua chave PIX para que possamos enviar seu dinheiro."
+                    }
+                </Text>
+            </View>
+            <TouchableOpacity style={styles.button}>
+                <Text style={styles.buttonText}>
+                    {
+                        "Gerenciar Chave PIX"
+                    }
+                </Text>
+            </TouchableOpacity>
+
         </ScrollView>
     )
 }
@@ -94,6 +113,17 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 3.84,
         elevation: 5,
+    },
+    text: {
+        color: Colors.light.text,
+        fontSize: 16
+    },
+    pageTitle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: Colors.light.primaryDark,
+        textAlign: 'center',
+        marginVertical: 20,
     },
 
     titleText: {
@@ -137,7 +167,6 @@ const styles = StyleSheet.create({
         paddingVertical: 15,
         borderRadius: 12,
         alignItems: 'center',
-        marginTop: 10,
     },
 
     buttonSecondary : {

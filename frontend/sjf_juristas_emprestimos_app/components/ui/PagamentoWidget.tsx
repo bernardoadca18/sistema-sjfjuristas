@@ -1,6 +1,6 @@
 import { Parcela } from "@/types/Emprestimo";
 import formatCurrency from "@/utils/formatCurrency";
-import formatDate from "@/utils/formatData";
+import formatDate from "@/utils/formatDate";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import StatusWidget from "./StatusWidget";
@@ -20,9 +20,10 @@ const PagamentoWidget : React.FC<PagamentoWidgetProps> = ( { pagamento } ) => {
     )
 }
 
-const styles = StyleSheet.create({
-    row: {
-        
+const styles = StyleSheet.create(
+{
+    row:
+    {    
         flexDirection: 'row',       
         justifyContent: 'space-between', 
         alignItems: 'center',       
@@ -32,11 +33,13 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: '#f0f0f0',
     },
-    text: {
+    text:
+    {
         fontSize: 16,
         color: Colors.light.textSecondary,
     },
-    value: {
+    value:
+    {
         color: Colors.light.text,
         fontWeight: 'bold',
     }
