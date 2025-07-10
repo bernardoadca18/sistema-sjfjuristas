@@ -1,23 +1,79 @@
 import api from './api';
-import { Cliente, ChavePix } from '../types/Cliente';
-
+import { Cliente, ChavePix, TipoChavePix } from '../types/Cliente';
 
 export const getPerfil = async (): Promise<Cliente> => {
-    try {
+    try
+    {
         const response = await api.get('/cliente/perfil');
         return response.data;
-    } catch (error) {
+    } 
+    catch (error)
+    {
         console.error("Erro ao buscar perfil do cliente:", error);
         throw error;
     }
 };
 
 export const getChavesPix = async (): Promise<ChavePix[]> => {
-    try {
+    try
+    {
         const response = await api.get('/cliente/chaves-pix');
         return response.data;
-    } catch (error) {
+    } 
+    catch (error)
+    {
         console.error("Erro ao buscar chaves PIX:", error);
         throw error;
     }
 }
+
+export const addChavePix = async (tipoChavePixId: string, valorChave: string): Promise<ChavePix> => {
+    try
+    {
+        const response = await api.post('/cliente/chaves-pix', { tipoChavePixId, valorChave });
+        return response.data;
+    } 
+    catch (error)
+    {
+        console.error("Erro ao adicionar chave PIX:", error);
+        throw error;
+    }
+}
+
+export const setChavePixAtiva = async (chaveId: string): Promise<void> => {
+    try
+    {
+        await api.put(`/cliente/chaves-pix/${chaveId}/ativar`);
+    }
+    catch (error)
+    {
+        console.error("Erro ao ativar chave PIX:", error);
+        throw error;
+    }
+}
+
+export const deleteChavePix = async (chaveId: string): Promise<void> => {
+    try
+    {
+        await api.delete(`/cliente/chaves-pix/${chaveId}`);
+    } 
+    catch (error)
+    {
+        console.error("Erro ao deletar chave PIX:", error);
+        throw error;
+    }
+};
+
+export const getTiposChavePix = async (): Promise<TipoChavePix[]> => {
+    try
+    {
+        const response = await api.get("/tipo-chave-pix/non-paged");
+        return response.data;
+    } 
+    catch (error)
+    {
+        console.error("Erro ao buscar tipos de chave PIX:", error);
+        throw error;
+    }
+}
+
