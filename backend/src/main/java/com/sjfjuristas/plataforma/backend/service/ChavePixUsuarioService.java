@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +29,8 @@ public class ChavePixUsuarioService {
     @Autowired
     private TipoChavePixRepository tipoChavePixRepository;
 
+    private static final Logger logger = LoggerFactory.getLogger(ChavePixUsuarioService.class);
+
     @Transactional(readOnly = true)
     public List<ChavePixResponseDTO> getChavesPixDoUsuario(Usuario usuario)
     {
@@ -36,8 +40,7 @@ public class ChavePixUsuarioService {
     @Transactional
     public ChavePixResponseDTO addChavePix(Usuario usuario, ChavePixCreateRequestDTO dto)
     {
-        TipoChavePix tipoChave = tipoChavePixRepository.findById(dto.getTipoChavePixId())
-                .orElseThrow(() -> new EntityNotFoundException("Tipo de chave PIX não encontrado."));
+        TipoChavePix tipoChave = tipoChavePixRepository.findById(dto.getTipoChavePixId()).orElseThrow(() -> new EntityNotFoundException("Tipo de chave PIX não encontrado."));
 
         ChavePixUsuario novaChave = new ChavePixUsuario();
         novaChave.setUsuarioIdUsuarios(usuario);
@@ -52,6 +55,12 @@ public class ChavePixUsuarioService {
         ChavePixUsuario chaveSalva = chavePixRepository.save(novaChave);
         
         return toResponseDto(chaveSalva);
+    }
+
+    @Transactional
+    public ChavePixResponseDTO getChaveAtiva(Usuario usuario)
+    {
+        return chavePixRepository.findChavePixAtivaByUsuarioId(usuario.getId()).map(this::toResponseDto).orElseThrow(() -> new EntityNotFoundException("Nenhuma chave PIX ativa encontrada para este usuário."));
     }
     
     @Transactional
@@ -121,11 +130,22 @@ public class ChavePixUsuarioService {
         if (valor == null || valor.isEmpty()) {
             return "";
         }
+
+        logger.info(">>> MASCARANDO CHAVE TIPO '{}' <<<", tipo);
+
         return switch (tipo)
         {
             case "CPF" -> valor.replaceAll("(\\d{3})(\\d{3})(\\d{3})(\\d{2})", "***.$2.$3-**");
             case "E-mail" -> valor.replaceAll("(?<=.).(?=.*@)", "*");
             case "Telefone" -> valor.replaceAll("(\\d{2})(\\d{5})(\\d{4})", "($1) *****-$3");
+            case "Chave Aleatória" -> {
+                if (valor.length() > 12)
+                {
+                    yield valor.substring(0, 8) + "..." + valor.substring(valor.length() - 4);
+                }
+                yield valor.substring(0, 4) + "...";
+            }
+
             default -> valor;
         };
     }

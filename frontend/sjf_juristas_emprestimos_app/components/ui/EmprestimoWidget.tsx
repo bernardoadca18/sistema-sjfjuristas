@@ -6,14 +6,17 @@ import { Link } from 'expo-router';
 import formatDate from "@/utils/formatDate";
 import formatCurrency from "@/utils/formatCurrency";
 import PagamentoWidget from "./PagamentoWidget";
+import { ChavePix } from "@/types/Cliente";
+import { ChavePixItem } from "../ChavePixItem";
 
 interface EmprestimoWidgetProps {
     emprestimo: Emprestimo;
     proximaParcela?: Parcela;
-    pagamentos?: Parcela[] | null; 
+    pagamentos?: Parcela[] | null;
+    chavePixAtiva?: ChavePix | null;
 }
 
-const EmprestimoWidget : React.FC<EmprestimoWidgetProps> = ( { emprestimo, proximaParcela, pagamentos } ) => {
+const EmprestimoWidget : React.FC<EmprestimoWidgetProps> = ( { emprestimo, proximaParcela, pagamentos, chavePixAtiva } ) => {
     return (
         <ScrollView style={styles.container}>
             <View style={styles.card}>
@@ -71,23 +74,36 @@ const EmprestimoWidget : React.FC<EmprestimoWidgetProps> = ( { emprestimo, proxi
                 </TouchableOpacity>
             </View>
             
-            <View style={styles.card}>
-                <Text style={styles.pageTitle}>
-                    Chave PIX para Recebimento
-                </Text>
-                <Text style={styles.text}>
-                    {
-                        "Confirme ou atualize sua chave PIX para que possamos enviar seu dinheiro."
-                    }
-                </Text>
-            </View>
-            <TouchableOpacity style={styles.button}>
-                <Text style={styles.buttonText}>
-                    {
-                        "Gerenciar Chave PIX"
-                    }
-                </Text>
-            </TouchableOpacity>
+            {
+                chavePixAtiva ? (
+                    <>
+                        <Text style={styles.pageTitle}>
+                            Chave PIX para Recebimento
+                        </Text>
+                        <ChavePixItem item={chavePixAtiva} hideActions={true} onDelete={() => {}} onSetAtiva={() => {}} />
+                    </>
+                ) : (
+                    <>
+                        <View style={styles.card}>
+                            <Text style={styles.pageTitle}>
+                                Chave PIX para Recebimento
+                            </Text>
+                            <Text style={styles.text}>
+                                {
+                                    "Confirme ou atualize sua chave PIX para que possamos enviar seu dinheiro."
+                                }
+                            </Text>
+                        </View>
+                        <TouchableOpacity style={styles.button}>
+                            <Text style={styles.buttonText}>
+                                {
+                                    "Gerenciar Chave PIX"
+                                }
+                            </Text>
+                        </TouchableOpacity>
+                    </>
+                )
+            }
 
         </ScrollView>
     )

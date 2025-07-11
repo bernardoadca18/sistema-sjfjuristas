@@ -21,6 +21,7 @@ import com.sjfjuristas.plataforma.backend.dto.ChavesPixUsuario.ChavePixCreateReq
 import com.sjfjuristas.plataforma.backend.dto.ChavesPixUsuario.ChavePixResponseDTO;
 import com.sjfjuristas.plataforma.backend.service.ChavePixUsuarioService;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 
 @RestController
@@ -55,6 +56,20 @@ public class ChavePixUsuarioController
     {
         chavePixService.deleteChavePix(usuarioLogado, chaveId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/ativa")
+    public ResponseEntity<ChavePixResponseDTO> getMinhaChaveAtiva(@AuthenticationPrincipal Usuario usuarioLogado)
+    {
+        try 
+        {
+            ChavePixResponseDTO chaveAtiva = chavePixService.getChaveAtiva(usuarioLogado);
+            return ResponseEntity.ok(chaveAtiva);
+        } 
+        catch (EntityNotFoundException e) 
+        {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
 

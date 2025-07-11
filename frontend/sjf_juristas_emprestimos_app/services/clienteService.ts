@@ -27,6 +27,19 @@ export const getChavesPix = async (): Promise<ChavePix[]> => {
     }
 }
 
+export const getChavePixAtiva = async () : Promise<ChavePix> => {
+    try
+    {
+        const response = await api.get('/cliente/chaves-pix/ativa');
+        return response.data;
+    } 
+    catch (error)
+    {
+        console.error("Erro ao buscar chaves PIX:", error);
+        throw error;
+    }
+};
+
 export const addChavePix = async (tipoChavePixId: string, valorChave: string): Promise<ChavePix> => {
     try
     {
@@ -38,7 +51,7 @@ export const addChavePix = async (tipoChavePixId: string, valorChave: string): P
         console.error("Erro ao adicionar chave PIX:", error);
         throw error;
     }
-}
+};
 
 export const setChavePixAtiva = async (chaveId: string): Promise<void> => {
     try

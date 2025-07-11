@@ -54,7 +54,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }
             catch (e)
             {
-                console.error("Falha ao carregar sessão do usuário.", e);
+                console.error("Falha ao carregar sessão do usuário. ");
             }
             finally
             {

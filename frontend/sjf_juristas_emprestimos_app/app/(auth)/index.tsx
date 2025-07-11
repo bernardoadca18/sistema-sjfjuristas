@@ -23,7 +23,7 @@ const LoginScreen : React.FC = () => {
 
         if (!result.success)
         {
-            Alert.alert("Erro no Login", result.error);
+            Alert.alert("Erro no Login");
         }
     }
 

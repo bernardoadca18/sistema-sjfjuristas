@@ -1,9 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { StyleSheet, Text, View, ActivityIndicator, ScrollView, RefreshControl } from 'react-native';
+import { StyleSheet, Text, ActivityIndicator, ScrollView, RefreshControl } from 'react-native';
 import EmprestimoWidget from '@/components/ui/EmprestimoWidget';
 import { Colors } from '@/constants/Colors';
 import { getEmprestimosAtivos, getParcelasForWidget, getProximaParcela } from '@/services/emprestimoService';
 import { Emprestimo, Parcela } from '@/types/Emprestimo';
+import { ChavePix } from '@/types/Cliente';
+import { getChavePixAtiva } from '@/services/clienteService';
 
 
 const HomeScreen: React.FC = () => {
@@ -12,6 +14,8 @@ const HomeScreen: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [proximaParcela, setProximaParcela] = useState<Parcela | null>();
     const [pagamentos, setPagamentos] = useState<Parcela[] | null>();
+    const [chavePixAtiva, setChavePixAtiva] = useState<ChavePix | null>(null);
+
     //const [parcelasEmprestimo, setParcelasEmprestimo] = useState<Parcela[] | null>();
 
     const fetchEmprestimoData = useCallback(async () => {
@@ -67,6 +71,26 @@ const HomeScreen: React.FC = () => {
             setIsLoading(false);
         }
     }, []);
+
+    const fetchChavePixAtiva = useCallback(async () => {
+        setError(null);
+        setChavePixAtiva(null);
+        try 
+        {
+           const chavePixResponse = await getChavePixAtiva();
+           console.log("[DEBUG] Chave Pix Ativa Recebida: ", JSON.stringify(chavePixResponse));
+           setChavePixAtiva(chavePixResponse);
+        } 
+        catch (e) 
+        {
+            setError("Não foi possível carregar os dados da chave pix.");
+            console.error(e);
+        } 
+        finally 
+        {
+            setIsLoading(false);
+        }
+    }, []);
 /*
     const fetchParcelasEmprestimo = async (emprestimo: Emprestimo) => {
       try
@@ -93,13 +117,15 @@ const HomeScreen: React.FC = () => {
 
     useEffect(() => {
       fetchEmprestimoData();
+      fetchChavePixAtiva();
 
-    }, [fetchEmprestimoData]);
+    }, [fetchEmprestimoData, fetchChavePixAtiva]);
 
     const onRefresh = React.useCallback(() => {
       setIsLoading(true);
       fetchEmprestimoData();
-    }, [fetchEmprestimoData])
+      fetchChavePixAtiva();
+    }, [fetchEmprestimoData, fetchChavePixAtiva])
 
     const renderContent = () => {
       if (isLoading)
@@ -107,14 +133,9 @@ const HomeScreen: React.FC = () => {
         return <ActivityIndicator size={`large`} color={Colors.light.primary} style={{ marginTop: 50 }}></ActivityIndicator>;
       }
 
-      if (error)
-      {
-        <Text style={styles.errorText}>{error}</Text>
-      }
-
       if (emprestimo && proximaParcela)
       {
-        return <EmprestimoWidget emprestimo={emprestimo} proximaParcela={proximaParcela} pagamentos={pagamentos}/>;
+        return <EmprestimoWidget emprestimo={emprestimo} proximaParcela={proximaParcela} pagamentos={pagamentos} chavePixAtiva={chavePixAtiva}/>;
       }
 
       return <Text style={styles.infoText}>Nenhum empréstimo ativo encontrado.</Text>
