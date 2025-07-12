@@ -1,21 +1,29 @@
 package com.sjfjuristas.plataforma.backend.controller;
 
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.sjfjuristas.plataforma.backend.domain.PropostaEmprestimo;
+import com.sjfjuristas.plataforma.backend.domain.Usuario;
 import com.sjfjuristas.plataforma.backend.dto.PropostasEmprestimo.PropostaHistoricoResponseDTO;
 import com.sjfjuristas.plataforma.backend.dto.PropostasEmprestimo.PropostaResponseDTO;
 import com.sjfjuristas.plataforma.backend.dto.PropostasEmprestimo.RespostaClienteDTO;
 import com.sjfjuristas.plataforma.backend.service.PropostaService;
+
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.data.domain.Sort;
-import java.util.UUID;
-import com.sjfjuristas.plataforma.backend.domain.Usuario;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 @RestController
 @RequestMapping("/api/cliente/propostas")
@@ -26,9 +34,9 @@ public class PropostaClienteController
     private PropostaService propostaService;
 
     @PostMapping("/{propostaId}/responder")
-    public ResponseEntity<PropostaResponseDTO> responderContraproposta(@PathVariable UUID propostaId, @Valid @RequestBody RespostaClienteDTO respostaDTO)
+    public ResponseEntity<PropostaResponseDTO> responderContraproposta(@AuthenticationPrincipal Usuario usuarioLogado, @PathVariable UUID propostaId, @Valid @RequestBody RespostaClienteDTO respostaDTO)
     {
-        PropostaEmprestimo propostaAtualizada = propostaService.processarRespostaCliente(propostaId, respostaDTO);
+        PropostaEmprestimo propostaAtualizada = propostaService.processarRespostaCliente(propostaId, respostaDTO, usuarioLogado.getId());
 
         PropostaResponseDTO response = new PropostaResponseDTO(
             propostaAtualizada.getId(),

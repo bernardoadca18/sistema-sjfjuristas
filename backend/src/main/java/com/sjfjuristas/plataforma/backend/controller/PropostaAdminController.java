@@ -56,7 +56,7 @@ public class PropostaAdminController
     @PostMapping("/{propostaId}/contraproposta")
     public ResponseEntity<PropostaResponseDTO> enviarContrapropostaAdmin(@PathVariable UUID propostaId, @Valid @RequestBody ContrapropostaAdminRequestDTO dto)
     {
-        PropostaEmprestimo propostaAtualizada = propostaService.salvarContrapropostaAdmin(propostaId, dto);
+        PropostaEmprestimo propostaAtualizada = propostaService.enviarContrapropostaAdmin(propostaId, dto);
         PropostaResponseDTO response = new PropostaResponseDTO(
             propostaAtualizada.getId(),
             propostaAtualizada.getValorOfertado(),
@@ -71,7 +71,7 @@ public class PropostaAdminController
     @PostMapping("/{propostaId}/negar")
     public ResponseEntity<Void> negarProposta(@PathVariable UUID propostaId, @RequestBody String motivo)
     {
-        propostaService.negarProposta(propostaId, motivo);
+        propostaService.negarPropostaAdmin(propostaId, motivo);
         return ResponseEntity.ok().build();
     }
 

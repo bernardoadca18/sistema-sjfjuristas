@@ -95,6 +95,7 @@ const PixManagementScreen = () => {
     return (
         <View style={styles.container}>
             <Stack.Screen options={{title: 'Chaves PIX'}} />
+            <Text style={styles.pageTitle}>Chaves PIX</Text>
             <FlatList
                 data={chaves}
                 renderItem={renderItem}
@@ -312,5 +313,13 @@ const styles = StyleSheet.create(
     pickerButtonText: { fontSize: 16, color: '#333' },
     pickerModalView: { width: '80%', maxHeight: '50%', backgroundColor: 'white', borderRadius: 10, padding: 20, alignItems: 'center', elevation: 10 },
     pickerItem: { paddingVertical: 15, borderBottomWidth: 1, borderBottomColor: '#eee', width: '100%' },
-    pickerItemText: { textAlign: 'center', fontSize: 18 }
+    pickerItemText: { textAlign: 'center', fontSize: 18 },
+    pageTitle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: Colors.light.primaryDark,
+        textAlign: 'center',
+        marginVertical: 20,
+    },
+
 });
