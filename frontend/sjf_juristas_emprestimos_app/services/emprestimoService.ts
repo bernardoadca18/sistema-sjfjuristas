@@ -117,3 +117,16 @@ export const getPagamentos = async (emprestimoId: string, page?: number, size? :
         throw error;
     }
 }
+
+export const getParcelaById = async (id: string): Promise<Parcela> => {
+  try 
+  {
+    const response = await api.get(`/cliente/parcelas/${id}`);
+    return response.data;
+  } 
+  catch (error) 
+  {
+    console.error(`Erro ao buscar a parcela com ID ${id}:`, error);
+    throw error;
+  }
+};

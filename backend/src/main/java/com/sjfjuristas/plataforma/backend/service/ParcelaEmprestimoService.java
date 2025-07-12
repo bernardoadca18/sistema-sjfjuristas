@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -72,6 +73,20 @@ public class ParcelaEmprestimoService
 
         return new ParcelaEmprestimoResponseDTO(parcelaEmprestimo);
     }
+
+
+    public ParcelaEmprestimoResponseDTO getParcelaDTOByIdAndUsuario(UUID parcelaId, UUID usuarioId)
+    {
+        ParcelaEmprestimo parcela = parcelaRepository.findById(parcelaId).orElseThrow(() -> new EntityNotFoundException("Parcela não encontrada com o ID: " + parcelaId));
+
+        if (!parcela.getEmprestimoIdEmprestimos().getUsuarioIdUsuarios().getId().equals(usuarioId))
+        {
+            throw new AccessDeniedException("Acesso negado. Esta parcela não pertence ao usuário autenticado.");
+        }
+
+        return new ParcelaEmprestimoResponseDTO(parcela);
+    }
+
     
     @Transactional
     private ParcelaEmprestimo gerarEPersistirPix(ParcelaEmprestimo parcela, BigDecimal valor, String descricao) {

@@ -11,41 +11,44 @@ interface ParcelaWidgetProps
 {
     parcela: Parcela;
     isNextPayment: boolean;
+    onPress?: () => void;
 }
 
-const ParcelaWidget: React.FC<ParcelaWidgetProps> = ( { parcela, isNextPayment } ) => {
+const ParcelaWidget: React.FC<ParcelaWidgetProps> = ( { parcela, isNextPayment, onPress } ) => {
     const temDetalhes = parcela.valorPrincipal > 0 || parcela.valorJuros > 0;
 
     return (
-        <View style={styles.container}>
-            <View style={styles.infoContainer}>
-                <Text style={styles.parcelaNumero}>Parcela {parcela.numeroParcela}</Text>
-                <Text style={styles.text}>Vencimento: {formatDate(parcela.dataVencimento)}</Text>
-                <Text style={[styles.text, styles.valor]}>{formatCurrency(parcela.valorTotalParcela)}</Text>
-                {
-                    temDetalhes && (
-                        <Text style={styles.detalheValor}>
-                            ({formatCurrency(parcela.valorPrincipal)} de principal + {formatCurrency(parcela.valorJuros)} de juros)
-                        </Text>
-                    )
-                }
-            </View>
-
-            <View style={styles.statusContainer}>
-                <StatusWidget status={parcela.statusPagamentoParcelaNome}/>
+        <TouchableOpacity onPress={onPress} disabled={!onPress}>
+            <View style={styles.container}>
+                <View style={styles.infoContainer}>
+                    <Text style={styles.parcelaNumero}>Parcela {parcela.numeroParcela}</Text>
+                    <Text style={styles.text}>Vencimento: {formatDate(parcela.dataVencimento)}</Text>
+                    <Text style={[styles.text, styles.valor]}>{formatCurrency(parcela.valorTotalParcela)}</Text>
                     {
-                        isNextPayment && (
-                            <Link href={{ pathname: "/payment/[id]", params: {id: parcela.id} }} asChild>
-                                <TouchableOpacity style={styles.pagarButton}>
-                                    <Text style={styles.pagarButtonText}>
-                                        Pagar
-                                    </Text>
-                                </TouchableOpacity>
-                            </Link>
+                        temDetalhes && (
+                            <Text style={styles.detalheValor}>
+                                ({formatCurrency(parcela.valorPrincipal)} de principal + {formatCurrency(parcela.valorJuros)} de juros)
+                            </Text>
                         )
                     }
+                </View>
+
+                <View style={styles.statusContainer}>
+                    <StatusWidget status={parcela.statusPagamentoParcelaNome}/>
+                        {
+                            isNextPayment && (
+                                <Link href={{ pathname: "/payment/[id]", params: {id: parcela.id} }} asChild>
+                                    <TouchableOpacity style={styles.pagarButton}>
+                                        <Text style={styles.pagarButtonText}>
+                                            Pagar
+                                        </Text>
+                                    </TouchableOpacity>
+                                </Link>
+                            )
+                        }
+                </View>
             </View>
-        </View>
+        </TouchableOpacity>
     )
 }
 

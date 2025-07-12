@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.UUID;
+import com.sjfjuristas.plataforma.backend.domain.PropostaHistorico;
 
 @Data
 @Builder
@@ -27,5 +28,22 @@ public class PropostaHistoricoResponseDTO
     private BigDecimal taxaJurosNova;
     private String motivoRecusa;
     private String observacoes;
+
+    public PropostaHistoricoResponseDTO(PropostaHistorico entity)
+    {
+        this.id = entity.getId();
+        this.dataAlteracao = entity.getDataAlteracao();
+        this.atorAlteracao = entity.getAtorAlteracao();
+        this.statusAnterior = entity.getStatusAnterior();
+        this.statusNovo = entity.getStatusNovo();
+        this.valorAnterior = entity.getValorAnterior();
+        this.valorNovo = entity.getValorNovo();
+        this.numParcelasAnterior = entity.getNumParcelasAnterior();
+        this.numParcelasNovo = entity.getNumParcelasNovo();
+        this.taxaJurosAnterior = entity.getTaxaJurosAnterior();
+        this.taxaJurosNova = entity.getTaxaJurosNova();
+        this.motivoRecusa = entity.getMotivoRecusa();
+        this.observacoes = entity.getObservacoes();
+    }
 }
 

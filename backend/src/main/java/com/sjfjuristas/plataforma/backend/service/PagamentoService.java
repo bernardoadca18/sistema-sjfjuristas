@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -79,5 +81,16 @@ public class PagamentoService
         Emprestimo emprestimo = emprestimoRepository.findById(emprestimoId).orElseThrow(() -> new EntityNotFoundException("Empréstimo não encontrado."));
         Page<PagamentoParcela> pagamentosPage = pagamentoParcelaRepository.findByEmprestimoIdEmprestimos(emprestimo, pageable);
         return pagamentosPage.map(PagamentoParcelaResponseDTO::new);
+    }
+
+    public void validarPropriedadeEmprestimo(UUID emprestimoId)
+    {
+        String emailUsuarioLogado = SecurityContextHolder.getContext().getAuthentication().getName();
+        Emprestimo emprestimo = emprestimoRepository.findById(emprestimoId).orElseThrow(() -> new EntityNotFoundException("Empréstimo não encontrado com o ID: " + emprestimoId));
+        
+        if (!emprestimo.getUsuarioIdUsuarios().getEmail().equals(emailUsuarioLogado))
+        {
+            throw new AccessDeniedException("Acesso negado. Este empréstimo não pertence ao usuário autenticado.");
+        }
     }
 }
