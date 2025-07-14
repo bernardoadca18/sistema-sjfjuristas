@@ -38,15 +38,7 @@ public class PropostaClienteController
     {
         PropostaEmprestimo propostaAtualizada = propostaService.processarRespostaCliente(propostaId, respostaDTO, usuarioLogado.getId());
 
-        PropostaResponseDTO response = new PropostaResponseDTO(
-            propostaAtualizada.getId(),
-            propostaAtualizada.getValorOfertado() != null ? propostaAtualizada.getValorOfertado() : propostaAtualizada.getValorSolicitado(),
-            propostaAtualizada.getNomeCompletoSolicitante(),
-            propostaAtualizada.getEmailSolicitante(),
-            propostaAtualizada.getDataSolicitacao(),
-            propostaAtualizada.getStatusPropostaIdStatusproposta().getNomeStatus()
-        );
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new PropostaResponseDTO(propostaAtualizada));
     }
 
     @GetMapping("/{propostaId}/historico")

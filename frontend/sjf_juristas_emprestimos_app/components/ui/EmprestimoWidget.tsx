@@ -14,9 +14,11 @@ interface EmprestimoWidgetProps {
     proximaParcela?: Parcela;
     pagamentos?: Parcela[] | null;
     chavePixAtiva?: ChavePix | null;
+    isSummary?: boolean;
+    showPixMenu?: boolean;
 }
 
-const EmprestimoWidget : React.FC<EmprestimoWidgetProps> = ( { emprestimo, proximaParcela, pagamentos, chavePixAtiva } ) => {
+const EmprestimoWidget : React.FC<EmprestimoWidgetProps> = ( { emprestimo, proximaParcela, pagamentos, chavePixAtiva, showPixMenu=true } ) => {
     return (
         <ScrollView style={styles.container}>
             <View style={styles.card}>
@@ -75,34 +77,40 @@ const EmprestimoWidget : React.FC<EmprestimoWidgetProps> = ( { emprestimo, proxi
             </View>
             
             {
-                chavePixAtiva ? (
-                    <>
-                        <Text style={styles.pageTitle}>
-                            Chave PIX para Recebimento
-                        </Text>
-                        <ChavePixItem item={chavePixAtiva} hideActions={true} onDelete={() => {}} onSetAtiva={() => {}} />
-                    </>
-                ) : (
-                    <>
-                        <View style={styles.card}>
-                            <Text style={styles.pageTitle}>
-                                Chave PIX para Recebimento
-                            </Text>
-                            <Text style={styles.text}>
-                                {
-                                    "Confirme ou atualize sua chave PIX para que possamos enviar seu dinheiro."
-                                }
-                            </Text>
-                        </View>
-                        <TouchableOpacity style={styles.button}>
-                            <Text style={styles.buttonText}>
-                                {
-                                    "Gerenciar Chave PIX"
-                                }
-                            </Text>
-                        </TouchableOpacity>
-                    </>
-                )
+                showPixMenu ? (
+                    <View>
+                        {
+                            chavePixAtiva ? (
+                                <>
+                                    <Text style={styles.pageTitle}>
+                                        Chave PIX para Recebimento
+                                    </Text>
+                                    <ChavePixItem item={chavePixAtiva} hideActions={true} onDelete={() => {}} onSetAtiva={() => {}} />
+                                </>
+                            ) : (
+                                <>
+                                    <View style={styles.card}>
+                                        <Text style={styles.pageTitle}>
+                                            Chave PIX para Recebimento
+                                        </Text>
+                                        <Text style={styles.text}>
+                                            {
+                                                "Confirme ou atualize sua chave PIX para que possamos enviar seu dinheiro."
+                                            }
+                                        </Text>
+                                    </View>
+                                    <TouchableOpacity style={styles.button}>
+                                        <Text style={styles.buttonText}>
+                                            {
+                                                "Gerenciar Chave PIX"
+                                            }
+                                        </Text>
+                                    </TouchableOpacity>
+                                </>
+                            )
+                        }
+                    </View>
+                ) : (<></>)
             }
 
         </ScrollView>

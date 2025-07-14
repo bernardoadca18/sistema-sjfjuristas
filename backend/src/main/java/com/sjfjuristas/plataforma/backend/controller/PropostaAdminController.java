@@ -57,14 +57,7 @@ public class PropostaAdminController
     public ResponseEntity<PropostaResponseDTO> enviarContrapropostaAdmin(@PathVariable UUID propostaId, @Valid @RequestBody ContrapropostaAdminRequestDTO dto)
     {
         PropostaEmprestimo propostaAtualizada = propostaService.enviarContrapropostaAdmin(propostaId, dto);
-        PropostaResponseDTO response = new PropostaResponseDTO(
-            propostaAtualizada.getId(),
-            propostaAtualizada.getValorOfertado(),
-            propostaAtualizada.getNomeCompletoSolicitante(),
-            propostaAtualizada.getEmailSolicitante(),
-            propostaAtualizada.getDataSolicitacao(),
-            propostaAtualizada.getStatusPropostaIdStatusproposta().getNomeStatus()
-        );
+        PropostaResponseDTO response = new PropostaResponseDTO(propostaAtualizada);
         return ResponseEntity.ok(response);
     }
 

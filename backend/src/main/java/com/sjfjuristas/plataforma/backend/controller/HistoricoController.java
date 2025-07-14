@@ -22,7 +22,6 @@ import com.sjfjuristas.plataforma.backend.dto.PropostasEmprestimo.PropostaHistor
 import com.sjfjuristas.plataforma.backend.repository.EmprestimoRepository;
 import com.sjfjuristas.plataforma.backend.service.EmprestimoService;
 import com.sjfjuristas.plataforma.backend.service.PropostaHistoricoService;
-import com.sjfjuristas.plataforma.backend.service.PropostaService;
 
 @RestController
 @RequestMapping("/api/cliente/historico")
@@ -37,8 +36,6 @@ public class HistoricoController
     @Autowired
     private PropostaHistoricoService propostaHistoricoService;
 
-    @Autowired
-    PropostaService propostaService;
 
     @GetMapping("/emprestimos")
     public ResponseEntity<Page<EmprestimoClienteResponseDTO>> getHistoricoEmprestimos(@AuthenticationPrincipal Usuario usuarioLogado, @PageableDefault(sort = "dataContratacao", direction = Sort.Direction.DESC) Pageable pageable)
@@ -52,7 +49,7 @@ public class HistoricoController
         return ResponseEntity.ok(emprestimoService.getParcelasDoEmprestimo(emprestimoId, usuarioLogado.getId(), pageable));
     }
 
-    @GetMapping("/emprestimos/propostas")
+    @GetMapping("/emprestimos/{emprestimoId}/propostas")
     public ResponseEntity<Page<PropostaHistoricoResponseDTO>> getHistoricoPropostas( @AuthenticationPrincipal Usuario usuarioLogado, @PathVariable UUID emprestimoId, Pageable pageable)
     {
         Emprestimo emprestimo = emprestimoRepository.findById(emprestimoId).get();

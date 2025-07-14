@@ -51,9 +51,9 @@ const PreCadastroScreen : React.FC = () => {
             <Text style={styles.title}>Primeiro Acesso</Text>
             <Text style={styles.subtitle}>Informe os dados utilizados na sua proposta para continuar.</Text>
 
-            <MaskInput style={styles.input} value={cpf} mask={cpfMask} placeholder='CPF' keyboardType='numeric' onChangeText={(masked, unmasked) => { setCpf(masked); setUnmaskedCpf(unmasked) }}></MaskInput>
-            <TextInput style={styles.input} placeholder="E-mail" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
-            <MaskInput style={styles.input} value={dataNascimento} mask={dateMask} placeholder='Data de Nascimento (DD/MM/AAAA)' keyboardType='numeric' onChangeText={(masked, unmasked) => { setDataNascimento(masked); setUnmaskedDataNascimento(unmasked) }}></MaskInput>
+            <MaskInput style={styles.input} value={cpf} mask={cpfMask} placeholder='CPF' keyboardType='numeric' onChangeText={(masked, unmasked) => { setCpf(masked); setUnmaskedCpf(unmasked) }} placeholderTextColor={Colors.light.textSecondary}></MaskInput>
+            <TextInput style={styles.input} placeholder="E-mail" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" placeholderTextColor={Colors.light.textSecondary}/>
+            <MaskInput style={styles.input} value={dataNascimento} mask={dateMask} placeholder='Data de Nascimento (DD/MM/AAAA)' keyboardType='numeric' onChangeText={(masked, unmasked) => { setDataNascimento(masked); setUnmaskedDataNascimento(unmasked) }} placeholderTextColor={Colors.light.textSecondary}></MaskInput>
 
 
             <TouchableOpacity onPress={handleVerify} disabled={isLoading} style={[styles.button, isLoading && styles.buttonDisabled]}>

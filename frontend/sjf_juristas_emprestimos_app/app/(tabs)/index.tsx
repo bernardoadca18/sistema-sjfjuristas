@@ -91,7 +91,7 @@ const HomeScreen: React.FC = () => {
             setIsLoading(false);
         }
     }, []);
-/*
+    /*
     const fetchParcelasEmprestimo = async (emprestimo: Emprestimo) => {
       try
       {
@@ -113,7 +113,8 @@ const HomeScreen: React.FC = () => {
         setError("Não foi possível carregar os dados das parcelas do empréstimo.");
         console.error(error);
       }
-    };*/
+    };
+    */
 
     useEffect(() => {
       fetchEmprestimoData();

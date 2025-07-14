@@ -55,8 +55,8 @@ export default function FinalizarCadastroScreen() {
         <View style={styles.container}>
             <Text style={styles.title}>Falta pouco, {onboardingData?.nomeCompleto}!</Text>
             <Text style={styles.subtitle}>Crie uma senha para acessar o aplicativo com segurança.</Text>
-            <TextInput style={styles.input} placeholder="Crie sua senha" value={senha} onChangeText={setSenha} secureTextEntry />
-            <TextInput style={styles.input} placeholder="Confirme sua senha" value={confirmarSenha} onChangeText={setConfirmarSenha} secureTextEntry />
+            <TextInput style={styles.input} placeholder="Crie sua senha" value={senha} onChangeText={setSenha} secureTextEntry placeholderTextColor={Colors.light.textSecondary} />
+            <TextInput style={styles.input} placeholder="Confirme sua senha" value={confirmarSenha} onChangeText={setConfirmarSenha} secureTextEntry placeholderTextColor={Colors.light.textSecondary} />
             
             <View style={styles.termsContainer}>
                 <Switch 

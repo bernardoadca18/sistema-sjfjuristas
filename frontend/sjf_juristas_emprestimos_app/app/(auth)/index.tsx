@@ -30,8 +30,8 @@ const LoginScreen : React.FC = () => {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Bem-vindo à SJF Juristas</Text>
-            <TextInput style={styles.input} placeholder="E-mail" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
-            <TextInput style={styles.input} placeholder="Senha" value={senha} onChangeText={setSenha} secureTextEntry />
+            <TextInput style={styles.input} placeholder="E-mail" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" placeholderTextColor={Colors.light.textSecondary}/>
+            <TextInput style={styles.input} placeholder="Senha" value={senha} onChangeText={setSenha} secureTextEntry placeholderTextColor={Colors.light.textSecondary}/>
             <TouchableOpacity style={[styles.button, isLoading && styles.buttonDisabled]} onPress={handleLogin} disabled={isLoading}>
                 <Text style={styles.buttonText}>{isLoading ? "Entrando..." : "Entrar"}</Text>
             </TouchableOpacity>
