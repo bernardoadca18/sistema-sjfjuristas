@@ -37,6 +37,8 @@ public class EmprestimoClienteController
         return ResponseEntity.ok(pagina);
     }
 
+    
+
     @GetMapping("/{emprestimoId}")
     public ResponseEntity<EmprestimoClienteResponseDTO> getMeuEmprestimoPorId(@AuthenticationPrincipal Usuario usuarioLogado, @PathVariable UUID emprestimoId)
     {

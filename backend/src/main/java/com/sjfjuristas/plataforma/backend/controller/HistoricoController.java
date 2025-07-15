@@ -1,5 +1,6 @@
 package com.sjfjuristas.plataforma.backend.controller;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sjfjuristas.plataforma.backend.domain.Emprestimo;
 import com.sjfjuristas.plataforma.backend.domain.Usuario;
 import com.sjfjuristas.plataforma.backend.dto.Emprestimos.EmprestimoClienteResponseDTO;
+import com.sjfjuristas.plataforma.backend.dto.Emprestimos.EmprestimoSummaryDTO;
 import com.sjfjuristas.plataforma.backend.dto.ParcelaEmprestimo.ParcelaEmprestimoResponseDTO;
 import com.sjfjuristas.plataforma.backend.dto.PropostasEmprestimo.PropostaHistoricoResponseDTO;
 import com.sjfjuristas.plataforma.backend.repository.EmprestimoRepository;
@@ -41,6 +43,12 @@ public class HistoricoController
     public ResponseEntity<Page<EmprestimoClienteResponseDTO>> getHistoricoEmprestimos(@AuthenticationPrincipal Usuario usuarioLogado, @PageableDefault(sort = "dataContratacao", direction = Sort.Direction.DESC) Pageable pageable)
     {
         return ResponseEntity.ok(emprestimoService.getEmprestimosDoCliente(usuarioLogado.getId(), pageable));
+    }
+
+    @GetMapping("/emprestimos/summary")
+    public ResponseEntity<List<EmprestimoSummaryDTO>> getInfoEmprestimosDoCliente(@AuthenticationPrincipal Usuario usuarioLogado)
+    {
+        return ResponseEntity.ok(emprestimoService.getInfoEmprestimosDoCliente(usuarioLogado.getId()));
     }
 
     @GetMapping("/emprestimos/{emprestimoId}/parcelas")

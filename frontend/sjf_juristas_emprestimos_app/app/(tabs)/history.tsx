@@ -1,6 +1,6 @@
 import { getEmprestimosAtivos, getParcelas } from "@/services/emprestimoService";
-import { getHistoricoEmprestimos, getHistoricoParcelas, getHistoricoPropostas, getMinhasPropostas } from "@/services/historicoService";
-import { Emprestimo, Parcela } from "@/types/Emprestimo";
+import { getHistoricoEmprestimos, getHistoricoEmprestimosSummary, getHistoricoParcelas, getHistoricoPropostas, getMinhasPropostas } from "@/services/historicoService";
+import { Emprestimo, EmprestimoSummary, Parcela } from "@/types/Emprestimo";
 import { Proposta, PropostaHistorico } from "@/types/Proposta";
 import React, { useCallback, useState } from "react";
 
@@ -12,6 +12,7 @@ const HistoryScreen : React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
 
     const [emprestimos, setEmprestimos] = useState<Emprestimo[]>([]);
+    const [emprestimosSummary, setEmprestimosSummary] = useState<EmprestimoSummary[]>([]);
     const [propostas, setPropostas] = useState<Proposta[]>([]);
     const [parcelas, setParcelas] = useState<Parcela[]>([]);
     const [historicoProposta, setHistoricoProposta] = useState<PropostaHistorico[]>([]);
@@ -71,6 +72,31 @@ const HistoryScreen : React.FC = () => {
         }
 
     }, []);
+
+    const handleHistoryTypeChange = async (type : HistoryType) => {
+        setHistoryType(type);
+        setSelectedEmprestimoId(null);
+        setSelectedPropostaId(null);
+
+        if (type === 'emprestimos')
+        {
+            fetchHistory('emprestimos');
+        }
+        else if (type ===  'parcelas_emprestimo')
+        {
+            const emprestimosResponse = await getHistoricoEmprestimosSummary();
+
+
+        }
+        else if (type === 'propostas')
+        {
+            fetchHistory('propostas');
+        }
+        else if (type === 'historico_proposta')
+        {
+
+        }
+    }
 
     return (<></>);
 };

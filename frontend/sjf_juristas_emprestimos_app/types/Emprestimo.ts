@@ -14,6 +14,15 @@ export interface Emprestimo
     dataInicioCobrancaParcelas: string;
     proximaParcela: Parcela | null;
 }
+
+export interface EmprestimoSummary
+{
+    id : string;
+    valor : number;
+    numeroParcelas : number;
+    dataContratacao : string;
+}
+
 export interface Parcela
 {
     id: string;

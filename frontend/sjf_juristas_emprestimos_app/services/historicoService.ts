@@ -17,7 +17,7 @@ export const getHistoricoParcelas = async (emprestimoId: string, page: number, s
     return response.data;
 };
 
-export const getHistoricoPropostas = async (emprestimoId: string, page: number, size: number): Promise<Page<Proposta>> => {
+export const getHistoricoPropostas = async (emprestimoId: string, page: number, size: number): Promise<Page<PropostaHistorico>> => {
     const response = await api.get(`/cliente/historico/emprestimos/${emprestimoId}/propostas`, {
         params: { page, size },
     });
@@ -30,3 +30,8 @@ export const getMinhasPropostas = async (page: number, size: number): Promise<Pa
     });
     return response.data;
 };
+
+export const getHistoricoEmprestimosSummary = async () : Promise<Emprestimo[]> => {
+    const response = await api.get('/cliente/historico/emprestimos/summary');
+    return response.data;
+}
