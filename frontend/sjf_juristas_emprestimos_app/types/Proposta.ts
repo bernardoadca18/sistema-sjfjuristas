@@ -27,3 +27,8 @@ export interface PropostaHistorico
     motivoRecusa?: string;
     observacoes?: string;
 }
+
+export interface RespostaCliente
+{
+    
+}

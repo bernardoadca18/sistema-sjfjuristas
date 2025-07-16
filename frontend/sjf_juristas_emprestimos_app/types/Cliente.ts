@@ -24,3 +24,11 @@ export interface TipoChavePix
     nomeTipo: string;
     mascara?: string;
 }
+
+export interface ClienteUpdateRequest
+{
+    nomeCompleto?: string;
+    telefoneWhatsapp?: string;
+    dataNascimento?: string;
+    enderecoCompleto?: string;
+}

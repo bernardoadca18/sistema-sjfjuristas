@@ -1,5 +1,5 @@
 import api from './api';
-import { Cliente, ChavePix, TipoChavePix } from '../types/Cliente';
+import { Cliente, ChavePix, TipoChavePix, ClienteUpdateRequest } from '../types/Cliente';
 
 export const getPerfil = async (): Promise<Cliente> => {
     try
@@ -98,3 +98,14 @@ export const getTiposChavePix = async (): Promise<TipoChavePix[]> => {
     }
 }
 
+export const updatePerfil = async (data: ClienteUpdateRequest): Promise<void> => {
+    try
+    {
+        await api.put('/cliente/perfil', data);
+    }
+    catch (error)
+    {
+        console.error("Erro ao atualizar o perfil do cliente:", error);
+        throw error;
+    }
+};

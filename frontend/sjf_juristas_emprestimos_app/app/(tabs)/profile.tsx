@@ -51,7 +51,7 @@ export default function ProfileScreen() {
 
       <View style={styles.buttonContainer}>
           <Text style={styles.title}>{"Configurações da Conta"}</Text>
-          <Link href={`/(tabs)/pix`} asChild>
+          <Link href={`/(tabs)/editar-cadastro`} asChild>
               <TouchableOpacity style={styles.regularButton}>
                   <Text style={styles.regularButtonText}>Editar dados Cadastrais</Text>
               </TouchableOpacity>

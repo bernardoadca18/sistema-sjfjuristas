@@ -19,6 +19,7 @@ export default function TabLayout() {
             <Tabs.Screen name="notifications" options={{ title: 'Notificações', tabBarIcon: ({ color, focused}) => (<Ionicons name={focused ? 'notifications' : 'notifications-outline'} size={28} color={color} />)  }} />
             <Tabs.Screen name="profile" options={{ title: 'Perfil', tabBarIcon: ({ color, focused}) => (<Ionicons name={focused ? 'person' : 'person-outline'} size={28} color={color} />) }} />
             <Tabs.Screen name="loan-details/[id]" options={{ href: null, }}/>
+            <Tabs.Screen name="editar-cadastro" options={{ href: null, }}/>
         </Tabs>
     );
 }
