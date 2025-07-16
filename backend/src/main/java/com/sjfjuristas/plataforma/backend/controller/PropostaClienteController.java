@@ -1,5 +1,6 @@
 package com.sjfjuristas.plataforma.backend.controller;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,18 @@ public class PropostaClienteController
 {
     @Autowired
     private PropostaService propostaService;
+
+    @GetMapping
+    public ResponseEntity<Page<PropostaResponseDTO>> getMyPropostas(@AuthenticationPrincipal Usuario usuarioLogado, @PageableDefault(page = 0, size = 10) Pageable pageable)
+    {
+        return ResponseEntity.ok(propostaService.getMyPropostas(usuarioLogado.getId(), pageable));
+    }
+
+    @GetMapping("/non-paged")
+    public ResponseEntity<List<PropostaResponseDTO>> getMyPropostasNonPaged(@AuthenticationPrincipal Usuario usuarioLogado)
+    {
+        return ResponseEntity.ok(propostaService.getMyPropostasNonPaged(usuarioLogado.getId()));
+    }
 
     @PostMapping("/{propostaId}/responder")
     public ResponseEntity<PropostaResponseDTO> responderContraproposta(@AuthenticationPrincipal Usuario usuarioLogado, @PathVariable UUID propostaId, @Valid @RequestBody RespostaClienteDTO respostaDTO)

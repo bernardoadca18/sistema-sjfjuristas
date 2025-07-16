@@ -1,6 +1,7 @@
 package com.sjfjuristas.plataforma.backend.service;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.BeanUtils;
@@ -55,7 +56,22 @@ public class PropostaService
     private PropostaHistoricoRepository propostaHistoricoRepository;
 
     @Transactional
-    public PropostaResponseDTO criarProposta(PropostaRequestDTO dto, HttpServletRequest request) {
+    public Page<PropostaResponseDTO> getMyPropostas(UUID userId, Pageable pageable)
+    {
+        Page<PropostaEmprestimo> propostas = propostaRepository.findPropostasByUserId(userId, pageable);
+        return propostas.map(PropostaResponseDTO::new);
+    }
+
+    @Transactional
+    public List<PropostaResponseDTO> getMyPropostasNonPaged(UUID userId)
+    {
+        List<PropostaEmprestimo> propostas = propostaRepository.findPropostasByUserIdNonPaged(userId);
+        return propostas.stream().map(PropostaResponseDTO::new).toList();
+    }
+
+    @Transactional
+    public PropostaResponseDTO criarProposta(PropostaRequestDTO dto, HttpServletRequest request)
+    {
 
         Usuario usuario = usuarioRepository.findByCpf(dto.getCpf()).orElseGet(() -> {
             Usuario novoUsuario = new Usuario();

@@ -7,6 +7,9 @@ export interface Proposta
     dataSolicitacao: string;
     statusProposta: string;
     valorOfertado?: number;
+    numeroParcelasSolicitadas : number;
+    numeroParcelasOfertadas? : number;
+    taxaJurosDiaria : number;
 }
 
 export interface PropostaHistorico

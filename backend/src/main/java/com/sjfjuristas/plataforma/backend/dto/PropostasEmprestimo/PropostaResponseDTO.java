@@ -22,6 +22,10 @@ public class PropostaResponseDTO
     private BigDecimal valorProposta;
     private String nomeCompletoSolicitante;
     private String emailSolicitante;
+    
+    private Integer numeroParcelasSolicitadas;
+    private Integer numeroParcelasOfertadas;
+    private BigDecimal taxaJurosDiaria;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     private OffsetDateTime dataSolicitacao;
@@ -36,5 +40,8 @@ public class PropostaResponseDTO
         this.emailSolicitante = entity.getEmailSolicitante();
         this.dataSolicitacao = entity.getDataSolicitacao();
         this.statusProposta = entity.getStatusPropostaIdStatusproposta().getNomeStatus();
+        this.numeroParcelasSolicitadas = entity.getNumParcelasPreferido();
+        this.numeroParcelasOfertadas = entity.getNumParcelasOfertado();
+        this.taxaJurosDiaria = entity.getTaxaJurosOfertada();
     }
 }

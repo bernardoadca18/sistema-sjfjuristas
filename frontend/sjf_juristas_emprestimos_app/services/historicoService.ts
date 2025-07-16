@@ -1,6 +1,6 @@
 import api from './api';
 import { Page } from '@/types/Page';
-import { Emprestimo, Parcela } from '@/types/Emprestimo';
+import { Emprestimo, EmprestimoSummary, Parcela } from '@/types/Emprestimo';
 import { Proposta, PropostaHistorico } from '@/types/Proposta';
 
 export const getHistoricoEmprestimos = async (page: number, size: number): Promise<Page<Emprestimo>> => {
@@ -31,7 +31,7 @@ export const getMinhasPropostas = async (page: number, size: number): Promise<Pa
     return response.data;
 };
 
-export const getHistoricoEmprestimosSummary = async () : Promise<Emprestimo[]> => {
+export const getHistoricoEmprestimosSummary = async () : Promise<EmprestimoSummary[]> => {
     const response = await api.get('/cliente/historico/emprestimos/summary');
     return response.data;
 }
