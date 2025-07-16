@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sjfjuristas.plataforma.backend.domain.Usuario;
 import com.sjfjuristas.plataforma.backend.dto.ChavesPixUsuario.ChavePixCreateRequestDTO;
 import com.sjfjuristas.plataforma.backend.dto.ChavesPixUsuario.ChavePixResponseDTO;
+import com.sjfjuristas.plataforma.backend.repository.UsuarioRepository;
 import com.sjfjuristas.plataforma.backend.service.ChavePixUsuarioService;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -31,6 +32,9 @@ public class ChavePixUsuarioController
     @Autowired
     private ChavePixUsuarioService chavePixService;
 
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
     @GetMapping
     public ResponseEntity<List<ChavePixResponseDTO>> getMinhasChavesPix(@AuthenticationPrincipal Usuario usuarioLogado)
     {
@@ -41,6 +45,16 @@ public class ChavePixUsuarioController
     public ResponseEntity<ChavePixResponseDTO> addMinhaChavePix(@AuthenticationPrincipal Usuario usuarioLogado, @Valid @RequestBody ChavePixCreateRequestDTO dto)
     {
         ChavePixResponseDTO response = chavePixService.addChavePix(usuarioLogado, dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping("/add-to/{userId}")
+    public ResponseEntity<ChavePixResponseDTO> addMinhaChavePixSignUp(@PathVariable UUID userId, @Valid @RequestBody ChavePixCreateRequestDTO dto)
+    {
+        Usuario usuario;
+        usuario = usuarioRepository.findById(userId).get();
+
+        ChavePixResponseDTO response = chavePixService.addChavePix(usuario, dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     

@@ -18,10 +18,7 @@ const PropostaHistoricoWidget : React.FC<PropostaHistoricoProps> = ({ item, onPr
                 <View style={styles.infoContainer}>
                     <Text style={styles.widgetTitle}>Proposta</Text>
                     <Text style={styles.text}>Data da Solicitação: {formatDate(item.dataSolicitacao)}</Text>
-                    <Text style={[styles.text, styles.valor]}>Valor solicitado: {formatCurrency(item.valorSolicitado)}</Text>
-                    {
-                        item.valorOfertado ? (<Text style={[styles.text, styles.valor]}>Valor ofertado: {formatCurrency(item.valorOfertado)}</Text>)  : (<></>)
-                    }
+                    <Text style={[styles.text, styles.valor]}>Valor da Proposta: {formatCurrency(item.valorProposta)}</Text>
                     <Text style={styles.text}>Parcelas solicitadas: {item.numeroParcelasSolicitadas}</Text>
                     {
                         item.numeroParcelasOfertadas ? (<Text style={styles.text}>Parcelas ofertadas: {item.numeroParcelasOfertadas}</Text>) : (<></>)

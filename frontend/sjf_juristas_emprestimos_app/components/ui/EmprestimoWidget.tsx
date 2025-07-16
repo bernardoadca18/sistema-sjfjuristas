@@ -49,9 +49,15 @@ const EmprestimoWidget : React.FC<EmprestimoWidgetProps> = ( { emprestimo, proxi
                 
             </View>
 
-            <TouchableOpacity style={styles.button}>
-                <Text style= {styles.buttonText}>Fazer Pagamento</Text>
-            </TouchableOpacity>
+            {
+                proximaParcela && (
+                    <Link href={`/payment/${proximaParcela?.id}`} asChild>
+                        <TouchableOpacity style={styles.button}>
+                            <Text style= {styles.buttonText}>Fazer Pagamento</Text>
+                        </TouchableOpacity>
+                    </Link>
+                )
+            }
 
             <Link href={{
                 pathname: "/loan-details/[id]",
@@ -71,9 +77,18 @@ const EmprestimoWidget : React.FC<EmprestimoWidgetProps> = ( { emprestimo, proxi
                         })
                     ) : (<></>)
                 }
-                <TouchableOpacity style={styles.buttonSecondary}>
-                    <Text style= {styles.linkText}>Ver Histórico Completo</Text>
-                </TouchableOpacity>
+                
+
+                <Link href={{
+                    pathname: '/(tabs)/history',
+                    params: { initialTab: 'parcelas_emprestimo', emprestimoId: emprestimo.id }
+                }} asChild>
+                    <TouchableOpacity style={styles.buttonSecondary}>
+                        <Text style= {styles.linkText}>Ver Histórico Completo</Text>
+                    </TouchableOpacity>
+                </Link>
+
+
             </View>
             
             {

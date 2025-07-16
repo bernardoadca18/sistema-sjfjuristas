@@ -16,7 +16,6 @@ const HomeScreen: React.FC = () => {
     const [pagamentos, setPagamentos] = useState<Parcela[] | null>();
     const [chavePixAtiva, setChavePixAtiva] = useState<ChavePix | null>(null);
 
-    //const [parcelasEmprestimo, setParcelasEmprestimo] = useState<Parcela[] | null>();
 
     const fetchEmprestimoData = useCallback(async () => {
         setIsLoading(true);

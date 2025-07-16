@@ -1,15 +1,14 @@
 export interface Proposta 
 {
     id: string;
-    valorSolicitado: number;
+    valorProposta: number;
     nomeCompletoSolicitante: string;
     emailSolicitante: string;
-    dataSolicitacao: string;
-    statusProposta: string;
-    valorOfertado?: number;
     numeroParcelasSolicitadas : number;
     numeroParcelasOfertadas? : number;
     taxaJurosDiaria : number;
+    dataSolicitacao: string;
+    statusProposta: string;
 }
 
 export interface PropostaHistorico

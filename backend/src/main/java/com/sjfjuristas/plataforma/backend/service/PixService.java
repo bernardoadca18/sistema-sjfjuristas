@@ -1,29 +1,37 @@
 package com.sjfjuristas.plataforma.backend.service;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.Base64;
+import java.util.EnumMap;
+import java.util.Map;
+
+import javax.imageio.ImageIO;
+
+import org.springframework.stereotype.Service;
+
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
-import org.springframework.stereotype.Service;
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.EnumMap;
-import java.util.Map;
 
 @Service
 public class PixService 
 {
+
+    public record PixResult(String payload, byte[] qrCode, String qrCodeBase64) {}
+
     public PixResult gerarPix(String chavePix, BigDecimal valor, String nomeBeneficiario, String cidadeBeneficiario, String descricao) 
     {
         String payload = gerarPayload(chavePix, valor, nomeBeneficiario, cidadeBeneficiario, descricao);
         byte[] qrCodeBytes = gerarQrCodeImageBytes(payload);
+        String qrCodeBase64 = Base64.getEncoder().encodeToString(qrCodeBytes);
 
-        return new PixResult(payload, qrCodeBytes);
+        return new PixResult(payload, qrCodeBytes, qrCodeBase64);
     }
 
     private String gerarPayload(String chavePix, BigDecimal valor, String nome, String cidade, String descricao) 
@@ -115,6 +123,4 @@ public class PixService
         crc &= 0xFFFF;
         return String.format("%04X", crc);
     }
-
-    public record PixResult(String payload, byte[] qrCode) {}
 }

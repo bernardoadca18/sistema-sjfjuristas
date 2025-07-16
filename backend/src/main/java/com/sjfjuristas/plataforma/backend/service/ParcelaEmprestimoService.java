@@ -17,7 +17,6 @@ import com.sjfjuristas.plataforma.backend.domain.ParcelaEmprestimo;
 import com.sjfjuristas.plataforma.backend.dto.ParcelaEmprestimo.ParcelaEmprestimoResponseDTO;
 import com.sjfjuristas.plataforma.backend.repository.EmprestimoRepository;
 import com.sjfjuristas.plataforma.backend.repository.ParcelaEmprestimoRepository;
-import com.sjfjuristas.plataforma.backend.util.ByteArrayMultipartFile;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -98,19 +97,11 @@ public class ParcelaEmprestimoService
                 descricao
         );
 
-        ByteArrayMultipartFile qrCodeFile = new ByteArrayMultipartFile(
-                pixResult.qrCode(),
-                "qrcode_parcela_" + parcela.getId() + ".png",
-                "image/png"
-        );
-        String subfolder = "qrcodes/parcela-" + parcela.getId();
-        String qrCodeUrl = fileStorageService.uploadFile(qrCodeBucketName, qrCodeFile, subfolder);
-
         OffsetDateTime agora = OffsetDateTime.now();
         OffsetDateTime dataExpiracao = agora.plusSeconds(expiracaoSegundos);
 
         parcela.setPixCopiaCola(pixResult.payload());
-        parcela.setPixQrCodeBase64(qrCodeUrl);
+        parcela.setPixQrCodeBase64(pixResult.qrCodeBase64());
         parcela.setDataGeracaoPix(agora);
         parcela.setPixDataExpiracao(dataExpiracao);
         

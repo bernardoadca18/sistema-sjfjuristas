@@ -22,4 +22,5 @@ export interface TipoChavePix
 {
     id: string;
     nomeTipo: string;
+    mascara?: string;
 }

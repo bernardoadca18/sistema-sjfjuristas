@@ -1,25 +1,30 @@
 package com.sjfjuristas.plataforma.backend.service.Auth;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Optional;
+
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import com.sjfjuristas.plataforma.backend.domain.Usuario;
 import com.sjfjuristas.plataforma.backend.dto.Usuario.AuthResponseDTO;
 import com.sjfjuristas.plataforma.backend.dto.Usuario.ClienteCreateRequestDTO;
+import com.sjfjuristas.plataforma.backend.dto.Usuario.FinalizarCadastroDTO;
 import com.sjfjuristas.plataforma.backend.dto.Usuario.LoginRequestDTO;
 import com.sjfjuristas.plataforma.backend.dto.Usuario.PreCadastroCheckDTO;
 import com.sjfjuristas.plataforma.backend.dto.Usuario.PreCadastroInfoDTO;
 import com.sjfjuristas.plataforma.backend.exceptions.RegistrationConflictException;
 import com.sjfjuristas.plataforma.backend.exceptions.UserNotFoundException;
-import com.sjfjuristas.plataforma.backend.dto.Usuario.FinalizarCadastroDTO;
+import com.sjfjuristas.plataforma.backend.repository.ChavePixUsuarioRepository;
 import com.sjfjuristas.plataforma.backend.repository.UsuarioRepository;
 import com.sjfjuristas.plataforma.backend.service.Jwt.JwtService;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +34,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final ChavePixUsuarioRepository chavePixRepository;
 
     @Override
     public AuthResponseDTO register(ClienteCreateRequestDTO request) {
@@ -54,31 +60,23 @@ public class AuthServiceImpl implements AuthService {
         novoUsuario.setEmailVerificado(false);
         novoUsuario.setDataCadastro(LocalDate.now().atStartOfDay(fusoHorarioPadrao).toOffsetDateTime());
         novoUsuario.setAtivo(true);
-        
-        //TODO: Definir um perfil padrão para o cliente
-        // novoUsuario.setPerfilIdPerfisusuario(...);
-        // definir como cliente após criar os perfis no banco de dados
+    
 
         usuarioRepository.save(novoUsuario);
-
-
-        // String jwtToken = jwtService.generateToken(novoUsuario);
         
         return AuthResponseDTO.builder()
-                // .token(jwtToken)
                 .usuarioId(novoUsuario.getId())
                 .nomeUsuario(novoUsuario.getNomeCompleto())
                 .build();
     }
 
     @Override
-    public AuthResponseDTO login(LoginRequestDTO request) {
-        // AuthenticationManager usará o UserDetailsService e o PasswordEncoder para validar
+    public AuthResponseDTO login(LoginRequestDTO request) 
+    {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getSenha())
         );
 
-        // Se a autenticação for bem-sucedida, busca o usuário para gerar o token
         var usuario = usuarioRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
         
@@ -115,9 +113,15 @@ public class AuthServiceImpl implements AuthService {
         return new PreCadastroInfoDTO(usuario.getId(), usuario.getNomeCompleto(), usuario.getEmail());
     }
 
+    @Override
     public AuthResponseDTO finalizarCadastro(FinalizarCadastroDTO request)
     {
         Usuario usuario = usuarioRepository.findById(request.getUsuarioId()).orElseThrow(() -> new UserNotFoundException("Usuário não encontrado."));
+
+        if (chavePixRepository.findByUsuarioIdUsuarios(usuario).isEmpty())
+        {
+            throw new BadCredentialsException("É necessário cadastrar ao menos uma chave PIX para finalizar o cadastro.");
+        }
 
         usuario.setHashSenha(passwordEncoder.encode(request.getSenha()));
         usuarioRepository.save(usuario);

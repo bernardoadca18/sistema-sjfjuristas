@@ -40,11 +40,19 @@ export const getChavePixAtiva = async () : Promise<ChavePix> => {
     }
 };
 
-export const addChavePix = async (tipoChavePixId: string, valorChave: string): Promise<ChavePix> => {
+export const addChavePix = async (tipoChavePixId: string, valorChave: string, usuarioId?: number): Promise<ChavePix> => {
     try
     {
-        const response = await api.post('/cliente/chaves-pix', { tipoChavePixId, valorChave });
-        return response.data;
+        if (usuarioId)
+        {
+            const response = await api.post(`/cliente/chaves-pix/add-to/${usuarioId}`, { tipoChavePixId, valorChave });
+            return response.data;
+        }
+        else
+        {
+            const response = await api.post('/cliente/chaves-pix', { tipoChavePixId, valorChave });
+            return response.data;
+        }
     } 
     catch (error)
     {

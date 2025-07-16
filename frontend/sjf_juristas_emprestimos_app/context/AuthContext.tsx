@@ -3,36 +3,40 @@ import { FinalizarCadastroDTO, LoginRequestDTO, PreCadastroCheckDTO } from '@/ut
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
-interface User {
+interface User
+{
     nomeUsuario: string;
     token: string;
     usuarioId: number;
 }
 
-interface OnboardingData {
+interface OnboardingData 
+{
     usuarioId: number;
     nomeCompleto: string;
     email: string;
 }
 
-interface AuthContextType {
-  user: User | null;
-  isLoading: boolean;
-  onboardingData: OnboardingData | null;
-  signIn: (data: LoginRequestDTO) => Promise<{ success: boolean; error?: string }>;
-  signOut: () => Promise<void>;
-  checkPreCadastro: (data: PreCadastroCheckDTO) => Promise<{ success: boolean; error?: string }>;
-  completeRegistration: (data: FinalizarCadastroDTO) => Promise<{ success: boolean; error?: string }>;
+interface AuthContextType 
+{
+    user: User | null;
+    isLoading: boolean;
+    onboardingData: OnboardingData | null;
+    signIn: (data: LoginRequestDTO) => Promise<{ success: boolean; error?: string }>;
+    signOut: () => Promise<void>;
+    checkPreCadastro: (data: PreCadastroCheckDTO) => Promise<{ success: boolean; error?: string }>;
+    completeRegistration: (data: FinalizarCadastroDTO) => Promise<{ success: boolean; error?: string }>;
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
 export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth deve ser usado dentro de um AuthProvider');
-  }
-  return context;
+    const context = useContext(AuthContext);
+    if (!context) 
+    {
+        throw new Error('useAuth deve ser usado dentro de um AuthProvider');
+    }
+    return context;
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -54,7 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }
             catch (e)
             {
-                console.error("Falha ao carregar sessão do usuário. ");
+                console.error("Falha ao carregar sessão do usuário.: " + e);
             }
             finally
             {
