@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Alert, ActivityIndicator } from 'react-native';
-import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { Link, Stack, useLocalSearchParams, useRouter } from 'expo-router';
 
 import { gerarPixParaPagamento, anexarComprovante } from '@/services/pagamentoService';
 import { Parcela } from '@/types/Emprestimo';
@@ -9,6 +9,7 @@ import formatDate from '@/utils/formatDate';
 import * as DocumentPicker from 'expo-document-picker';
 import * as Clipboard from 'expo-clipboard';
 import { getParcelaById } from '@/services/emprestimoService';
+import { Colors } from '@/constants/Colors';
 
 const PaymentScreen = () => {
     const { id } = useLocalSearchParams<{ id: string }>();
@@ -149,11 +150,17 @@ const PaymentScreen = () => {
                               <Text style={styles.copyButtonText} numberOfLines={2}>{parcela.pixCopiaCola}</Text>
                           </TouchableOpacity>
 
-                          <TouchableOpacity style={[styles.button, styles.secondaryButton]} onPress={handleAnexarComprovante} disabled={uploadLoading}>
-                              {
-                                  uploadLoading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Anexar Comprovante</Text>
-                              }
-                          </TouchableOpacity>
+                          <View style={styles.buttonContainer}>
+                                <TouchableOpacity style={[styles.button]} onPress={handleAnexarComprovante} disabled={uploadLoading}>
+                                    {
+                                        uploadLoading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Anexar Comprovante</Text>
+                                    }
+                                </TouchableOpacity>
+
+                                <TouchableOpacity style={[styles.button, styles.secondaryButton]} onPress={() => router.back()}>
+                                    <Text style={styles.buttonText}>Voltar</Text>
+                                </TouchableOpacity>
+                          </View>
                       </View>
                   )
               }
@@ -169,6 +176,10 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 16,
         backgroundColor: '#f0f4f7',
+    },
+    buttonContainer:
+    {
+        gap: 16
     },
     card: 
     {
@@ -206,10 +217,11 @@ const styles = StyleSheet.create({
     },
     button: 
     {
-        marginTop: 20,
-        padding: 15,
+        padding: 16,
+        width: 240,
         borderRadius: 8,
         alignItems: 'center',
+        backgroundColor: Colors.light.primary
     },
     primaryButton: 
     {
@@ -221,7 +233,7 @@ const styles = StyleSheet.create({
     },
     buttonText: 
     {
-        color: '#fff',
+        color: Colors.light.textOnPrimary,
         fontWeight: 'bold',
         fontSize: 16,
     },

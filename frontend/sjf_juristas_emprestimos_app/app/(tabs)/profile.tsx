@@ -39,7 +39,7 @@ export default function ProfileScreen() {
   return (
     <View style={styles.container}>
       {
-          user && 
+          (user && userData) &&
           <>
               <Text style={styles.title}>{userData?.nomeCompleto}</Text>
               <Text style={styles.subtitle}>{userData?.email}</Text>
@@ -50,6 +50,12 @@ export default function ProfileScreen() {
       }
 
       <View style={styles.buttonContainer}>
+          <Text style={styles.title}>{"Configurações da Conta"}</Text>
+          <Link href={`/(tabs)/pix`} asChild>
+              <TouchableOpacity style={styles.regularButton}>
+                  <Text style={styles.regularButtonText}>Editar dados Cadastrais</Text>
+              </TouchableOpacity>
+          </Link>
 
           <Link href={`/(tabs)/pix`} asChild>
               <TouchableOpacity style={styles.regularButton}>
