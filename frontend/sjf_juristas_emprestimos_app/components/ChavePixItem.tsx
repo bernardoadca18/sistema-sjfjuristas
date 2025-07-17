@@ -14,33 +14,33 @@ interface ChavePixItemProps
 
 export const ChavePixItem: React.FC<ChavePixItemProps> = ({ item, onSetAtiva, onDelete, hideActions = false }) => {
     return (
-        <View style={styles.chaveItem}>
-        <View style={styles.chaveInfo}>
-            <Text style={styles.chaveTipo}>{item.tipoChavePixNome}</Text>
-            <Text style={styles.chaveValor}>{item.valorChaveMascarado}</Text>
-            {
-                item.ativaParaDesembolso && (
-                    <Text style={styles.chaveAtiva}>✓ Padrão</Text>
-                )
-            }
-        </View>
-
-        {
-            !hideActions && (
-                <View style={styles.chaveAcoes}>
+        <View style={[styles.chaveItem, styles.card]}>
+            <View style={styles.chaveInfo}>
+                <Text style={styles.chaveTipo}>{item.tipoChavePixNome}</Text>
+                <Text style={styles.chaveValor}>{item.valorChaveMascarado}</Text>
                 {
-                    !item.ativaParaDesembolso && (
-                        <TouchableOpacity onPress={() => onSetAtiva(item.id)} style={styles.acaoButton}>
-                        <Ionicons name="checkmark-circle-outline" size={24} color={Colors.light.primary} />
-                        </TouchableOpacity>
+                    item.ativaParaDesembolso && (
+                        <Text style={styles.chaveAtiva}>✓ Padrão</Text>
                     )
                 }
-                <TouchableOpacity onPress={() => onDelete(item)} style={styles.acaoButton}>
-                    <Ionicons name="trash-outline" size={24} color={Colors.light.atrasadoText} />
-                </TouchableOpacity>
-                </View>
-            )
-        }
+            </View>
+
+            {
+                !hideActions && (
+                    <View style={styles.chaveAcoes}>
+                    {
+                        !item.ativaParaDesembolso && (
+                            <TouchableOpacity onPress={() => onSetAtiva(item.id)} style={styles.acaoButton}>
+                            <Ionicons name="checkmark-circle-outline" size={24} color={Colors.light.primary} />
+                            </TouchableOpacity>
+                        )
+                    }
+                    <TouchableOpacity onPress={() => onDelete(item)} style={styles.acaoButton}>
+                        <Ionicons name="trash-outline" size={24} color={Colors.light.atrasadoText} />
+                    </TouchableOpacity>
+                    </View>
+                )
+            }
         </View>
     );
 }
@@ -57,6 +57,22 @@ const styles = StyleSheet.create(
         alignItems: 'center',
         justifyContent: 'space-between',
         elevation: 2,
+    },
+    card: 
+    {
+        backgroundColor: Colors.light.card,
+        borderRadius: 16,
+        padding: 20,
+        marginBottom: 20,
+        alignItems: 'center',
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 3.84,
+        elevation: 5,
     },
     chaveInfo:
     {

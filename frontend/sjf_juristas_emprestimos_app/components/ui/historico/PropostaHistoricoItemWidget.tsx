@@ -14,11 +14,17 @@ interface PropostaHistoricoItemProps
 const PropostaHistoricoItemWidget : React.FC<PropostaHistoricoItemProps> = ({ item, onPress }) => {
     return (
         <TouchableOpacity onPress={onPress}>
-            <View style={styles.container}>
+            <View style={[styles.container, styles.card]}>
                 <View style={styles.infoContainer}>
                     <Text style={styles.widgetTitle}>Atualização</Text>
                     <Text style={styles.text}>Data da Atualização: {formatDate(item.dataAlteracao)}</Text>
-                    <Text style={styles.text}>Última atualização feita por {item.atorAlteracao}.</Text>
+                    {
+                        (item.atorAlteracao === "CLIENTE") ? (
+                             <Text style={styles.text}>Atualização feita por você.</Text>
+                        ) : (item.atorAlteracao === "ADMIN") ? (<Text style={styles.text}>Atualização feita por um administrador.</Text>) : (
+                            <></>
+                        )
+                    }
                     {
                         item.statusAnterior ? (
                             <Text style={[styles.text]}>Status Anterior: {item.statusAnterior}</Text>
@@ -83,14 +89,24 @@ const styles = StyleSheet.create(
     container: 
     {
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        backgroundColor: Colors.light.card,
-        padding: 15,
-        borderRadius: 10,
-        marginBottom: 10,
         borderWidth: 1,
         borderColor: Colors.light.border,
+    },
+    card: 
+    {
+        backgroundColor: Colors.light.card,
+        borderRadius: 16,
+        padding: 20,
+        marginBottom: 20,
+        alignItems: 'center',
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 3.84,
+        elevation: 5,
     },
     infoContainer: 
     {

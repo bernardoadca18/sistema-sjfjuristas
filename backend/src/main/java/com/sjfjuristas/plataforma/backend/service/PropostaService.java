@@ -165,41 +165,6 @@ public class PropostaService
     }
 
     @Transactional
-    public PropostaEmprestimo responderContrapropostaCliente(UUID propostaId, RespostaClienteDTO resposta, UUID usuarioId)
-    {
-        PropostaEmprestimo propostaAtual = propostaRepository.findById(propostaId).orElseThrow(() -> new EntityNotFoundException("Proposta não encontrada com o ID: " + propostaId));
-
-        if (!propostaAtual.getUsuarioIdUsuarios().getId().equals(usuarioId))
-        {
-            throw new AccessDeniedException("Acesso negado. Esta proposta não pertence ao usuário autenticado.");
-        }
-
-        PropostaEmprestimo propostaAntes = cloneProposta(propostaAtual);
-        String novoStatusNome;
-        String observacao;
-
-        if (resposta.getAceite())
-        {
-            novoStatusNome = "Contraproposta Aceita";
-            observacao = "Cliente aceitou a contraproposta do administrador";
-        }
-        else
-        {
-            novoStatusNome = "Contraproposta Recusada";
-            propostaAtual.setMotivoRecusaCliente(resposta.getMotivoRecusa());
-            observacao = "Cliente recusou a contraproposta. Motivo: " + resposta.getMotivoRecusa();
-        }
-
-        StatusProposta novoStatus = statusPropostaRepository.findByNomeStatus(novoStatusNome).orElseThrow(() -> new EntityNotFoundException("Status '" + novoStatusNome + "' não encontrado."));
-        propostaAtual.setStatusPropostaIdStatusproposta(novoStatus);
-
-        PropostaEmprestimo propostaSalva = propostaRepository.save(propostaAtual);
-        salvarHistorico(propostaAntes, propostaSalva, AtorAlteracao.CLIENTE, observacao);
-
-        return propostaSalva;
-    }
-
-    @Transactional
     public void negarPropostaAdmin(UUID propostaId, String motivo)
     {
         PropostaEmprestimo propostaAtual = propostaRepository.findById(propostaId).orElseThrow(() -> new EntityNotFoundException("Proposta não encontrada com o ID: " + propostaId));
@@ -255,6 +220,7 @@ public class PropostaService
                 propostaAtual.setValorOfertado(resposta.getValorContrapropostaOpt().orElseThrow(() -> new IllegalArgumentException("Valor da contraproposta é obrigatório.")));
                 propostaAtual.setNumParcelasOfertado(resposta.getNumParcelasContrapropostaOpt().orElseThrow(() -> new IllegalArgumentException("Número de parcelas da contraproposta é obrigatório.")));
                 propostaAtual.setOrigemUltimaOferta("CLIENTE");
+                propostaAtual.setTaxaJurosOfertada(resposta.getTaxaJurosOfertada());
                 observacao = "Cliente enviou uma nova contraproposta.";
             }
             default -> throw new IllegalArgumentException("Ação inválida.");

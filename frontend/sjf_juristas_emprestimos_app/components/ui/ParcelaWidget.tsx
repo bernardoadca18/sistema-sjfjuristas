@@ -19,7 +19,7 @@ const ParcelaWidget: React.FC<ParcelaWidgetProps> = ( { parcela, isNextPayment, 
 
     return (
         <TouchableOpacity onPress={onPress} disabled={!onPress}>
-            <View style={styles.container}>
+            <View style={[styles.container, styles.card]}>
                 <View style={styles.infoContainer}>
                     <Text style={styles.parcelaNumero}>Parcela {parcela.numeroParcela}</Text>
                     <Text style={styles.text}>Vencimento: {formatDate(parcela.dataVencimento)}</Text>
@@ -65,6 +65,22 @@ const styles = StyleSheet.create(
         marginBottom: 10,
         borderWidth: 1,
         borderColor: Colors.light.border,
+    },
+    card: 
+    {
+        backgroundColor: Colors.light.card,
+        borderRadius: 16,
+        padding: 20,
+        marginBottom: 20,
+        alignItems: 'center',
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 3.84,
+        elevation: 5,
     },
     infoContainer: 
     {
