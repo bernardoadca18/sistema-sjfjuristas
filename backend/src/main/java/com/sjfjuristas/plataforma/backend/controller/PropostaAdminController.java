@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,6 +40,21 @@ public class PropostaAdminController
     @Autowired
     private EmprestimoService emprestimoService;
 
+    @PostMapping("/{propostaId}/criar-emprestimo-em-analise")
+    public ResponseEntity<EmprestimoAdminResponseDTO> criarEmprestimoEmAnalise(@PathVariable UUID propostaId)
+    {
+        Emprestimo emprestimo = emprestimoService.criarEmprestimoEmAnalise(propostaId);
+        EmprestimoAdminResponseDTO dto = new EmprestimoAdminResponseDTO(emprestimo);
+        return ResponseEntity.ok(dto);
+    }
+
+    @PutMapping("/{propostaId}/aprovar-em-analise")
+    public ResponseEntity<EmprestimoAdminResponseDTO> aprovarEmprestimoEmAnalise(@PathVariable UUID propostaId, @Valid @RequestBody CondicoesAprovadasDTO condicoes)
+    {
+        Emprestimo emprestimo = emprestimoService.aprovarEmprestimoEmAnalise(propostaId, condicoes);
+        EmprestimoAdminResponseDTO dto = new EmprestimoAdminResponseDTO(emprestimo);
+        return ResponseEntity.ok(dto);
+    }
 
     @PostMapping("/{propostaId}/aprovar")
     public ResponseEntity<EmprestimoAdminResponseDTO> aprovarProposta(@PathVariable UUID propostaId, @Valid @RequestBody CondicoesAprovadasDTO condicoes)

@@ -56,30 +56,39 @@ public class EmprestimoService
     private UsuarioRepository usuarioRepository;
 
     @Transactional
-    public Emprestimo criarEmprestimoEGerarParcelas(UUID propostaId, CondicoesAprovadasDTO condicoes) 
+    public Emprestimo criarEmprestimoEmAnalise(UUID propostaId)
     {
-        BigDecimal taxaJurosDiariaPercentual =  condicoes.getTaxaJurosDiaria();
-        BigDecimal taxaJurosDiariaDecimal = taxaJurosDiariaPercentual.divide(new BigDecimal("100"), 8, RoundingMode.HALF_UP);
-        
         PropostaEmprestimo proposta = propostaRepository.findById(propostaId).orElseThrow(() -> new IllegalArgumentException("Proposta não encontrada."));
         
         Usuario usuario = proposta.getUsuarioIdUsuarios();
 
-        StatusEmprestimo statusInicialEmprestimo = statusEmprestimoRepository.findByNomeStatus("Pendente Desembolso").orElseThrow(() -> new IllegalStateException("Status 'Pendente Desembolso' não encontrado."));
-
-        BigDecimal valorParcelaDiaria = calcularValorParcela( condicoes.getValorContratado(), taxaJurosDiariaDecimal, condicoes.getNumeroTotalParcelas() );
+        StatusEmprestimo statusInicialEmprestimo = statusEmprestimoRepository.findByNomeStatus("Em Análise").orElseThrow(() -> new IllegalStateException("Status 'Em Análise' não encontrado."));
 
         Emprestimo novoEmprestimo = new Emprestimo();
+
         novoEmprestimo.setPropostaIdPropostasemprestimo(proposta);
         novoEmprestimo.setUsuarioIdUsuarios(usuario);
         novoEmprestimo.setStatusEmprestimoIdStatusemprestimo(statusInicialEmprestimo);
+
+        Emprestimo emprestimoSalvo = emprestimoRepository.save(novoEmprestimo);
+        return emprestimoSalvo;
+    }
+
+    @Transactional
+    public Emprestimo aprovarEmprestimoEmAnalise(UUID propostaId, CondicoesAprovadasDTO condicoes)
+    {
+        Emprestimo novoEmprestimo = emprestimoRepository.findByPropostaIdPropostasemprestimo_Id(propostaId).orElseThrow(() -> new IllegalArgumentException("Empréstimo não encontrado."));
+
+        BigDecimal taxaJurosDiariaPercentual =  condicoes.getTaxaJurosDiaria();
+        BigDecimal taxaJurosDiariaDecimal = taxaJurosDiariaPercentual.divide(new BigDecimal("100"), 8, RoundingMode.HALF_UP);
+        BigDecimal valorParcelaDiaria = calcularValorParcela( condicoes.getValorContratado(), taxaJurosDiariaDecimal, condicoes.getNumeroTotalParcelas() );
+        BigDecimal taxaJurosMensal = taxaJurosDiariaDecimal.max(new BigDecimal("30")).setScale(4, RoundingMode.HALF_UP);
         
+        LocalDate ultimoVencimento = condicoes.getDataPrimeiroVencimento().plusDays(condicoes.getNumeroTotalParcelas() - 1);
+
         novoEmprestimo.setValorContratado(condicoes.getValorContratado());
         novoEmprestimo.setValorLiberado(condicoes.getValorLiberado());
-
-        BigDecimal taxaJurosMensal = taxaJurosDiariaDecimal.max(new BigDecimal("30")).setScale(4, RoundingMode.HALF_UP);
         novoEmprestimo.setTaxaJurosMensalEfetiva(taxaJurosMensal);
-        
         novoEmprestimo.setTaxaJurosDiariaEfetiva(taxaJurosDiariaPercentual);
         novoEmprestimo.setNumeroTotalParcelas(condicoes.getNumeroTotalParcelas());
         novoEmprestimo.setDataPrimeiroVencimento(condicoes.getDataPrimeiroVencimento());
@@ -87,8 +96,6 @@ public class EmprestimoService
         novoEmprestimo.setSaldoDevedorAtual(condicoes.getValorContratado());
         novoEmprestimo.setValorParcelaDiaria(valorParcelaDiaria);
         novoEmprestimo.setDataContratacao(OffsetDateTime.now());
-        
-        LocalDate ultimoVencimento = condicoes.getDataPrimeiroVencimento().plusDays(condicoes.getNumeroTotalParcelas() - 1);
         novoEmprestimo.setDataUltimoVencimento(ultimoVencimento);
 
         Emprestimo emprestimoSalvo = emprestimoRepository.save(novoEmprestimo);
@@ -96,6 +103,53 @@ public class EmprestimoService
         gerarEGravarParcelasPara(emprestimoSalvo, taxaJurosDiariaDecimal);
 
         return emprestimoSalvo;
+    }
+
+    @Transactional
+    public Emprestimo criarEmprestimoEGerarParcelas(UUID propostaId, CondicoesAprovadasDTO condicoes)
+    {
+        BigDecimal taxaJurosDiariaPercentual =  condicoes.getTaxaJurosDiaria();
+        BigDecimal taxaJurosDiariaDecimal = taxaJurosDiariaPercentual.divide(new BigDecimal("100"), 8, RoundingMode.HALF_UP);
+        BigDecimal valorParcelaDiaria = calcularValorParcela( condicoes.getValorContratado(), taxaJurosDiariaDecimal, condicoes.getNumeroTotalParcelas() );
+        BigDecimal taxaJurosMensal = taxaJurosDiariaDecimal.max(new BigDecimal("30")).setScale(4, RoundingMode.HALF_UP);
+        
+        LocalDate ultimoVencimento = condicoes.getDataPrimeiroVencimento().plusDays(condicoes.getNumeroTotalParcelas() - 1);
+        
+        PropostaEmprestimo proposta = propostaRepository.findById(propostaId).orElseThrow(() -> new IllegalArgumentException("Proposta não encontrada."));
+        Usuario usuario = proposta.getUsuarioIdUsuarios();
+        StatusEmprestimo statusInicialEmprestimo = statusEmprestimoRepository.findByNomeStatus("Pendente Desembolso").orElseThrow(() -> new IllegalStateException("Status 'Pendente Desembolso' não encontrado."));
+
+
+
+        Emprestimo novoEmprestimo = new Emprestimo();
+        
+        novoEmprestimo.setPropostaIdPropostasemprestimo(proposta);
+        novoEmprestimo.setUsuarioIdUsuarios(usuario);
+        novoEmprestimo.setStatusEmprestimoIdStatusemprestimo(statusInicialEmprestimo);
+        
+        
+        novoEmprestimo.setValorContratado(condicoes.getValorContratado());
+        novoEmprestimo.setValorLiberado(condicoes.getValorLiberado());
+        novoEmprestimo.setTaxaJurosMensalEfetiva(taxaJurosMensal);
+        novoEmprestimo.setTaxaJurosDiariaEfetiva(taxaJurosDiariaPercentual);
+        novoEmprestimo.setNumeroTotalParcelas(condicoes.getNumeroTotalParcelas());
+        novoEmprestimo.setDataPrimeiroVencimento(condicoes.getDataPrimeiroVencimento());
+        novoEmprestimo.setDataInicioCobrancaParcelas(condicoes.getDataPrimeiroVencimento());
+        novoEmprestimo.setSaldoDevedorAtual(condicoes.getValorContratado());
+        novoEmprestimo.setValorParcelaDiaria(valorParcelaDiaria);
+        novoEmprestimo.setDataContratacao(OffsetDateTime.now());
+        novoEmprestimo.setDataUltimoVencimento(ultimoVencimento);
+
+        Emprestimo emprestimoSalvo = emprestimoRepository.save(novoEmprestimo);
+
+        gerarEGravarParcelasPara(emprestimoSalvo, taxaJurosDiariaDecimal);
+
+        return emprestimoSalvo;
+    }
+
+    private boolean emprestimoCriado(UUID propostaId)
+    {
+        return !(emprestimoRepository.findByPropostaIdPropostasemprestimo_Id(propostaId).isEmpty());
     }
 
     @Transactional

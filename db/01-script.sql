@@ -322,6 +322,12 @@ CREATE TABLE schema_sjfjuristas.many_administradores_handle_many_propostas_empre
     CONSTRAINT fk_many_admin_prop_prop FOREIGN KEY (proposta_id_propostas_emprestimo) REFERENCES schema_sjfjuristas.propostas_emprestimo(proposta_id)
 );
 
+CREATE TABLE IF NOT EXISTS schema_sjfjuristas.ocupacoes (
+    ocupacao_id UUID PRIMARY KEY,
+    nome_ocupacao VARCHAR(255) NOT NULL UNIQUE,
+    ativo BOOLEAN DEFAULT TRUE
+);
+
 -- =================================================================
 -- ALTERAÇÕES DE TABELAS (EVOLUÇÃO DO SCHEMA)
 -- =================================================================
@@ -334,183 +340,18 @@ ALTER TABLE schema_sjfjuristas.propostas_emprestimo
     ADD COLUMN IF NOT EXISTS data_deposito_prevista date,
     ADD COLUMN IF NOT EXISTS data_inicio_pagamento_prevista date,
     ADD COLUMN IF NOT EXISTS origem_ultima_oferta varchar(50),
-    ADD COLUMN IF NOT EXISTS motivo_recusa_cliente text;
-
-ALTER TABLE schema_sjfjuristas.propostas_emprestimo
+    ADD COLUMN IF NOT EXISTS motivo_recusa_cliente text,
+    ADD COLUMN IF NOT EXISTS proposito_emprestimo VARCHAR(255),
+    ADD COLUMN IF NOT EXISTS estado_civil VARCHAR(50),
+    ADD COLUMN IF NOT EXISTS possui_imovel_veiculo BOOLEAN,
     ADD COLUMN IF NOT EXISTS data_nascimento_solicitante date,
     ADD COLUMN IF NOT EXISTS num_parcelas_preferido integer;
-
--- =================================================================
--- INSERÇÃO DE DADOS BÁSICOS (SEED DATA)
--- =================================================================
-
--- Inserção de dados na tabela: perfis_usuario
-INSERT INTO "schema_sjfjuristas"."perfis_usuario" (perfil_id, nome_perfil) VALUES
-('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Cliente'),
-('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12', 'Administrador')
-ON CONFLICT (nome_perfil) DO NOTHING;
-
--- Inserção de dados na tabela: tipos_chave_pix
-INSERT INTO "schema_sjfjuristas"."tipos_chave_pix" (tipo_chave_pix_id, nome_tipo) VALUES
-('e0eebc99-9c0b-4ef8-bb6d-6bb9bd380a51', 'CPF'),
-('e0eebc99-9c0b-4ef8-bb6d-6bb9bd380a52', 'CNPJ'),
-('e0eebc99-9c0b-4ef8-bb6d-6bb9bd380a53', 'E-mail'),
-('e0eebc99-9c0b-4ef8-bb6d-6bb9bd380a54', 'Telefone'),
-('e0eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'Chave Aleatória')
-ON CONFLICT (nome_tipo) DO NOTHING;
-
--- Inserção de dados na tabela: tipos_documento
-INSERT INTO "schema_sjfjuristas"."tipos_documento" (obrigatorio_proposta, tipo_documento_id, nome_documento, descricao) VALUES
-(true, 'f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a61', 'RG/CNH (Frente)', 'Foto da parte frontal do documento de identidade com foto (RG ou CNH).'),
-(true, 'f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a62', 'RG/CNH (Verso)', 'Foto da parte de trás do documento de identidade com foto (RG ou CNH).'),
-(true, 'f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a63', 'Comprovante de Residência', 'Conta de consumo recente (água, luz, telefone) ou outro documento válido como comprovante de endereço.'),
-(true, 'f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a65', 'Comprovante de Renda', 'Holerite, declaração de imposto de renda, extrato bancário ou outro documento que comprove os rendimentos.'),
-(false, 'f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a64', 'Selfie de Validação', 'Uma selfie do usuário segurando o documento de identidade ao lado do rosto.')
-ON CONFLICT (nome_documento) DO NOTHING;
-
--- Inserção de dados na tabela: status_proposta
-INSERT INTO "schema_sjfjuristas"."status_proposta" (status_proposta_id, nome_status) VALUES
-('b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a21', 'Pendente de Análise'),
-('b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', 'Documentação Pendente'),
-('b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a23', 'Em Análise'),
-('b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a24', 'Aprovada'),
-('b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a25', 'Negada'),
-('b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a26', 'Finalizada'),
-('b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a27', 'Contraproposta Enviada'),
-('b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a28', 'Contraproposta Aceita'),
-('b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a29', 'Contraproposta Recusada')
-ON CONFLICT (nome_status) DO NOTHING;
-
--- Inserção de dados na tabela: status_pagamento_parcela
-INSERT INTO "schema_sjfjuristas"."status_pagamento_parcela" (status_pagamento_parcela_id, nome_status) VALUES
-('d0eebc99-9c0b-4ef8-bb6d-6bb9bd380a41', 'Pendente'),
-('d0eebc99-9c0b-4ef8-bb6d-6bb9bd380a42', 'Pago'),
-('d0eebc99-9c0b-4ef8-bb6d-6bb9bd380a43', 'Atrasado'),
-('d0eebc99-9c0b-4ef8-bb6d-6bb9bd380a44', 'Pago com Atraso')
-ON CONFLICT (nome_status) DO NOTHING;
-
--- Inserção de dados na tabela: status_emprestimo
-INSERT INTO "schema_sjfjuristas"."status_emprestimo" (status_emprestimo_id, nome_status) VALUES
-('c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a31', 'Pendente Desembolso'),
-('c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a32', 'Ativo'),
-('c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a33', 'Finalizado'),
-('c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a34', 'Inadimplente'),
-('c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a35', 'Cancelado')
-ON CONFLICT (nome_status) DO NOTHING;
-
-CREATE TABLE IF NOT EXISTS schema_sjfjuristas.ocupacoes (
-    ocupacao_id UUID PRIMARY KEY,
-    nome_ocupacao VARCHAR(255) NOT NULL UNIQUE,
-    ativo BOOLEAN DEFAULT TRUE
-);
 
 ALTER TABLE schema_sjfjuristas.propostas_emprestimo
     ADD COLUMN IF NOT EXISTS remuneracao_mensal_solicitante NUMERIC(16, 2),
     ADD COLUMN IF NOT EXISTS ocupacao_id_ocupacoes UUID,
     ADD COLUMN IF NOT EXISTS outra_ocupacao_solicitante VARCHAR(255),
     ADD CONSTRAINT fk_propostas_ocupacoes FOREIGN KEY (ocupacao_id_ocupacoes) REFERENCES schema_sjfjuristas.ocupacoes(ocupacao_id) ON DELETE SET NULL;
-
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
-ALTER TABLE schema_sjfjuristas.ocupacoes
-ALTER COLUMN ocupacao_id SET DEFAULT gen_random_uuid();
-
-INSERT INTO schema_sjfjuristas.ocupacoes (nome_ocupacao) VALUES
-('Advogado(a)'),
-('Agrônomo(a)'),
-('Arquiteto(a)'),
-('Artista'),
-('Assistente Administrativo'),
-('Assistente Social'),
-('Atendente de Telemarketing'),
-('Autônomo(a) / Profissional Liberal'),
-('Bombeiro(a)'),
-('Bancário(a)'),
-('Cabeleireiro(a)'),
-('Cientista de Dados'),
-('Contador(a)'),
-('Cozinheiro(a) / Chef'),
-('Dentista'),
-('Designer Gráfico'),
-('Desenvolvedor(a) de Software'),
-('Eletricista'),
-('Empresário(a)'),
-('Enfermeiro(a)'),
-('Engenheiro(a) Civil'),
-('Engenheiro(a) de Produção'),
-('Engenheiro(a) Elétrico'),
-('Engenheiro(a) Mecânico'),
-('Estudante'),
-('Farmacêutico(a)'),
-('Fisioterapeuta'),
-('Fotógrafo(a)'),
-('Funcionário(a) Público(a)'),
-('Garçom / Garçonete'),
-('Gerente de Projetos'),
-('Jornalista'),
-('Marceneiro(a)'),
-('Mecânico(a) de Automóveis'),
-('Médico(a)'),
-('Militar'),
-('Motorista'),
-('Músico(a)'),
-('Nutricionista'),
-('Operador(a) de Caixa'),
-('Pedreiro(a)'),
-('Policial'),
-('Professor(a)'),
-('Psicólogo(a)'),
-('Publicitário(a)'),
-('Recepcionista'),
-('Representante Comercial'),
-('Técnico(a) em Informática'),
-('Técnico(a) em Enfermagem'),
-('Vendedor(a)'),
-('Veterinário(a)'),
-('Zelador(a)'),
-('Analista de Marketing'),
-('Analista Financeiro'),
-('Artesão(ã)'),
-('Atleta'),
-('Aviador(a) / Piloto(a)'),
-('Biólogo(a)'),
-('Biomédico(a)'),
-('Consultor(a)'),
-('Corretor(a) de Imóveis'),
-('Cientista'),
-('Cuidador(a) de Idosos'),
-('Diarista / Empregado(a) Doméstico(a)'),
-('Economista'),
-('Editor(a) de Vídeo'),
-('Geólogo(a)'),
-('Gestor(a) de Recursos Humanos'),
-('Historiador(a)'),
-('Investidor(a)'),
-('Manobrista'),
-('Maquiador(a)'),
-('Marinheiro(a)'),
-('Modelo'),
-('Músico Terapeuta'),
-('Padeiro(a) / Confeiteiro(a)'),
-('Porteiro(a)'),
-('Produtor(a) de Eventos'),
-('Químico(a)'),
-('Radiologista'),
-('Redator(a) / Revisor(a)'),
-('Segurança / Vigilante'),
-('Sociólogo(a)'),
-('Soldador(a)'),
-('Tradutor(a) / Intérprete'),
-('Turismólogo(a)'),
-('Urbanista'),
-('Web Designer'),
-('Outros')
-ON CONFLICT (nome_ocupacao) DO NOTHING;
-
-ALTER TABLE schema_sjfjuristas.propostas_emprestimo
-    ADD COLUMN IF NOT EXISTS proposito_emprestimo VARCHAR(255),
-    ADD COLUMN IF NOT EXISTS estado_civil VARCHAR(50),
-    ADD COLUMN IF NOT EXISTS possui_imovel_veiculo BOOLEAN;
 
 CREATE TABLE schema_sjfjuristas.propostas_historico (
     historico_id uuid NOT NULL DEFAULT gen_random_uuid(),

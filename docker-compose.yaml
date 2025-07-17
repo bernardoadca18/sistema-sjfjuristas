@@ -10,7 +10,9 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./db/script.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./db/01-script.sql:/docker-entrypoint-initdb.d/init-schema.sql
+      - ./db/02-create-extensions.sql:/docker-entrypoint-initdb.d/create-extensions.sql
+      - ./db/03-seed.sql:/docker-entrypoint-initdb.d/seed.sql
       - db_data:/var/lib/postgresql/data
     networks:
       - sjf-network
