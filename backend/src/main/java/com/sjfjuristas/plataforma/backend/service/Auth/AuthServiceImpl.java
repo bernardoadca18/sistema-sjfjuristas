@@ -3,7 +3,10 @@ package com.sjfjuristas.plataforma.backend.service.Auth;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -11,6 +14,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.sjfjuristas.plataforma.backend.domain.PropostaEmprestimo;
 import com.sjfjuristas.plataforma.backend.domain.Usuario;
 import com.sjfjuristas.plataforma.backend.dto.Usuario.AuthResponseDTO;
 import com.sjfjuristas.plataforma.backend.dto.Usuario.ClienteCreateRequestDTO;
@@ -18,10 +22,14 @@ import com.sjfjuristas.plataforma.backend.dto.Usuario.FinalizarCadastroDTO;
 import com.sjfjuristas.plataforma.backend.dto.Usuario.LoginRequestDTO;
 import com.sjfjuristas.plataforma.backend.dto.Usuario.PreCadastroCheckDTO;
 import com.sjfjuristas.plataforma.backend.dto.Usuario.PreCadastroInfoDTO;
+import com.sjfjuristas.plataforma.backend.exceptions.CadastroNaoAprovadoException;
 import com.sjfjuristas.plataforma.backend.exceptions.RegistrationConflictException;
 import com.sjfjuristas.plataforma.backend.exceptions.UserNotFoundException;
 import com.sjfjuristas.plataforma.backend.repository.ChavePixUsuarioRepository;
+import com.sjfjuristas.plataforma.backend.repository.EmprestimoRepository;
+import com.sjfjuristas.plataforma.backend.repository.PropostaEmprestimoRepository;
 import com.sjfjuristas.plataforma.backend.repository.UsuarioRepository;
+import com.sjfjuristas.plataforma.backend.service.EmprestimoService;
 import com.sjfjuristas.plataforma.backend.service.Jwt.JwtService;
 
 import lombok.RequiredArgsConstructor;
@@ -31,10 +39,13 @@ import lombok.RequiredArgsConstructor;
 public class AuthServiceImpl implements AuthService {
 
     private final UsuarioRepository usuarioRepository;
+    private final PropostaEmprestimoRepository propostaEmprestimoRepository;
+    private final EmprestimoRepository emprestimoRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final ChavePixUsuarioRepository chavePixRepository;
+    private final EmprestimoService emprestimoService;
 
     @Override
     public AuthResponseDTO register(ClienteCreateRequestDTO request) {
@@ -118,9 +129,25 @@ public class AuthServiceImpl implements AuthService {
     {
         Usuario usuario = usuarioRepository.findById(request.getUsuarioId()).orElseThrow(() -> new UserNotFoundException("Usuário não encontrado."));
 
+        if (usuario.getCadastroAprovado() == null || !usuario.getCadastroAprovado())
+        {
+            throw new CadastroNaoAprovadoException("Seu cadastro está em análise e ainda não foi aprovado. Por favor, aguarde.");
+        }
+
         if (chavePixRepository.findByUsuarioIdUsuarios(usuario).isEmpty())
         {
             throw new BadCredentialsException("É necessário cadastrar ao menos uma chave PIX para finalizar o cadastro.");
+        }
+
+        if (emprestimoRepository.findByUsuarioIdUsuarios(usuario).isEmpty())
+        {
+            List<PropostaEmprestimo> propostasCadastradas = propostaEmprestimoRepository.findPropostasByUserIdNonPaged(request.getUsuarioId());
+            List<UUID> propostaIds = propostasCadastradas.stream().map(PropostaEmprestimo::getId).collect(Collectors.toList());
+
+            if (!propostaIds.isEmpty())
+            {
+                emprestimoService.criarEmprestimosEmAnalise(propostaIds);
+            }
         }
 
         usuario.setHashSenha(passwordEncoder.encode(request.getSenha()));

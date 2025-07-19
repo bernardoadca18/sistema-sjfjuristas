@@ -1,18 +1,18 @@
 package com.sjfjuristas.plataforma.backend.repository;
 
-import com.sjfjuristas.plataforma.backend.domain.Usuario;
+import java.time.LocalDate;
+import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
-import java.util.Optional;
-import java.util.UUID;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import com.sjfjuristas.plataforma.backend.domain.Usuario;
 
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, UUID>, JpaSpecificationExecutor<Usuario>
@@ -35,5 +35,13 @@ public interface UsuarioRepository extends JpaRepository<Usuario, UUID>, JpaSpec
     boolean existsByCpf(String cpf);
 
     Page<Usuario> findByNomeCompletoContainingIgnoreCase(String nomeCompleto, Pageable pageable);
+
+    @Query(
+        value = "SELECT u.* FROM schema_sjfjuristas.usuarios u " +
+                "JOIN schema_sjfjuristas.propostas_emprestimo p ON u.usuario_id = p.usuario_id_usuarios " +
+                "WHERE p.proposta_id = :propostaId",
+        nativeQuery = true
+    )
+    Optional<Usuario> findUsuarioByPropostaId(@Param("propostaId") UUID propostaId);
 
 }

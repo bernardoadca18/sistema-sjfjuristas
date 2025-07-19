@@ -1,20 +1,32 @@
 package com.sjfjuristas.plataforma.backend.domain;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
+
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -31,47 +43,38 @@ public class Emprestimo {
     @Column(name = "emprestimo_id", nullable = false)
     private UUID id;
 
-    @NotNull
-    @Column(name = "valor_contratado", nullable = false, precision = 16, scale = 2)
+    @Column(name = "valor_contratado", nullable = true, precision = 16, scale = 2)
     private BigDecimal valorContratado;
 
-    @NotNull
-    @Column(name = "valor_liberado", nullable = false, precision = 16, scale = 2)
+    @Column(name = "valor_liberado", nullable = true, precision = 16, scale = 2)
     private BigDecimal valorLiberado;
 
-    @NotNull
-    @Column(name = "taxa_juros_mensal_efetiva", nullable = false, precision = 16, scale = 2)
+    @Column(name = "taxa_juros_mensal_efetiva", nullable = true, precision = 16, scale = 2)
     private BigDecimal taxaJurosMensalEfetiva;
 
-    @NotNull
-    @Column(name = "taxa_juros_diaria_efetiva", nullable = false, precision = 16, scale = 2)
+    @Column(name = "taxa_juros_diaria_efetiva", nullable = true, precision = 16, scale = 2)
     private BigDecimal taxaJurosDiariaEfetiva;
 
     @Column(name = "cet_anual", precision = 16, scale = 6)
     private BigDecimal cetAnual;
 
-    @NotNull
-    @Column(name = "numero_total_parcelas", nullable = false)
+    @Column(name = "numero_total_parcelas", nullable = true)
     private Integer numeroTotalParcelas;
 
-    @NotNull
-    @Column(name = "valor_parcela_diaria", nullable = false, precision = 16, scale = 2)
+    @Column(name = "valor_parcela_diaria", nullable = true, precision = 16, scale = 2)
     private BigDecimal valorParcelaDiaria;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "data_contratacao")
     private OffsetDateTime dataContratacao;
 
-    @NotNull
-    @Column(name = "data_primeiro_vencimento", nullable = false)
+    @Column(name = "data_primeiro_vencimento", nullable = true)
     private LocalDate dataPrimeiroVencimento;
 
-    @NotNull
-    @Column(name = "data_ultimo_vencimento", nullable = false)
+    @Column(name = "data_ultimo_vencimento", nullable = true)
     private LocalDate dataUltimoVencimento;
 
-    @NotNull
-    @Column(name = "saldo_devedor_atual", nullable = false, precision = 16, scale = 2)
+    @Column(name = "saldo_devedor_atual", nullable = true, precision = 16, scale = 2)
     private BigDecimal saldoDevedorAtual;
 
     @Column(name = "data_solicitacao_desembolso")
@@ -96,8 +99,7 @@ public class Emprestimo {
     @Column(name = "outras_taxas", precision = 16, scale = 2)
     private BigDecimal outrasTaxas;
 
-    @NotNull
-    @Column(name = "data_inicio_cobranca_parcelas", nullable = false)
+    @Column(name = "data_inicio_cobranca_parcelas", nullable = true)
     private LocalDate dataInicioCobrancaParcelas;
 
     @ManyToOne(fetch = FetchType.LAZY)

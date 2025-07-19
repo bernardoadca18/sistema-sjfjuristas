@@ -1,22 +1,34 @@
 package com.sjfjuristas.plataforma.backend.domain;
 
-import jakarta.persistence.*;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.UUID;
+
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.UUID;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import java.util.Collection;
-import java.util.Collections;
 
 @Getter
 @Setter
@@ -80,6 +92,10 @@ public class Usuario implements UserDetails
     @ColumnDefault("false")
     @Column(name = "email_verificado")
     private Boolean emailVerificado = false;
+
+    @ColumnDefault("false")
+    @Column(name = "cadastro_aprovado")
+    private Boolean cadastroAprovado = false;
 
     @Size(max = 255)
     @Column(name = "token_verificacao_email")

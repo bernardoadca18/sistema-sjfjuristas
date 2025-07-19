@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -72,6 +73,35 @@ public class EmprestimoService
 
         Emprestimo emprestimoSalvo = emprestimoRepository.save(novoEmprestimo);
         return emprestimoSalvo;
+    }
+
+    @Transactional
+    public EmprestimoClienteResponseDTO findByPropostaId(UUID propostaId)
+    {
+        Emprestimo emprestimo = emprestimoRepository.findByPropostaIdPropostasemprestimo_Id(propostaId).orElseThrow(() -> new IllegalArgumentException("Empréstimo não encontrado"));
+        return new EmprestimoClienteResponseDTO(emprestimo);
+    }
+
+    public void criarEmprestimosEmAnalise(List<UUID> propostaIds)
+    {
+        StatusEmprestimo statusInicialEmprestimo = statusEmprestimoRepository.findByNomeStatus("Em Análise").orElseThrow(() -> new IllegalStateException("Status 'Em Análise' não encontrado."));
+        PropostaEmprestimo propostaSample = propostaRepository.findById(propostaIds.get(0)).orElseThrow(() -> new IllegalArgumentException("Proposta não encontrada."));
+        Usuario usuario = propostaSample.getUsuarioIdUsuarios();
+    
+        List<PropostaEmprestimo> propostas = propostaRepository.findAllById(propostaIds);
+
+        List<Emprestimo> emprestimosParaSalvar = propostas.stream().map(proposta -> {
+            Emprestimo novoEmprestimo = new Emprestimo();
+
+            novoEmprestimo.setPropostaIdPropostasemprestimo(proposta);
+            novoEmprestimo.setUsuarioIdUsuarios(usuario);
+            novoEmprestimo.setStatusEmprestimoIdStatusemprestimo(statusInicialEmprestimo);
+
+            return novoEmprestimo;
+        })
+        .collect(Collectors.toList());
+
+        emprestimoRepository.saveAll(emprestimosParaSalvar);
     }
 
     @Transactional

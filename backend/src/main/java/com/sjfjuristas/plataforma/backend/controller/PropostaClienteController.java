@@ -34,6 +34,12 @@ public class PropostaClienteController
     @Autowired
     private PropostaService propostaService;
 
+    @GetMapping("/{propostaId}")
+    public ResponseEntity<PropostaResponseDTO> getPropostaById(@PathVariable UUID propostaId)
+    {
+        return ResponseEntity.ok(propostaService.findPropostaById(propostaId));
+    }
+
     @GetMapping
     public ResponseEntity<Page<PropostaResponseDTO>> getMyPropostas(@AuthenticationPrincipal Usuario usuarioLogado, @PageableDefault(page = 0, size = 10) Pageable pageable)
     {

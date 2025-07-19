@@ -56,6 +56,13 @@ public class PropostaService
     private PropostaHistoricoRepository propostaHistoricoRepository;
 
     @Transactional
+    public PropostaResponseDTO findPropostaById(UUID id)
+    {
+        PropostaEmprestimo propostaEmprestimo = propostaRepository.findById(id).get();
+        return new PropostaResponseDTO(propostaEmprestimo);
+    }
+
+    @Transactional
     public Page<PropostaResponseDTO> getMyPropostas(UUID userId, Pageable pageable)
     {
         Page<PropostaEmprestimo> propostas = propostaRepository.findPropostasByUserId(userId, pageable);
@@ -234,6 +241,15 @@ public class PropostaService
         
         // TODO: Enviar notificação para o Admin (em caso de aceite ou nova contraproposta)
         return propostaRepository.save(propostaSalva);
+    }
+
+    public void aprovarCadastro(UUID propostaId)
+    {
+        Usuario usuario = usuarioRepository.findUsuarioByPropostaId(propostaId).orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado."));
+
+        usuario.setCadastroAprovado(true);
+
+        System.out.println("Cadastro aprovado para " + usuario.getNomeCompleto());
     }
 
     @Transactional(readOnly = true)

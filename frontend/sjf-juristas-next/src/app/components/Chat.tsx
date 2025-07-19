@@ -5,6 +5,7 @@ import { conversationSteps, Message, InputType, IFormData } from '@/app/utils/co
 import { theme } from '@/config/theme';
 import { PatternFormat, NumericFormat } from 'react-number-format';
 import axios from 'axios';
+import {formatarInput} from '../utils/formatters';
 
 interface Occupation
 {
@@ -167,7 +168,7 @@ const Chat = () => {
                 setFormData(prevData => ({ ...prevData, [messageIdentifier]: cleanValue }));
             }
     
-            const userMessage: Message = { id: Date.now(), text: userResponseText, sender: 'user' };
+            const userMessage: Message = { id: Date.now(), text: formatarInput(userResponseText, messageIdentifier), sender: 'user' };
             setMessages(prev => [...prev, userMessage]);
         }
         else
@@ -311,6 +312,7 @@ const Chat = () => {
             
             case InputType.Number:
                 const isCurrencyVal = (currentInputData.message_identifier === 'loanValue' || currentInputData.message_identifier === 'monthlyIncome');
+
                 let correctComponent = null;
 
                 if (isCurrencyVal)

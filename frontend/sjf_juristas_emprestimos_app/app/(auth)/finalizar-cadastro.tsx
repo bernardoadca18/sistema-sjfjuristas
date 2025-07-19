@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
-import { CheckBox, Switch } from 'react-native-elements';
+import { CheckBox } from 'react-native-elements';
 import { useRouter } from 'expo-router';
-import api  from '../../services/api';
 import { Colors } from '@/constants/Colors';
 import { addChavePix, getTiposChavePix } from '@/services/clienteService';
 import { TipoChavePix } from '@/types/Cliente';

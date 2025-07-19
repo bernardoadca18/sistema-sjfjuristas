@@ -4,6 +4,7 @@ import { Colors } from '@/constants/Colors';
 import formatDate from '@/utils/formatDate';
 import formatCurrency from '@/utils/formatCurrency';
 import { Proposta } from '@/types/Proposta';
+import { Link } from 'expo-router';
 
 interface PropostaHistoricoProps
 {
@@ -13,23 +14,28 @@ interface PropostaHistoricoProps
 
 const PropostaHistoricoWidget : React.FC<PropostaHistoricoProps> = ({ item, onPress }) => {
     return (
-        <TouchableOpacity onPress={onPress}>
-            <View style={[styles.container, styles.card]}>
-                <View style={styles.infoContainer}>
-                    <Text style={styles.widgetTitle}>Proposta</Text>
-                    <Text style={styles.text}>Data da Solicitação: {formatDate(item.dataSolicitacao)}</Text>
-                    <Text style={[styles.text, styles.valor]}>Valor da Proposta: {formatCurrency(item.valorProposta)}</Text>
-                    <Text style={styles.text}>Parcelas solicitadas: {item.numeroParcelasSolicitadas}</Text>
-                    {
-                        item.numeroParcelasOfertadas ? (<Text style={styles.text}>Parcelas ofertadas: {item.numeroParcelasOfertadas}</Text>) : (<></>)
-                    }
-                    {
-                        item.taxaJurosDiaria ? (<Text style={styles.text}>Taxa de Juros Diária: {item.taxaJurosDiaria}</Text>) : (<></>)
-                    }
+        <Link href={{
+                pathname: "/analise-proposta/[id]",
+                params: { id : item.id }
+            }as any} asChild>
+            <TouchableOpacity>
+                <View style={[styles.container, styles.card]}>
+                    <View style={styles.infoContainer}>
+                        <Text style={styles.widgetTitle}>Proposta</Text>
+                        <Text style={styles.text}>Data da Solicitação: {formatDate(item.dataSolicitacao)}</Text>
+                        <Text style={[styles.text, styles.valor]}>Valor da Proposta: {formatCurrency(item.valorProposta)}</Text>
+                        <Text style={styles.text}>Parcelas solicitadas: {item.numeroParcelasSolicitadas}</Text>
+                        {
+                            item.numeroParcelasOfertadas ? (<Text style={styles.text}>Parcelas ofertadas: {item.numeroParcelasOfertadas}</Text>) : (<></>)
+                        }
+                        {
+                            item.taxaJurosDiaria ? (<Text style={styles.text}>Taxa de Juros Diária: {item.taxaJurosDiaria}</Text>) : (<></>)
+                        }
 
+                    </View>
                 </View>
-            </View>
-        </TouchableOpacity>
+            </TouchableOpacity>
+        </Link>
     )
 };
 

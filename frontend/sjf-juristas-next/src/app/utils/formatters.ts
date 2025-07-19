@@ -1,4 +1,4 @@
-export const formatarCPF = (cpf : string): string => {
+const formatarCPF = (cpf : string): string => {
     const cpfDigitos = cpf.replace(/\D/g, '');
 
     if (cpfDigitos.length !== 11)
@@ -13,7 +13,7 @@ export const formatarCPF = (cpf : string): string => {
     );
 };
 
-export const formatarTelefone = (telefone: string): string => {
+const formatarTelefone = (telefone: string): string => {
     const telefoneDigitos = telefone.replace(/\D/g, '');
 
     if (telefoneDigitos.length !== 11)
@@ -28,7 +28,7 @@ export const formatarTelefone = (telefone: string): string => {
     );
 };
 
-export const formatarData = (data: string): string => {
+const formatarData = (data: string): string => {
     const dataApenasDigitos = data.replace(/\D/g, '');
 
     if (dataApenasDigitos.length !== 8)
@@ -42,3 +42,17 @@ export const formatarData = (data: string): string => {
         '$1/$2/$3'
     );
 };
+
+export const formatarInput =  (data: string, messageIdentifier: string): string => {
+    switch (messageIdentifier)
+    {
+        case ("dateOfBirth"):
+            return formatarData(data);
+        case ("cpf"):
+            return formatarCPF(data);
+        case("whatsapp"):
+            return formatarTelefone(data);
+        default:
+            return data;
+    }
+}

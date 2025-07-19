@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -48,6 +47,7 @@ public class PropostaAdminController
         return ResponseEntity.ok(dto);
     }
 
+    /*
     @PutMapping("/{propostaId}/aprovar-em-analise")
     public ResponseEntity<EmprestimoAdminResponseDTO> aprovarEmprestimoEmAnalise(@PathVariable UUID propostaId, @Valid @RequestBody CondicoesAprovadasDTO condicoes)
     {
@@ -55,17 +55,19 @@ public class PropostaAdminController
         EmprestimoAdminResponseDTO dto = new EmprestimoAdminResponseDTO(emprestimo);
         return ResponseEntity.ok(dto);
     }
+    */
 
     @PostMapping("/{propostaId}/aprovar")
     public ResponseEntity<EmprestimoAdminResponseDTO> aprovarProposta(@PathVariable UUID propostaId, @Valid @RequestBody CondicoesAprovadasDTO condicoes)
-    {    
-        propostaService.atualizarStatus(propostaId, "Aprovada");
-
-        Emprestimo emprestimoCriado = emprestimoService.criarEmprestimoEGerarParcelas(propostaId, condicoes);
+    {
+        propostaService.aprovarCadastro(propostaId);
         
-
+        propostaService.atualizarStatus(propostaId, "Aprovada");
+        
+        Emprestimo emprestimoCriado = emprestimoService.criarEmprestimoEGerarParcelas(propostaId, condicoes);
         EmprestimoAdminResponseDTO response = new EmprestimoAdminResponseDTO(emprestimoCriado);
         
+
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
