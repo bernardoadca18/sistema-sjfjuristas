@@ -1,20 +1,21 @@
 package com.sjfjuristas.plataforma.backend.controller.CRUD;
 
-import com.sjfjuristas.plataforma.backend.dto.Admin.AdminCreateRequestDTO;
-import com.sjfjuristas.plataforma.backend.dto.Admin.AdminResponseDTO;
-import com.sjfjuristas.plataforma.backend.dto.Admin.AdminUpdateRequestDTO;
-import com.sjfjuristas.plataforma.backend.service.CRUD.AdminCRUDService;
+import java.util.List;
+import java.util.UUID;
 
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import java.util.List;
-import java.util.UUID;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.sjfjuristas.plataforma.backend.dto.Admin.AdminResponseDTO;
+import com.sjfjuristas.plataforma.backend.service.CRUD.AdminCRUDService;
 
 @RestController
 @RequestMapping("/api/admins")
@@ -24,12 +25,14 @@ public class AdminController
     @Autowired
     private AdminCRUDService adminCRUDService;
 
+    /*
     @PostMapping
     public ResponseEntity<AdminResponseDTO> createAdmin(@Valid @RequestBody AdminCreateRequestDTO request)
     {
         AdminResponseDTO response = adminCRUDService.createAdmin(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+    */
 
     @GetMapping("/{id}")
     public ResponseEntity<AdminResponseDTO> getAdminById(@PathVariable UUID id)
@@ -80,6 +83,7 @@ public class AdminController
         return ResponseEntity.ok(response);
     }
 
+    /*
     @PutMapping("/{id}")
     public ResponseEntity<AdminResponseDTO> updateAdmin(@PathVariable UUID id, @Valid @RequestBody AdminUpdateRequestDTO request)
     {
@@ -93,4 +97,5 @@ public class AdminController
         adminCRUDService.deleteAdmin(id);
         return ResponseEntity.noContent().build();
     }
+    */
 }
