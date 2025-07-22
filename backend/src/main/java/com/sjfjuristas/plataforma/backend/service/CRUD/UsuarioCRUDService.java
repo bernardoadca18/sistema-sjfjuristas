@@ -2,6 +2,7 @@ package com.sjfjuristas.plataforma.backend.service.CRUD;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,9 @@ import com.sjfjuristas.plataforma.backend.domain.Ocupacao;
 import com.sjfjuristas.plataforma.backend.domain.PropostaEmprestimo;
 import com.sjfjuristas.plataforma.backend.domain.Usuario;
 import com.sjfjuristas.plataforma.backend.dto.CRUD.OcupacaoResponseDTO;
+import com.sjfjuristas.plataforma.backend.dto.CRUD.UsuarioRequestDTO;
 import com.sjfjuristas.plataforma.backend.dto.CRUD.UsuarioResponseDTO;
+import com.sjfjuristas.plataforma.backend.repository.OcupacaoRepository;
 import com.sjfjuristas.plataforma.backend.repository.PropostaEmprestimoRepository;
 import com.sjfjuristas.plataforma.backend.repository.UsuarioRepository;
 import com.sjfjuristas.plataforma.backend.repository.spec.UsuarioSpecification;
@@ -28,6 +31,9 @@ public class UsuarioCRUDService
 
     @Autowired
     private PropostaEmprestimoRepository propostaEmprestimoRepository;
+
+    @Autowired
+    private OcupacaoRepository ocupacaoRepository;
 
     @Transactional(readOnly = true)
     public Page<UsuarioResponseDTO> getAllUsuarios(Pageable pageable)
@@ -59,12 +65,40 @@ public class UsuarioCRUDService
         return paginaUsuarios.map(this::toResponseDto);
     }
 
+    @Transactional
+    public UsuarioResponseDTO updateUsuario(UUID id, UsuarioRequestDTO dto)
+    {
+        Usuario usuario = usuarioRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        if (usuario != null)
+        {
+            Optional.ofNullable(dto.getNome()).filter(nome -> !nome.trim().isEmpty()).ifPresent(usuario::setNomeCompleto);
+            Optional.ofNullable(dto.getEmail()).filter(email -> !email.trim().isEmpty()).ifPresent(usuario::setEmail);
+            Optional.ofNullable(dto.getTelefone()).filter(telefone -> !telefone.trim().isEmpty()).ifPresent(usuario::setTelefoneWhatsapp);
+            Optional.ofNullable(dto.getCpf()).filter(cpf -> !cpf.trim().isEmpty()).ifPresent(usuario::setCpf);
+
+            Optional.ofNullable(dto.getDataNascimento()).ifPresent(usuario::setDataNascimento);
+            
+            Optional.ofNullable(dto.getNomeMae()).filter(nomeMae -> !nomeMae.trim().isEmpty()).ifPresent(usuario::setNomeCompletoMae);
+
+            Optional.ofNullable(dto.getRendaMensal()).ifPresent(usuario::setRendaMensal);
+
+            Ocupacao ocupacao = ocupacaoRepository.findById(id).orElseThrow(() -> new RuntimeException("Ocupacao não encontrada."));
+
+            usuario.getOcupacoes().add(ocupacao);
+            
+            Optional.ofNullable(dto.isAtivo()).ifPresent(usuario::setAtivo);
+        }
+
+        Usuario savedUsuario = usuarioRepository.save(usuario);
+
+        return new UsuarioResponseDTO(savedUsuario);
+    }
+
     private UsuarioResponseDTO toResponseDto(Usuario usuario)
     {
         UsuarioResponseDTO dto = new UsuarioResponseDTO();
 
-        //BigDecimal rendaMensal = propostaEmprestimoRepository.findTopByUsuarioIdOrderByDataPropostaDesc(usuario.getId()).map(PropostaEmprestimo::getRemuneracaoMensalSolicitante).orElseThrow(() -> new RuntimeException("Valor não encontrado"));
-        //Ocupacao ocupacao = propostaEmprestimoRepository.findTopByUsuarioIdOrderByDataPropostaDesc(usuario.getId()).map(PropostaEmprestimo::getOcupacao).orElseThrow(() -> new RuntimeException("Valor não encontrado"));
         BigDecimal rendaMensal = propostaEmprestimoRepository.findTopByUsuarioIdUsuarios_IdOrderByDataSolicitacaoDesc(usuario.getId()).map(PropostaEmprestimo::getRemuneracaoMensalSolicitante).orElseThrow(() -> new RuntimeException("Valor não encontrado"));
         Ocupacao ocupacao = propostaEmprestimoRepository.findTopByUsuarioIdUsuarios_IdOrderByDataSolicitacaoDesc(usuario.getId()).map(PropostaEmprestimo::getOcupacao).orElseThrow(() -> new RuntimeException("Valor não encontrado"));
         

@@ -29,6 +29,8 @@ CREATE TABLE schema_sjfjuristas.usuarios (
     data_aceite_termos_app timestamp(6) with time zone,
     aceitou_termos_app boolean DEFAULT false,
     cadastro_aprovado boolean DEFAULT false,
+    nome_completo_mae varchar(255),
+    renda_mensal numeric(16,2),
     perfil_id_perfis_usuario uuid,
     PRIMARY KEY (usuario_id),
     CONSTRAINT usuarios_cpf_uq UNIQUE (cpf),
@@ -327,6 +329,18 @@ CREATE TABLE IF NOT EXISTS schema_sjfjuristas.ocupacoes (
     ocupacao_id UUID PRIMARY KEY,
     nome_ocupacao VARCHAR(255) NOT NULL UNIQUE,
     ativo BOOLEAN DEFAULT TRUE
+);
+
+CREATE TABLE schema_sjfjuristas.usuario_ocupacoes (
+    usuario_id_usuarios uuid NOT NULL,
+    ocupacao_id_ocupacoes uuid NOT NULL,
+    PRIMARY KEY (usuario_id_usuarios, ocupacao_id_ocupacoes),
+    
+    CONSTRAINT fk_usuarioocupacoes_usuarios FOREIGN KEY (usuario_id_usuarios) 
+        REFERENCES schema_sjfjuristas.usuarios(usuario_id) ON DELETE CASCADE,
+        
+    CONSTRAINT fk_usuarioocupacoes_ocupacoes FOREIGN KEY (ocupacao_id_ocupacoes) 
+        REFERENCES schema_sjfjuristas.ocupacoes(ocupacao_id) ON DELETE CASCADE
 );
 
 -- =================================================================

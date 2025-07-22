@@ -1,5 +1,6 @@
 package com.sjfjuristas.plataforma.backend.domain;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Collection;
@@ -21,6 +22,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -82,6 +85,9 @@ public class Usuario implements UserDetails
     @Column(name = "ativo")
     private Boolean ativo = true;
 
+    @Column(name = "renda_mensal", precision = 16, scale = 2)
+    private BigDecimal rendaMensal;
+
     @Size(max = 255)
     @Column(name = "token_recuperacao_senha")
     private String tokenRecuperacaoSenha;
@@ -107,6 +113,16 @@ public class Usuario implements UserDetails
     @ColumnDefault("false")
     @Column(name = "aceitou_termos_app")
     private Boolean aceitouTermosApp;
+
+    @Size(max = 255)
+    @Column(name = "nome_completo_mae")
+    private String nomeCompletoMae;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "usuario_ocupacoes", schema = "schema_sjfjuristas",
+               joinColumns = @JoinColumn(name = "usuario_id_usuarios"),
+               inverseJoinColumns = @JoinColumn(name = "ocupacao_id_ocupacoes"))
+    private Set<Ocupacao> ocupacoes = new LinkedHashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.RESTRICT)

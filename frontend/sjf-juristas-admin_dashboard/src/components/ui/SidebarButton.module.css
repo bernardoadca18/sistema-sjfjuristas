@@ -1,0 +1,36 @@
+.icon
+{
+    color: var(--sidebar-button-inactive-details);
+}
+
+.buttonContainer:hover *
+{
+    color: var(--sidebar-button-active-details);
+}
+
+.buttonContainer:active *
+{
+    color: var(--sidebar-button-active-details);
+}
+
+.text
+{
+    color: var(--sidebar-button-inactive-details);
+    font-weight: bold;
+}
+
+.buttonContainer:active
+{
+    background-color: var(--sidebar-button-active-bg);
+}
+
+.buttonContainer:hover
+{
+    background-color: var(--sidebar-button-active-bg);
+}
+
+.buttonContainer
+{
+    justify-content: flex-start;
+    width: 192px;
+}

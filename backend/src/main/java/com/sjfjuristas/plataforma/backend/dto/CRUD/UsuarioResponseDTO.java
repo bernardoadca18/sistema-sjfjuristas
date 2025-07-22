@@ -42,4 +42,19 @@ public class UsuarioResponseDTO
         this.dataInclusao = entity.getDataCadastro().toLocalDateTime();
         this.dataAlteracao = LocalDateTime.now();
     }
+
+    public UsuarioResponseDTO(Usuario entity)
+    {
+        this.id = entity.getId();
+        this.nome = entity.getNomeCompleto();
+        this.email = entity.getEmail();
+        this.telefone = entity.getTelefoneWhatsapp();
+        this.cpf = entity.getCpf();
+        this.dataNascimento = entity.getDataNascimento();
+        this.rendaMensal = entity.getRendaMensal();
+        this.ocupacao = null;
+        this.ativo = entity.getAtivo();
+        this.dataInclusao = entity.getDataCadastro().toLocalDateTime();
+        this.dataAlteracao = LocalDateTime.now();
+    }
 }

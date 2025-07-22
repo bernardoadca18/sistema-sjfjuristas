@@ -1,0 +1,20 @@
+.title
+{
+    color: var(--sidebar-button-active-details);
+    font-weight: bolder;
+    font-size: 32px;
+    text-align: center;
+    padding: 16;
+}
+
+.container
+{
+    width: 15vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16;
+    position: fixed;
+    left: 0;
+    top: 0;
+}
