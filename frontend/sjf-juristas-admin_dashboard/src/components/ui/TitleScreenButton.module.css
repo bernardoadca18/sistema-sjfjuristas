@@ -1,0 +1,17 @@
+.buttonContainer
+{
+    justify-content: flex-start;
+    background-color: var(--sidebar-button-active-bg);
+}
+
+.buttonContainer:hover
+{
+    background-color: var(--sidebar-button-active-bg-light);
+}
+
+.text
+{
+    color: var(--sidebar-button-active-details);
+    font-weight: bold;
+    text-align: center;
+}

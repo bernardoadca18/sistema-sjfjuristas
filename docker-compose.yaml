@@ -3,10 +3,8 @@ services:
     image: postgres:17
     container_name: sjfjuristas-db
     restart: unless-stopped
-    environment:
-      POSTGRES_DB: sjfjuristas
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: "12345678"
+    env_file:
+      - .env
     ports:
       - "5432:5432"
     volumes:
@@ -21,9 +19,8 @@ services:
     image: dpage/pgadmin4
     container_name: sjfjuristas-pgadmin
     restart: unless-stopped
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: "12345678"
+    env_file:
+      - .env
     ports:
       - "8082:80"
     volumes:
@@ -37,9 +34,8 @@ services:
     image: minio/minio:latest
     container_name: sjfjuristas-minio
     restart: unless-stopped
-    environment:
-      MINIO_ROOT_USER: admin
-      MINIO_ROOT_PASSWORD: "12345678"
+    env_file:
+      - .env
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -81,12 +77,11 @@ services:
     build: ./backend
     container_name: sjfjuristas-backend
     restart: unless-stopped
+    env_file:
+      - .env
     depends_on:
       - db
       - create-bucket
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/sjfjuristas
-      - MINIO_URL=http://minio:9000
     networks:
       - sjf-network
 

@@ -177,11 +177,6 @@ public class EmprestimoService
         return emprestimoSalvo;
     }
 
-    private boolean emprestimoCriado(UUID propostaId)
-    {
-        return !(emprestimoRepository.findByPropostaIdPropostasemprestimo_Id(propostaId).isEmpty());
-    }
-
     @Transactional
     private void gerarEGravarParcelasPara(Emprestimo emprestimo, BigDecimal taxaJurosDiariaDecimal)
     {
