@@ -217,7 +217,8 @@ public class EmprestimoService
     @Transactional
     private BigDecimal calcularValorParcela(BigDecimal valorPrincipal, BigDecimal taxaJurosDiaria, int numParcelas)
     {
-        if (taxaJurosDiaria.compareTo(BigDecimal.ZERO) == 0) {
+        if (taxaJurosDiaria.compareTo(BigDecimal.ZERO) == 0)
+        {
             return valorPrincipal.divide(new BigDecimal(numParcelas), 2, RoundingMode.HALF_UP);
         }
         BigDecimal i = taxaJurosDiaria;
