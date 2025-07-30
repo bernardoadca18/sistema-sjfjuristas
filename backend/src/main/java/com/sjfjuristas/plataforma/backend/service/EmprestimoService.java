@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sjfjuristas.plataforma.backend.domain.ChavePixUsuario;
 import com.sjfjuristas.plataforma.backend.domain.Emprestimo;
 import com.sjfjuristas.plataforma.backend.domain.ParcelaEmprestimo;
 import com.sjfjuristas.plataforma.backend.domain.PropostaEmprestimo;
@@ -26,6 +27,7 @@ import com.sjfjuristas.plataforma.backend.dto.Emprestimos.CondicoesAprovadasDTO;
 import com.sjfjuristas.plataforma.backend.dto.Emprestimos.EmprestimoClienteResponseDTO;
 import com.sjfjuristas.plataforma.backend.dto.Emprestimos.EmprestimoSummaryDTO;
 import com.sjfjuristas.plataforma.backend.dto.ParcelaEmprestimo.ParcelaEmprestimoResponseDTO;
+import com.sjfjuristas.plataforma.backend.repository.ChavePixUsuarioRepository;
 import com.sjfjuristas.plataforma.backend.repository.EmprestimoRepository;
 import com.sjfjuristas.plataforma.backend.repository.ParcelaEmprestimoRepository;
 import com.sjfjuristas.plataforma.backend.repository.PropostaEmprestimoRepository;
@@ -52,6 +54,9 @@ public class EmprestimoService
 
     @Autowired
     private PropostaEmprestimoRepository propostaRepository;
+
+    @Autowired
+    private ChavePixUsuarioRepository chavePixUsuarioRepository;
 
     @Autowired
     private UsuarioRepository usuarioRepository;
@@ -93,6 +98,13 @@ public class EmprestimoService
         List<Emprestimo> emprestimosParaSalvar = propostas.stream().map(proposta -> {
             Emprestimo novoEmprestimo = new Emprestimo();
 
+            ChavePixUsuario chavePixAtiva = chavePixUsuarioRepository.findChavePixAtivaByUsuarioId(usuario.getId()).get();
+        
+            if (chavePixAtiva != null && novoEmprestimo.getChavePixIdChavespixusuario() == null)
+            {
+                novoEmprestimo.setChavePixIdChavespixusuario(chavePixAtiva);
+            }
+
             novoEmprestimo.setPropostaIdPropostasemprestimo(proposta);
             novoEmprestimo.setUsuarioIdUsuarios(usuario);
             novoEmprestimo.setStatusEmprestimoIdStatusemprestimo(statusInicialEmprestimo);
@@ -115,6 +127,13 @@ public class EmprestimoService
         BigDecimal taxaJurosMensal = taxaJurosDiariaDecimal.max(new BigDecimal("30")).setScale(4, RoundingMode.HALF_UP);
         
         LocalDate ultimoVencimento = condicoes.getDataPrimeiroVencimento().plusDays(condicoes.getNumeroTotalParcelas() - 1);
+        
+        ChavePixUsuario chavePixAtiva = chavePixUsuarioRepository.findChavePixAtivaByUsuarioId(novoEmprestimo.getUsuarioIdUsuarios().getId()).get();
+        
+        if (chavePixAtiva != null && novoEmprestimo.getChavePixIdChavespixusuario() == null)
+        {
+            novoEmprestimo.setChavePixIdChavespixusuario(chavePixAtiva);
+        }
 
         novoEmprestimo.setValorContratado(condicoes.getValorContratado());
         novoEmprestimo.setValorLiberado(condicoes.getValorLiberado());
@@ -149,14 +168,19 @@ public class EmprestimoService
         Usuario usuario = proposta.getUsuarioIdUsuarios();
         StatusEmprestimo statusInicialEmprestimo = statusEmprestimoRepository.findByNomeStatus("Pendente Desembolso").orElseThrow(() -> new IllegalStateException("Status 'Pendente Desembolso' não encontrado."));
 
-
-
+        
         Emprestimo novoEmprestimo = new Emprestimo();
         
         novoEmprestimo.setPropostaIdPropostasemprestimo(proposta);
         novoEmprestimo.setUsuarioIdUsuarios(usuario);
         novoEmprestimo.setStatusEmprestimoIdStatusemprestimo(statusInicialEmprestimo);
         
+        ChavePixUsuario chavePixAtiva = chavePixUsuarioRepository.findChavePixAtivaByUsuarioId(usuario.getId()).get();
+        
+        if (chavePixAtiva != null && novoEmprestimo.getChavePixIdChavespixusuario() == null)
+        {
+            novoEmprestimo.setChavePixIdChavespixusuario(chavePixAtiva);
+        }
         
         novoEmprestimo.setValorContratado(condicoes.getValorContratado());
         novoEmprestimo.setValorLiberado(condicoes.getValorLiberado());

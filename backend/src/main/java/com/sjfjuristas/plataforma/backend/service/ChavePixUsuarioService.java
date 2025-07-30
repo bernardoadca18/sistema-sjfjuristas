@@ -11,23 +11,29 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sjfjuristas.plataforma.backend.domain.ChavePixUsuario;
+import com.sjfjuristas.plataforma.backend.domain.Emprestimo;
 import com.sjfjuristas.plataforma.backend.domain.TipoChavePix;
 import com.sjfjuristas.plataforma.backend.domain.Usuario;
 import com.sjfjuristas.plataforma.backend.dto.ChavesPixUsuario.ChavePixCreateRequestDTO;
 import com.sjfjuristas.plataforma.backend.dto.ChavesPixUsuario.ChavePixResponseDTO;
 import com.sjfjuristas.plataforma.backend.repository.ChavePixUsuarioRepository;
+import com.sjfjuristas.plataforma.backend.repository.EmprestimoRepository;
 import com.sjfjuristas.plataforma.backend.repository.TipoChavePixRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
-public class ChavePixUsuarioService {
+public class ChavePixUsuarioService
+{
 
     @Autowired
     private ChavePixUsuarioRepository chavePixRepository;
 
     @Autowired
     private TipoChavePixRepository tipoChavePixRepository;
+
+    @Autowired
+    private EmprestimoRepository emprestimoRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(ChavePixUsuarioService.class);
 
@@ -53,8 +59,27 @@ public class ChavePixUsuarioService {
         novaChave.setVerificada(false);
 
         ChavePixUsuario chaveSalva = chavePixRepository.save(novaChave);
+
+        if (isFirstKey)
+        {
+            vincularChaveAEmprestimosPendentes(usuario, chaveSalva);
+        }
         
         return toResponseDto(chaveSalva);
+    }
+
+    private void vincularChaveAEmprestimosPendentes(Usuario usuario, ChavePixUsuario chaveRecemSalva)
+    {
+        List<Emprestimo> emprestimosPendentes = emprestimoRepository.findEmprestimosSemChavePixDefinida(usuario.getId());
+
+        if (!emprestimosPendentes.isEmpty()) {
+            logger.info("Encontrados {} empréstimo(s) sem chave PIX para o usuário {}. Vinculando a nova chave ID: {}", emprestimosPendentes.size(), usuario.getId(), chaveRecemSalva.getId());
+            
+            for (Emprestimo emprestimo : emprestimosPendentes)
+            {
+                emprestimo.setChavePixIdChavespixusuario(chaveRecemSalva);
+            }
+        }
     }
 
     @Transactional

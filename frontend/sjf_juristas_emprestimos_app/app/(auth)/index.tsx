@@ -32,6 +32,11 @@ const LoginScreen : React.FC = () => {
             <Text style={styles.title}>Bem-vindo à SJF Juristas</Text>
             <TextInput style={styles.input} placeholder="E-mail" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" placeholderTextColor={Colors.light.textSecondary}/>
             <TextInput style={styles.input} placeholder="Senha" value={senha} onChangeText={setSenha} secureTextEntry placeholderTextColor={Colors.light.textSecondary}/>
+            
+            <TouchableOpacity onPress={() => router.push('/(auth)/redefinir-senha')} style={styles.buttonRedefinirSenha}>
+                <Text style={styles.link}>Esqueceu sua senha ?</Text>
+            </TouchableOpacity>
+
             <TouchableOpacity style={[styles.button, isLoading && styles.buttonDisabled]} onPress={handleLogin} disabled={isLoading}>
                 <Text style={styles.buttonText}>{isLoading ? "Entrando..." : "Entrar"}</Text>
             </TouchableOpacity>
@@ -56,7 +61,8 @@ const styles = StyleSheet.create({
     button: { backgroundColor: Colors.light.primary, paddingVertical: 15, borderRadius: 8, alignItems: 'center', },
     buttonDisabled: { backgroundColor: Colors.light.primaryLight, },
     buttonText: { color: Colors.light.textOnPrimary, fontSize: 16, fontWeight: 'bold', },
-    buttonEntrar: {alignSelf: 'center', backgroundColor: Colors.light.primary, paddingVertical: 15, borderRadius: 8, alignItems: 'center', textAlign: 'center'}
+    buttonEntrar: {alignSelf: 'center', backgroundColor: Colors.light.primary, paddingVertical: 15, borderRadius: 8, alignItems: 'center', textAlign: 'center'},
+    buttonRedefinirSenha: {marginVertical: 24}
 });
 
 export default LoginScreen;

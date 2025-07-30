@@ -66,9 +66,11 @@ export default function ProfileScreen() {
                         </TouchableOpacity>
                     </Link>
 
-                    <TouchableOpacity onPress={handleAlterarSenha} style={styles.regularButton}>
-                        <Text style={styles.regularButtonText}>Alterar Senha</Text>
-                    </TouchableOpacity>
+                    <Link href={`/(tabs)/atualizar-senha`} asChild>
+                        <TouchableOpacity style={styles.regularButton}>
+                            <Text style={styles.regularButtonText}>Alterar Senha</Text>
+                        </TouchableOpacity>
+                    </Link>
 
                     <TouchableOpacity onPress={signOut} style={styles.exitButton}>
                         <Text style={styles.exitButtonText}>Sair da Conta</Text>
