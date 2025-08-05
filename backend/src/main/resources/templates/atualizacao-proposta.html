@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alterações na sua Proposta</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #F8F9FA;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .card {
+            background-color: #FFFFFF;
+            border: 1px solid #DEE2E6;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+        }
+        h1 {
+            color: #212529;
+        }
+        p {
+            color: #6c757d;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        .button {
+            display: inline-block;
+            background-color: #DAA520;
+            color: #FFFFFF;
+            padding: 15px 25px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+        .button:hover {
+            background-color: #fdb90c;
+            cursor: pointer;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #6c757d;
+        }
+        a
+        {
+            color: #FFFFFF;
+        }
+        .form-container-card
+        {
+            padding: 16px;
+            border: 1px solid #DEE2E6;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: left;
+            box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Alterações na sua Proposta</h1>
+            <p>Olá, <strong th:text="${nomeUsuario}"></strong>!</p>
+            <p>Houve uma atualização na sua proposta de empréstimo. Por favor, revise as novas condições e confirme para que possamos dar continuidade ao processo.</p>
+            
+            <div class="form-container-card">
+                <p><strong>Valor do Empréstimo:</strong> <span th:text="${valorEmprestimo}"></span></p>
+                <p><strong>Taxa de Juros:</strong> <span th:text="${taxaJuros}"></span>% ao dia.</p>
+                <p><strong>Parcelas:</strong> <span th:text="${parcelas}"></span></p>
+                <p><strong>Data prevista para Depósito:</strong> <span th:text="${dataDepositoPrevista}"></span></p>
+                <p><strong>Data prevista para inicio do pagamento:</strong> <span th:text="${dataInicioPagamentoPrevista}"></span></p>
+
+            </div>
+
+            <a href="#" class="button">Verificar e Confirmar Alterações</a>
+            
+            <p>Caso tenha alguma dúvida, entre em contato com nosso suporte.</p>
+        </div>
+        <div class="footer">
+            <p>SJF Juristas &copy; 2025. Todos os direitos reservados.</p>
+        </div>
+    </div>
+</body>
+</html>

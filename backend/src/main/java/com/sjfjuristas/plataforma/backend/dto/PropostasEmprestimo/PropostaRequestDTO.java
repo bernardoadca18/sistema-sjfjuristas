@@ -1,16 +1,18 @@
 package com.sjfjuristas.plataforma.backend.dto.PropostasEmprestimo;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.util.UUID;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Data
 public class PropostaRequestDTO {
@@ -55,4 +57,6 @@ public class PropostaRequestDTO {
     private String propositoEmprestimo;
     private String estadoCivil;
     private Boolean possuiImovelVeiculo;
+    private String tipoChavePix;
+    private String chavePix;
 }

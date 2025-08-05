@@ -1,5 +1,6 @@
 package com.sjfjuristas.plataforma.backend.controller;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,12 +23,14 @@ import com.sjfjuristas.plataforma.backend.domain.PropostaEmprestimo;
 import com.sjfjuristas.plataforma.backend.dto.Emprestimos.CondicoesAprovadasDTO;
 import com.sjfjuristas.plataforma.backend.dto.Emprestimos.EmprestimoAdminResponseDTO;
 import com.sjfjuristas.plataforma.backend.dto.PropostasEmprestimo.ContrapropostaAdminRequestDTO;
+import com.sjfjuristas.plataforma.backend.dto.PropostasEmprestimo.NotificacaoDesembolsoDTO;
 import com.sjfjuristas.plataforma.backend.dto.PropostasEmprestimo.PropostaHistoricoResponseDTO;
 import com.sjfjuristas.plataforma.backend.dto.PropostasEmprestimo.PropostaResponseDTO;
 import com.sjfjuristas.plataforma.backend.service.EmprestimoService;
 import com.sjfjuristas.plataforma.backend.service.PropostaService;
 
 import jakarta.validation.Valid;
+
 
 @RestController
 @RequestMapping("/api/admin/propostas")
@@ -47,15 +51,20 @@ public class PropostaAdminController
         return ResponseEntity.ok(dto);
     }
 
-    /*
-    @PutMapping("/{propostaId}/aprovar-em-analise")
-    public ResponseEntity<EmprestimoAdminResponseDTO> aprovarEmprestimoEmAnalise(@PathVariable UUID propostaId, @Valid @RequestBody CondicoesAprovadasDTO condicoes)
+    @PostMapping("/notificar-desembolso")
+    public ResponseEntity<Void> notificarDesembolso(@RequestBody NotificacaoDesembolsoDTO notificacao)
     {
-        Emprestimo emprestimo = emprestimoService.aprovarEmprestimoEmAnalise(propostaId, condicoes);
-        EmprestimoAdminResponseDTO dto = new EmprestimoAdminResponseDTO(emprestimo);
+        propostaService.notificarDesembolso(notificacao.getUsuarioId(), notificacao.getValorDesembolsado());
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{propostaId}/definir-juros")
+    public ResponseEntity<PropostaResponseDTO> definirTaxaJuros(@PathVariable UUID propostaId, @RequestBody BigDecimal taxaJuros)
+    {
+        PropostaResponseDTO dto = propostaService.definirTaxaJuros(propostaId, taxaJuros);
+        
         return ResponseEntity.ok(dto);
     }
-    */
 
     @PostMapping("/{propostaId}/aprovar")
     public ResponseEntity<EmprestimoAdminResponseDTO> aprovarProposta(@PathVariable UUID propostaId, @Valid @RequestBody CondicoesAprovadasDTO condicoes)

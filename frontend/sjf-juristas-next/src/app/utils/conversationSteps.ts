@@ -19,6 +19,8 @@ export interface IFormData
     propositoEmprestimo?: string;
     estadoCivil?: string;
     possuiImovelVeiculo?: boolean;
+    pixKeyType?: 'CPF' | 'CNPJ' | 'E-mail' | 'Telefone' | 'Chave Aleatória';
+    pixKey?: string;
 }
 
 export enum InputType
@@ -186,6 +188,21 @@ export const conversationSteps: Message[] = [
         errorMessage: 'Por favor, insira um número de WhatsApp válido.'
     },
     {
+        id: 7.1,
+        text: 'Para agilizar o recebimento do valor, caso sua proposta seja aprovada, vamos configurar seu PIX. Qual o tipo da sua chave?',
+        sender: 'bot',
+        type: InputType.Radio,
+        options: ['CPF', 'Email', 'Telefone', 'Aleatória'],
+        message_identifier: 'pixKeyType',
+    },
+    {
+        id: 7.2,
+        text: 'Entendido. Agora, por favor, informe sua chave PIX.',
+        sender: 'bot',
+        type: InputType.Text,
+        message_identifier: 'pixKey',
+    },
+    {
         id: 8,
         sender: 'bot',
         text: 'Tudo certo! Agora vamos para a parte dos documentos. Para sua segurança, pedimos um documento por vez. Vamos começar com a FRENTE do seu RG ou CNH.',
@@ -233,7 +250,7 @@ export const conversationSteps: Message[] = [
     {
         id: 14,
         sender: 'bot',
-        text: 'Ufa! Documentos recebidos. Por favor, leia e aceite nossos [Termos de Uso](/termos) e [Política de Privacidade](/privacidade) para concluir.',
+        text: 'Documentos recebidos. Por favor, leia e aceite nossos [Termos de Uso](/termos) e [Política de Privacidade](/privacidade) para concluir.',
         message_identifier: "termsAcceptance",
         label: "Eu li e aceito os Termos de Uso e a Política de Privacidade.",
         type: InputType.Checkbox,

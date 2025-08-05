@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parabéns! Sua Proposta foi Aprovada.</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #F8F9FA;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .card {
+            background-color: #FFFFFF;
+            border: 1px solid #DEE2E6;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+        }
+        h1 {
+            color: #212529;
+        }
+        p {
+            color: #6c757d;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        .button {
+            display: inline-block;
+            background-color: #DAA520;
+            color: #FFFFFF;
+            padding: 15px 25px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+        .button:hover {
+            background-color: #fdb90c;
+            cursor: pointer;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #6c757d;
+        }
+        a
+        {
+            color: #FFFFFF;
+        }
+        .storeName
+        {
+            color: #DAA520;
+            text-decoration: none;
+        }
+        li
+        {
+            margin-bottom: 2px;
+            text-align: left;
+        }
+        .form-container-card
+        {
+            padding: 16px;
+            border: 1px solid #DEE2E6;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: left;
+            box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Parabéns! Sua Proposta foi Aprovada.</h1>
+            <p>Olá, <strong th:text="${nomeUsuario}"></strong>!</p>
+            <p>Temos uma ótima notícia: sua proposta de empréstimo foi aprovada! Para continuar, por favor, finalize seu cadastro através do nosso aplicativo.</p>
+            
+            <p><strong>Próximos Passos:</strong></p>
+            <ol>
+                <li>Baixe nosso aplicativo na <a class="storeName" href="${linkAppStore}">App Store</a> ou <a class="storeName" href="${linkGooglePlay}">Google Play</a>.</li>
+                <li>Complete as informações de cadastro pendentes.</li>
+                <li>Faça login com suas credenciais.</li>
+            </ol>
+
+            <p><strong>Condições da Proposta</strong></p>
+            <div class="form-container-card">
+                <p><strong>Valor do Empréstimo:</strong> <span th:text="${valorEmprestimo}"></span></p>
+                <p><strong>Taxa de Juros:</strong> <span th:text="${taxaJuros}"></span>% ao dia.</p>
+                <p><strong>Parcelas:</strong> <span th:text="${parcelas}"></span></p>
+                <p><strong>Data prevista para Depósito:</strong> <span th:text="${dataDepositoPrevista}"></span></p>
+                <p><strong>Data prevista para inicio do pagamento:</strong> <span th:text="${dataInicioPagamentoPrevista}"></span></p>
+
+            </div>
+            
+        </div>
+        <div class="footer">
+            <p>SJF Juristas &copy; 2025. Todos os direitos reservados.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -175,7 +175,7 @@ public class EmprestimoService
         novoEmprestimo.setUsuarioIdUsuarios(usuario);
         novoEmprestimo.setStatusEmprestimoIdStatusemprestimo(statusInicialEmprestimo);
         
-        ChavePixUsuario chavePixAtiva = chavePixUsuarioRepository.findChavePixAtivaByUsuarioId(usuario.getId()).get();
+        ChavePixUsuario chavePixAtiva = chavePixUsuarioRepository.findChavePixAtivaByUsuarioId(usuario.getId()).orElseThrow(() -> new IllegalStateException("Chave Pix ativa não encontrada para o usuário."));
         
         if (chavePixAtiva != null && novoEmprestimo.getChavePixIdChavespixusuario() == null)
         {

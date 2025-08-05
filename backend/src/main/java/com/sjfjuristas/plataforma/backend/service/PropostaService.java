@@ -1,22 +1,28 @@
 package com.sjfjuristas.plataforma.backend.service;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sjfjuristas.plataforma.backend.domain.ChavePixUsuario;
 import com.sjfjuristas.plataforma.backend.domain.Ocupacao;
 import com.sjfjuristas.plataforma.backend.domain.PerfilUsuario;
 import com.sjfjuristas.plataforma.backend.domain.PropostaEmprestimo;
 import com.sjfjuristas.plataforma.backend.domain.PropostaHistorico;
 import com.sjfjuristas.plataforma.backend.domain.StatusProposta;
+import com.sjfjuristas.plataforma.backend.domain.TipoChavePix;
 import com.sjfjuristas.plataforma.backend.domain.Usuario;
 import com.sjfjuristas.plataforma.backend.domain.enums.AtorAlteracao;
 import com.sjfjuristas.plataforma.backend.dto.PropostasEmprestimo.ContrapropostaAdminRequestDTO;
@@ -29,6 +35,7 @@ import com.sjfjuristas.plataforma.backend.repository.PerfilUsuarioRepository;
 import com.sjfjuristas.plataforma.backend.repository.PropostaEmprestimoRepository;
 import com.sjfjuristas.plataforma.backend.repository.PropostaHistoricoRepository;
 import com.sjfjuristas.plataforma.backend.repository.StatusPropostaRepository;
+import com.sjfjuristas.plataforma.backend.repository.TipoChavePixRepository;
 import com.sjfjuristas.plataforma.backend.repository.UsuarioRepository;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -55,6 +62,18 @@ public class PropostaService
     @Autowired
     private PropostaHistoricoRepository propostaHistoricoRepository;
 
+    @Autowired
+    private TipoChavePixRepository tipoChavePixRepository;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Value("${sjfjuristas.link.appstore}")
+    private String linkAppStore;
+
+    @Value("${sjfjuristas.link.playstore}")
+    private String linkGooglePlay;
+
     @Transactional
     public PropostaResponseDTO findPropostaById(UUID id)
     {
@@ -77,9 +96,20 @@ public class PropostaService
     }
 
     @Transactional
+    public void notificarDesembolso(UUID usuarioId, BigDecimal valorDesembolsado)
+    {
+        Usuario usuario = usuarioRepository.findById(usuarioId).orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado com o ID: " + usuarioId));
+
+        Map<String, Object> variaveisEmail = new HashMap<>();
+        variaveisEmail.put("nomeUsuario", usuario.getNomeCompleto());
+        variaveisEmail.put("valorDesembolsado", valorDesembolsado);
+
+        emailService.enviarEmailHtml(usuario.getEmail(), "Desembolso Realizado", "desembolso-realizado.html", variaveisEmail);
+    }
+
+    @Transactional
     public PropostaResponseDTO criarProposta(PropostaRequestDTO dto, HttpServletRequest request)
     {
-
         Usuario usuario = usuarioRepository.findByCpf(dto.getCpf()).orElseGet(() -> {
             Usuario novoUsuario = new Usuario();
 
@@ -88,10 +118,10 @@ public class PropostaService
             novoUsuario.setEmail(dto.getEmail());
             novoUsuario.setTelefoneWhatsapp(dto.getWhatsapp());
             novoUsuario.setDataNascimento(dto.getDataNascimento());
-
             
             PerfilUsuario perfilUsuarioCliente = perfilUsuarioRepository.findByNomePerfil("Cliente").orElseThrow(() -> new RuntimeException("Perfil 'Cliente' não encontrado."));
             novoUsuario.setPerfilIdPerfisusuario(perfilUsuarioCliente);
+
             return usuarioRepository.save(novoUsuario);
         });
 
@@ -118,6 +148,18 @@ public class PropostaService
         novaProposta.setPropositoEmprestimo(dto.getPropositoEmprestimo());
         novaProposta.setEstadoCivil(dto.getEstadoCivil());
         novaProposta.setPossuiImovelVeiculo(dto.getPossuiImovelVeiculo());
+        
+        TipoChavePix tipoChavePix = tipoChavePixRepository.findByNomeTipo(dto.getTipoChavePix()).orElseThrow(() -> new IllegalArgumentException("Tipo de chave Pix '" + dto.getTipoChavePix() + "' não encontrado."));
+        ChavePixUsuario chavePixUsuario = new ChavePixUsuario();
+
+        chavePixUsuario.setTipoChavePixIdTiposchavepix(tipoChavePix);
+        chavePixUsuario.setValorChave(dto.getChavePix());
+        chavePixUsuario.setAtivaParaDesembolso(true);
+        chavePixUsuario.setVerificada(false);
+        chavePixUsuario.setDataCadastro(OffsetDateTime.now());
+
+        chavePixUsuario.setUsuarioIdUsuarios(usuario);
+        usuario.getChavesPixUsuarios().add(chavePixUsuario);
 
         if ("Outros".equalsIgnoreCase(ocupacao.getNomeOcupacao()))
         {
@@ -144,7 +186,37 @@ public class PropostaService
 
         salvarHistorico(null, propostaSalva, AtorAlteracao.CLIENTE, "Proposta inicial criada pelo cliente via Landing Page.");
 
+        Map<String, Object> variaveisEmail = new HashMap<>();
+        variaveisEmail.put("nomeUsuario", usuario.getNomeCompleto());
+        variaveisEmail.put("valorProposta", dto.getValorSolicitado());
+        variaveisEmail.put("numeroParcelas", dto.getNumParcelasPreferido());
+
+        emailService.enviarEmailHtml(usuario.getEmail(), "Confirmação de proposta enviada.", "confirmar-proposta-recebida.html", variaveisEmail);
+
         return new PropostaResponseDTO(propostaSalva);
+    }
+
+    @Transactional
+    public PropostaResponseDTO definirTaxaJuros(UUID propostaId, BigDecimal taxaJuros)
+    {
+        PropostaEmprestimo propostaAtual = propostaRepository.findById(propostaId).orElseThrow(() -> new EntityNotFoundException("Proposta não encontrada com o ID: " + propostaId));
+        PropostaEmprestimo propostaAntes = cloneProposta(propostaAtual);
+
+        propostaAtual.setTaxaJurosOfertada(taxaJuros);
+        propostaAtual.setOrigemUltimaOferta(AtorAlteracao.ADMIN.name());
+
+        salvarHistorico(propostaAntes, propostaAtual, AtorAlteracao.ADMIN, "Taxa de juros definida pelo administrador.");
+
+        Map<String, Object> variaveisEmail = new HashMap<>();
+        variaveisEmail.put("nomeUsuario", propostaAtual.getUsuarioIdUsuarios().getNomeCompleto());
+
+        variaveisEmail.put("valorEmprestimo", propostaAtual.getValorSolicitado());
+        variaveisEmail.put("taxaJuros", taxaJuros);
+        variaveisEmail.put("parcelas", propostaAtual.getNumParcelasPreferido());
+
+        emailService.enviarEmailHtml(propostaAtual.getUsuarioIdUsuarios().getEmail(), "Atualização na sua proposta.", "atualizacao-juros.html", variaveisEmail);
+
+        return new PropostaResponseDTO(propostaRepository.save(propostaAtual));
     }
 
     @Transactional
@@ -167,6 +239,16 @@ public class PropostaService
         PropostaEmprestimo propostaSalva = propostaRepository.save(propostaAtual);
 
         salvarHistorico(propostaAntes, propostaSalva, AtorAlteracao.ADMIN, "Contraproposta enviada pelo administrador.");
+
+        Map<String, Object> variaveisEmail = new HashMap<>();
+        variaveisEmail.put("nomeUsuario", propostaAtual.getUsuarioIdUsuarios().getNomeCompleto());
+        variaveisEmail.put("valorEmprestimo", dto.getValorOfertado());
+        variaveisEmail.put("taxaJuros", dto.getTaxaJurosOfertada());
+        variaveisEmail.put("parcelas", dto.getNumParcelasOfertado());
+        variaveisEmail.put("dataDepositoPrevista", dto.getDataDepositoPrevista());
+        variaveisEmail.put("dataInicioPagamentoPrevista", dto.getDataInicioPagamentoPrevista());
+
+        emailService.enviarEmailHtml(propostaAtual.getUsuarioIdUsuarios().getEmail(), "Atualização na sua proposta.", "atualizacao-proposta.html", variaveisEmail);
 
         return propostaSalva;
     }
@@ -193,6 +275,22 @@ public class PropostaService
         PropostaEmprestimo proposta = propostaRepository.findById(propostaId).orElseThrow(() -> new EntityNotFoundException("Proposta não encontrada"));
         StatusProposta novoStatus = statusPropostaRepository.findByNomeStatus(novoStatusNome).orElseThrow(() -> new IllegalStateException("Status '" + novoStatusNome + "' inválido."));     
         proposta.setStatusPropostaIdStatusproposta(novoStatus);
+
+        if (novoStatusNome.equals("Aprovada"))
+        {
+            Map<String, Object> variaveisEmail = new HashMap<>();
+            
+            variaveisEmail.put("nomeUsuario", proposta.getUsuarioIdUsuarios().getNomeCompleto());
+            variaveisEmail.put("linkAppStore", linkAppStore);
+            variaveisEmail.put("linkGooglePlay", linkGooglePlay);
+            variaveisEmail.put("valorEmprestimo", proposta.getValorOfertado());
+            variaveisEmail.put("taxaJuros", proposta.getTaxaJurosOfertada());
+            variaveisEmail.put("parcelas", proposta.getNumParcelasOfertado());
+            variaveisEmail.put("dataDepositoPrevista", proposta.getDataDepositoPrevista());
+            variaveisEmail.put("dataInicioPagamentoPrevista", proposta.getDataInicioPagamentoPrevista());
+
+            emailService.enviarEmailHtml(proposta.getUsuarioIdUsuarios().getEmail(), "Proposta Aprovada", "proposta-aprovada.html", variaveisEmail);
+        }
         
         propostaRepository.save(proposta);
     }

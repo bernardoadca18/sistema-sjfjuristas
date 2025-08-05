@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmação de Recebimento da sua Proposta</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #F8F9FA;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .card {
+            background-color: #FFFFFF;
+            border: 1px solid #DEE2E6;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+        }
+        h1 {
+            color: #212529;
+        }
+        p {
+            color: #6c757d;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        .button {
+            display: inline-block;
+            background-color: #DAA520;
+            color: #FFFFFF;
+            padding: 15px 25px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+        .button:hover {
+            background-color: #fdb90c;
+            cursor: pointer;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #6c757d;
+        }
+        a
+        {
+            color: #FFFFFF;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Sua Proposta foi Recebida!</h1>
+            <p>Olá, <strong th:text="${nomeUsuario}"></strong>!</p>
+            <p>Recebemos sua proposta de empréstimo e já estamos analisando as informações. Em breve, nossa equipe entrará em contato com os próximos passos.</p>
+            <p><strong>Resumo da sua proposta:</strong></p>
+            <p>
+                <strong>Valor Solicitado:</strong> <span th:text="${valorProposta}"></span><br>
+                <strong>Número de Parcelas:</strong> <span th:text="${numeroParcelas}"></span>
+            </p>
+        </div>
+        <div class="footer">
+            <p>SJF Juristas &copy; 2025. Todos os direitos reservados.</p>
+        </div>
+    </div>
+</body>
+</html>

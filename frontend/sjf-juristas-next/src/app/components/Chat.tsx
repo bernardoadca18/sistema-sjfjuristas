@@ -32,8 +32,6 @@ const Chat = () => {
     const [propositoEmprestimo, setPropositoEmprestimo] = useState('');
     const [estadoCivil, setEstadoCivil] = useState('');
 
-
-
     const fetchOccupations = async () => {
         try
         {
@@ -111,6 +109,8 @@ const Chat = () => {
             propositoEmprestimo: data.propositoEmprestimo,
             estadoCivil: data.estadoCivil,
             possuiImovelVeiculo: data.possuiImovelVeiculo,
+            tipoChavePix: data.pixKeyType,
+            chavePix: data.pixKey,
         }
 
         console.log("Enviando para a API o seguinte payload:", proposalPayload);
@@ -153,7 +153,7 @@ const Chat = () => {
         }
     }
 
-    const proceedToNextStep = (userResponseText : string, cleanValue: string | number | boolean | File | null | Record<string, string | undefined> | { [x: string]: boolean; }) => {
+    const proceedToNextStep = (userResponseText : string, cleanValue: string | number | boolean | File | null | Record<string, string | boolean | undefined>) => {
         const currentMessageData = conversationSteps[currentStep];
         const messageIdentifier = currentMessageData.message_identifier;
 
@@ -237,11 +237,24 @@ const Chat = () => {
         e.preventDefault();
 
         if (!inputValue) return;
-        const booleanValue = inputValue.toLowerCase() === 'sim';
+
         const currentIdentifier = conversationSteps[currentStep].message_identifier;
 
-       if(currentIdentifier) {
-            proceedToNextStep(inputValue, { [currentIdentifier]: booleanValue });
+        let valueToSave : string | boolean;
+
+        if (currentIdentifier === 'possuiImovelVeiculo')
+        {
+            valueToSave = inputValue.toLowerCase() === 'sim';
+        }
+        else
+        {
+            valueToSave = inputValue;
+        }
+        
+
+        if(currentIdentifier)
+        {
+            proceedToNextStep(inputValue, { [currentIdentifier]: valueToSave });
         }
     }
 
@@ -289,6 +302,11 @@ const Chat = () => {
             return;
         }
 
+        if (nextStepItem.message_identifier === 'pixKey' && formData.pixKeyType === 'CPF' && formData.cpf)
+        {
+            setInputValue(formData.cpf);
+        }
+
         setIsBotTyping(true);
         setTimeout(() => {
             setMessages(prev => [...prev, nextStepItem]);
@@ -311,6 +329,32 @@ const Chat = () => {
         switch (currentInputData.type) {
             
             case InputType.Number:
+                const isAllowed = (values: { floatValue?: number }) => {
+                    const { floatValue } = values;
+                    const { min, max } = currentInputData; // Pega min/max do conversationSteps
+
+                    // Se o campo estiver sendo apagado, permita.
+                    if (floatValue === undefined) {
+                        return true;
+                    }
+
+                    // Se um valor MÍNIMO foi definido e o valor digitado é MENOR, não permita.
+                    if (min !== undefined && floatValue < min) {
+                        // Esta condição é mais para a validação no envio, 
+                        // pois digitar "2" é menor que "30", mas é um passo necessário para digitar "30".
+                        // A validação de máximo é a mais importante aqui.
+                    }
+
+                    // Se um valor MÁXIMO foi definido e o valor digitado é MAIOR, não permita.
+                    if (max !== undefined && floatValue > max) {
+                        return false; // REJEITA a digitação
+                    }
+
+                    return true; // Permite a digitação
+                };
+
+                // Verifica se o campo deve ser formatado como moeda
+                
                 const isCurrencyVal = (currentInputData.message_identifier === 'loanValue' || currentInputData.message_identifier === 'monthlyIncome');
 
                 let correctComponent = null;
@@ -335,6 +379,7 @@ const Chat = () => {
                             placeholder={currentInputData.placeholder || 'Digite o valor...'}
                             required
                             autoFocus={shouldAutoFocus}
+                            isAllowed={isAllowed}
                          />
                     );
                 }
@@ -357,6 +402,26 @@ const Chat = () => {
                     );
                 }
 
+                if (conversationSteps[currentStep].message_identifier === 'installments')
+                {
+                    correctComponent = (
+                        <NumericFormat
+                            key={currentInputData.id}
+                            value={inputValue}
+                            onValueChange={(values) => {
+                                setInputValue(values.formattedValue); // Para exibir no input
+                                setNumericValue(values.floatValue);   // Para enviar ao backend
+                            }}
+                            allowNegative={false}
+                            className="flex-1 w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-200 transition"
+                            placeholder={currentInputData.placeholder || 'Digite o valor...'}
+                            required
+                            autoFocus={shouldAutoFocus}
+                            isAllowed={isAllowed}
+                         />
+                    );
+                }
+
                 return (
                     <form onSubmit={handleSendMessage} className='flex items-center gap-4'>
                          {
@@ -369,6 +434,107 @@ const Chat = () => {
                  );
 
             case InputType.Text:
+                if (currentInputData.message_identifier === 'pixKey')
+                {
+                    let pixInputComponent;
+                    let placeholder = "Digite sua chave...";
+
+                    switch (formData.pixKeyType) {
+                        case 'CPF':
+                            placeholder = "Digite seu CPF";
+                            pixInputComponent = (
+                                <PatternFormat
+                                    format="###.###.###-##"
+                                    mask="_"
+                                    value={inputValue}
+                                    onValueChange={(values) => setInputValue(values.value)}
+                                    type='tel'
+                                    inputMode='numeric'
+                                    className="flex-1 w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-200 transition"
+                                    placeholder={placeholder}
+                                    required
+                                    autoFocus={shouldAutoFocus}
+                                />
+                            );
+                            break;
+                        case 'CNPJ':
+                            placeholder = "Digite seu CNPJ";
+                            pixInputComponent = (
+                                <PatternFormat
+                                    format="##.###.###/####-##"
+                                    mask="_"
+                                    value={inputValue}
+                                    onValueChange={(values) => setInputValue(values.value)}
+                                    type='tel'
+                                    inputMode='numeric'
+                                    className="flex-1 w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-200 transition"
+                                    placeholder={placeholder}
+                                    required
+                                    autoFocus={shouldAutoFocus}
+                                />
+                            );
+                            break;
+                        case 'Telefone':
+                            placeholder = "Ex: (11) 99999-9999";
+                             pixInputComponent = (
+                                <PatternFormat
+                                    format="+55 (##) #####-####"
+                                    mask="_"
+                                    value={inputValue}
+                                    onValueChange={(values) => setInputValue(values.value)}
+                                    type='tel'
+                                    inputMode='numeric'
+                                    className="flex-1 w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-200 transition"
+                                    placeholder={placeholder}
+                                    required
+                                    autoFocus={shouldAutoFocus}
+                                />
+                            );
+                            break;
+                        case 'E-mail':
+                            placeholder = "Digite seu e-mail";
+                            pixInputComponent = (
+                                <input
+                                    type="email"
+                                    value={inputValue}
+                                    onChange={(e) => setInputValue(e.target.value)}
+                                    className="flex-1 w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-200 transition"
+                                    placeholder={placeholder}
+                                    required
+                                    autoFocus={shouldAutoFocus}
+                                />
+                            );
+                            break;                       
+                        case 'Chave Aleatória':
+                            placeholder = "Digite sua chave aleatória";
+                            pixInputComponent = (
+                                <input
+                                    type="text"
+                                    value={inputValue}
+                                    onChange={(e) => setInputValue(e.target.value)}
+                                    className="flex-1 w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-200 transition"
+                                    placeholder={placeholder}
+                                    required
+                                    autoFocus={shouldAutoFocus}
+                                />
+                            );
+                            break;
+                        default:
+                            pixInputComponent = <p>Selecione um tipo de chave para continuar.</p>;
+                            break;
+                    }
+                    
+                    return (
+                         <form onSubmit={handleSendMessage} className='flex items-center gap-4'>
+                            {pixInputComponent}
+                            {formData.pixKeyType && formData.pixKeyType !== undefined && 
+                            <button type='submit' className='p-3 rounded-full hover:bg-yellow-100 focus:outline-none focus:ring-2 focus:bg-yellow-100 focus:ring-offset-2 transition-transform duration-150 ease-in-out transform hover:scale-105 disabled:bg-gray-300 disabled:cursor-not-allowed' disabled={isBotTyping || !inputValue.trim()}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                            </button>
+                            }
+                        </form>
+                    );
+                }
                 return (
                     <form onSubmit={handleSendMessage} className='flex items-center gap-4'>
                         {currentInputData.mask ? (
