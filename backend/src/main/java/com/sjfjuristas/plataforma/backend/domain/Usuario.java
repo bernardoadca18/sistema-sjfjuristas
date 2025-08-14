@@ -6,6 +6,7 @@ import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -13,6 +14,7 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.persistence.Column;
@@ -156,10 +158,16 @@ public class Usuario implements UserDetails
     // UserDetails
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        // TODO: etornar os perfis/permissões do usuário.
+    public Collection<? extends GrantedAuthority> getAuthorities()
+    {
+        if (this.perfilIdPerfisusuario == null)
+        {
+            return Collections.emptyList();
+        }
 
-        return Collections.emptyList();
+        String roleName = "ROLE_" + this.perfilIdPerfisusuario.getNomePerfil().toUpperCase();
+        
+        return List.of(new SimpleGrantedAuthority(roleName));
     }
 
     @Override

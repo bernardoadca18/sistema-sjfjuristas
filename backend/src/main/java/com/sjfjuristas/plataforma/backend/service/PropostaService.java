@@ -30,6 +30,7 @@ import com.sjfjuristas.plataforma.backend.dto.PropostasEmprestimo.PropostaHistor
 import com.sjfjuristas.plataforma.backend.dto.PropostasEmprestimo.PropostaRequestDTO;
 import com.sjfjuristas.plataforma.backend.dto.PropostasEmprestimo.PropostaResponseDTO;
 import com.sjfjuristas.plataforma.backend.dto.PropostasEmprestimo.RespostaClienteDTO;
+import com.sjfjuristas.plataforma.backend.repository.ChavePixUsuarioRepository;
 import com.sjfjuristas.plataforma.backend.repository.OcupacaoRepository;
 import com.sjfjuristas.plataforma.backend.repository.PerfilUsuarioRepository;
 import com.sjfjuristas.plataforma.backend.repository.PropostaEmprestimoRepository;
@@ -68,6 +69,9 @@ public class PropostaService
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private ChavePixUsuarioRepository chavePixUsuarioRepository;
+
     @Value("${sjfjuristas.link.appstore}")
     private String linkAppStore;
 
@@ -93,6 +97,13 @@ public class PropostaService
     {
         List<PropostaEmprestimo> propostas = propostaRepository.findPropostasByUserIdNonPaged(userId);
         return propostas.stream().map(PropostaResponseDTO::new).toList();
+    }
+
+    @Transactional
+    public Page<PropostaResponseDTO> getPropostasEmAnalise(UUID usuarioId, Pageable pageable)
+    {
+        Page<PropostaEmprestimo> propostas = propostaRepository.findPropostaByStatusAndUsuario("Em Análise", usuarioId, pageable);
+        return propostas.map(PropostaResponseDTO::new);
     }
 
     @Transactional
@@ -122,6 +133,20 @@ public class PropostaService
             PerfilUsuario perfilUsuarioCliente = perfilUsuarioRepository.findByNomePerfil("Cliente").orElseThrow(() -> new RuntimeException("Perfil 'Cliente' não encontrado."));
             novoUsuario.setPerfilIdPerfisusuario(perfilUsuarioCliente);
 
+            TipoChavePix tipoChavePix = tipoChavePixRepository.findByNomeTipo(dto.getTipoChavePix()).orElseThrow(() -> new IllegalArgumentException("Tipo de chave Pix '" + dto.getTipoChavePix() + "' não encontrado."));
+            ChavePixUsuario chavePixUsuario = new ChavePixUsuario();
+
+            chavePixUsuario.setTipoChavePixIdTiposchavepix(tipoChavePix);
+            chavePixUsuario.setValorChave(dto.getChavePix());
+            chavePixUsuario.setAtivaParaDesembolso(true);
+            chavePixUsuario.setVerificada(false);
+            chavePixUsuario.setDataCadastro(OffsetDateTime.now());
+
+            chavePixUsuario.setUsuarioIdUsuarios(novoUsuario);
+            novoUsuario.getChavesPixUsuarios().add(chavePixUsuario);
+
+            chavePixUsuarioRepository.save(chavePixUsuario);
+
             return usuarioRepository.save(novoUsuario);
         });
 
@@ -149,17 +174,7 @@ public class PropostaService
         novaProposta.setEstadoCivil(dto.getEstadoCivil());
         novaProposta.setPossuiImovelVeiculo(dto.getPossuiImovelVeiculo());
         
-        TipoChavePix tipoChavePix = tipoChavePixRepository.findByNomeTipo(dto.getTipoChavePix()).orElseThrow(() -> new IllegalArgumentException("Tipo de chave Pix '" + dto.getTipoChavePix() + "' não encontrado."));
-        ChavePixUsuario chavePixUsuario = new ChavePixUsuario();
-
-        chavePixUsuario.setTipoChavePixIdTiposchavepix(tipoChavePix);
-        chavePixUsuario.setValorChave(dto.getChavePix());
-        chavePixUsuario.setAtivaParaDesembolso(true);
-        chavePixUsuario.setVerificada(false);
-        chavePixUsuario.setDataCadastro(OffsetDateTime.now());
-
-        chavePixUsuario.setUsuarioIdUsuarios(usuario);
-        usuario.getChavesPixUsuarios().add(chavePixUsuario);
+        
 
         if ("Outros".equalsIgnoreCase(ocupacao.getNomeOcupacao()))
         {
@@ -293,6 +308,22 @@ public class PropostaService
         }
         
         propostaRepository.save(proposta);
+    }
+
+    @Transactional
+    public Page<PropostaResponseDTO> getAllPropostasAdmin(UUID usuarioId, Pageable pageable)
+    {
+        Page<PropostaEmprestimo> propostas;
+
+        if (usuarioId != null)
+        {
+            propostas = propostaRepository.findPropostasByUserId(usuarioId, pageable);
+        }
+        else
+        {
+            propostas = propostaRepository.findAll(pageable);
+        }
+        return propostas.map(PropostaResponseDTO::new);
     }
 
     @Transactional

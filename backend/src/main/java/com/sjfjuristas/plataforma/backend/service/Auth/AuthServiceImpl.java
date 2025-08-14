@@ -36,8 +36,8 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class AuthServiceImpl implements AuthService {
-
+public class AuthServiceImpl implements AuthService
+{
     private final UsuarioRepository usuarioRepository;
     private final PropostaEmprestimoRepository propostaEmprestimoRepository;
     private final EmprestimoRepository emprestimoRepository;
@@ -48,13 +48,15 @@ public class AuthServiceImpl implements AuthService {
     private final EmprestimoService emprestimoService;
 
     @Override
-    public AuthResponseDTO register(ClienteCreateRequestDTO request) {
-        
-        if (!request.getSenha().equals(request.getConfirmarSenha())) {
+    public AuthResponseDTO register(ClienteCreateRequestDTO request)
+    {    
+        if (!request.getSenha().equals(request.getConfirmarSenha()))
+        {
             throw new IllegalArgumentException("As senhas não coincidem.");
         }
         
-        if (usuarioRepository.findByEmail(request.getEmail()).isPresent()) {
+        if (usuarioRepository.findByEmail(request.getEmail()).isPresent())
+        {
             throw new IllegalArgumentException("O e-mail informado já está em uso.");
         }
         
@@ -71,14 +73,13 @@ public class AuthServiceImpl implements AuthService {
         novoUsuario.setEmailVerificado(false);
         novoUsuario.setDataCadastro(LocalDate.now().atStartOfDay(fusoHorarioPadrao).toOffsetDateTime());
         novoUsuario.setAtivo(true);
-    
 
         usuarioRepository.save(novoUsuario);
         
         return AuthResponseDTO.builder()
-                .usuarioId(novoUsuario.getId())
-                .nomeUsuario(novoUsuario.getNomeCompleto())
-                .build();
+            .usuarioId(novoUsuario.getId())
+            .nomeUsuario(novoUsuario.getNomeCompleto())
+            .build();
     }
 
     @Override
@@ -88,8 +89,7 @@ public class AuthServiceImpl implements AuthService {
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getSenha())
         );
 
-        var usuario = usuarioRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
+        var usuario = usuarioRepository.findByEmail(request.getEmail()).orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
         
         ZoneId fusoHorarioPadrao = ZoneId.systemDefault();
 

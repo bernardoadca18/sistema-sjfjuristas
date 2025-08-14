@@ -1,19 +1,30 @@
 package com.sjfjuristas.plataforma.backend.service;
 
-import com.sjfjuristas.plataforma.backend.domain.DocumentoProposta;
-import com.sjfjuristas.plataforma.backend.domain.PropostaEmprestimo;
-import com.sjfjuristas.plataforma.backend.domain.TipoDocumento;
-import com.sjfjuristas.plataforma.backend.repository.DocumentoPropostaRepository;
-import com.sjfjuristas.plataforma.backend.repository.PropostaEmprestimoRepository;
-import com.sjfjuristas.plataforma.backend.repository.TipoDocumentoRepository;
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import java.time.OffsetDateTime;
-import java.util.Map;
-import java.util.UUID;
+
+import com.sjfjuristas.plataforma.backend.domain.ComprovantePagamento;
+import com.sjfjuristas.plataforma.backend.domain.DocumentoProposta;
+import com.sjfjuristas.plataforma.backend.domain.ParcelaEmprestimo;
+import com.sjfjuristas.plataforma.backend.domain.PropostaEmprestimo;
+import com.sjfjuristas.plataforma.backend.domain.TipoDocumento;
+import com.sjfjuristas.plataforma.backend.dto.ComprovantesPagamento.ComprovanteResponseDTO;
+import com.sjfjuristas.plataforma.backend.repository.ComprovantePagamentoRepository;
+import com.sjfjuristas.plataforma.backend.repository.DocumentoPropostaRepository;
+import com.sjfjuristas.plataforma.backend.repository.ParcelaEmprestimoRepository;
+import com.sjfjuristas.plataforma.backend.repository.PropostaEmprestimoRepository;
+import com.sjfjuristas.plataforma.backend.repository.TipoDocumentoRepository;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class DocumentoPropostaService 
@@ -29,6 +40,12 @@ public class DocumentoPropostaService
 
     @Autowired
     private TipoDocumentoRepository tipoDocumentoRepository;
+
+    @Autowired
+    private ComprovantePagamentoRepository comprovantePagamentoRepository;
+
+    @Autowired
+    private ParcelaEmprestimoRepository parcelaEmprestimoRepository;
 
     @Value("${minio.bucket.documentos}")
     private String docsBucketName;
@@ -77,4 +94,19 @@ public class DocumentoPropostaService
         };
     }
     
+    public List<ComprovanteResponseDTO> getComprovantesByParcelaId(UUID parcelaId)
+    {
+        ParcelaEmprestimo parcela = parcelaEmprestimoRepository.findById(parcelaId).orElseThrow(() -> new EntityNotFoundException("Parcela não encontrada."));
+        
+        List<ComprovantePagamento> comprovantes = comprovantePagamentoRepository.findByParcelaIdParcelasemprestimo(parcela);
+
+        return comprovantes.stream()
+                .map(comp -> new ComprovanteResponseDTO(
+                    comp.getId(), 
+                    comp.getNomeArquivoOriginal(), 
+                    comp.getUrlComprovante(), 
+                    comp.getDataUpload(), 
+                    comp.getStatusVerificacao()))
+                .collect(Collectors.toList());
+    }
 }

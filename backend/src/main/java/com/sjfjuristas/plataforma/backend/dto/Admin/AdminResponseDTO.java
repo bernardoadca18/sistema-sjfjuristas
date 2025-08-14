@@ -1,12 +1,13 @@
 package com.sjfjuristas.plataforma.backend.dto.Admin;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.Builder;
-import lombok.AllArgsConstructor;
 import java.util.UUID;
 
 import com.sjfjuristas.plataforma.backend.domain.Administrador;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
@@ -32,7 +33,7 @@ public class AdminResponseDTO
         this.nomeCompleto = entity.getNomeCompleto();
         this.email = entity.getEmail();
         this.telefoneContatoInterno = entity.getTelefoneContato();
-        this.perfilId = entity.getPerfilIdPerfisusuario();
+        this.perfilId = entity.getPerfilIdPerfisusuario().getId();
         this.perfilName = "Adminstrador";
         this.cargoInterno = entity.getCargoInterno();
         this.departamento = entity.getDepartamento();

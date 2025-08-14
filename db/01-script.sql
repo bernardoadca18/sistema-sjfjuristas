@@ -41,6 +41,7 @@ CREATE TABLE schema_sjfjuristas.usuarios (
 CREATE TABLE schema_sjfjuristas.administradores (
     adminstrador_id uuid NOT NULL,
     nome_completo varchar(255),
+    username varchar(255) NOT NULL,
     email varchar(255) NOT NULL,
     hash_senha varchar(255),
     telefone_contato varchar(20),
@@ -197,6 +198,7 @@ CREATE TABLE schema_sjfjuristas.parcelas_emprestimo (
     valor_total_parcela numeric(16,2) NOT NULL,
     pix_copia_cola text,
     pix_qr_code_base64 text,
+    parcela_paga boolean DEFAULT false,
     data_geracao_pix timestamp(6) with time zone,
     id_transacao_geracao_pix_psp varchar(255),
     status_pagamento_parcela_id_status_pagamento_parcela uuid,

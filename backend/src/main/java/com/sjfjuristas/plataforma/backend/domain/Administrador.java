@@ -1,15 +1,36 @@
 package com.sjfjuristas.plataforma.backend.domain;
 
-import jakarta.persistence.*;
+import java.time.OffsetDateTime;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
-import java.time.OffsetDateTime;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -18,7 +39,8 @@ import java.util.UUID;
         @UniqueConstraint(name = "administradores_email_uq", columnNames = {"email"}),
         @UniqueConstraint(name = "Administradores_matricula_funcionario_uq", columnNames = {"matricula_funcionario"})
 })
-public class Administrador {
+public class Administrador implements UserDetails
+{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "adminstrador_id", nullable = false)
@@ -27,6 +49,10 @@ public class Administrador {
     @Size(max = 255)
     @Column(name = "nome_completo")
     private String nomeCompleto;
+
+    @Size(max = 255)
+    @Column(name = "username")
+    private String username;
 
     @Size(max = 255)
     @NotNull
@@ -68,8 +94,10 @@ public class Administrador {
     @Column(name = "token_verificacao_email")
     private String tokenVerificacaoEmail;
 
-    @Column(name = "\"perfil_id_PerfisUsuario\"")
-    private UUID perfilIdPerfisusuario;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.RESTRICT)
+    @JoinColumn(name = "\"perfil_id_PerfisUsuario\"")
+    private PerfilUsuario perfilIdPerfisusuario;
 
     @Size(max = 100)
     @Column(name = "cargo_interno", length = 100)
@@ -106,4 +134,58 @@ public class Administrador {
             joinColumns = @JoinColumn(name = "adminstrador_id_Administradores"),
             inverseJoinColumns = @JoinColumn(name = "proposta_id_PropostasEmprestimo"))
     private Set<PropostaEmprestimo> propostasEmprestimos = new LinkedHashSet<>();
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities()
+    {
+        if (this.perfilIdPerfisusuario == null)
+        {
+            return Collections.emptyList();
+        }
+        
+        String roleName = "ROLE_" + this.perfilIdPerfisusuario.getNomePerfil().toUpperCase();
+        
+        return List.of(new SimpleGrantedAuthority(roleName));
+    }
+
+    @Override
+    public String getPassword()
+    {
+        return this.hashSenha;
+    }
+
+    @Override
+    public String getUsername()
+    {
+        return this.username;
+    }
+
+    public String getEmail()
+    {
+        return this.email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired()
+    {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked()
+    {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired()
+    {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled()
+    {
+        return this.ativo;
+    }
 }

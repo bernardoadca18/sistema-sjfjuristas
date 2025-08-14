@@ -1,5 +1,17 @@
 package com.sjfjuristas.plataforma.backend.service.CRUD;
 
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.sjfjuristas.plataforma.backend.domain.Administrador;
 import com.sjfjuristas.plataforma.backend.domain.PerfilUsuario;
 import com.sjfjuristas.plataforma.backend.dto.Admin.AdminCreateRequestDTO;
@@ -7,17 +19,8 @@ import com.sjfjuristas.plataforma.backend.dto.Admin.AdminResponseDTO;
 import com.sjfjuristas.plataforma.backend.dto.Admin.AdminUpdateRequestDTO;
 import com.sjfjuristas.plataforma.backend.repository.AdministradorRepository;
 import com.sjfjuristas.plataforma.backend.repository.PerfilUsuarioRepository;
+
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class AdminCRUDService
@@ -68,7 +71,7 @@ public class AdminCRUDService
         novoAdministrador.setValidadeTokenRecuperacao(null);
         novoAdministrador.setEmailVerificado(false);
         novoAdministrador.setTokenVerificacaoEmail(null);
-        novoAdministrador.setPerfilIdPerfisusuario(perfilAdmin.getId());
+        novoAdministrador.setPerfilIdPerfisusuario(perfilAdmin);
 
         Administrador administradorSalvo = administradorRepository.save(novoAdministrador);
 

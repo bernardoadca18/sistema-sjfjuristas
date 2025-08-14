@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sjfjuristas.plataforma.backend.domain.Emprestimo;
@@ -42,6 +43,13 @@ public class PropostaAdminController
 
     @Autowired
     private EmprestimoService emprestimoService;
+
+    @GetMapping("/all")
+    public ResponseEntity<Page<PropostaResponseDTO>> getAllPropostas(@RequestParam(required = false) UUID usuarioId, @PageableDefault(size = 10, sort = "dataSolicitacao", direction = Sort.Direction.DESC) Pageable pageable)
+    {
+        Page<PropostaResponseDTO> propostas = propostaService.getAllPropostasAdmin(usuarioId, pageable);
+        return ResponseEntity.ok(propostas);
+    }
 
     @PostMapping("/{propostaId}/criar-emprestimo-em-analise")
     public ResponseEntity<EmprestimoAdminResponseDTO> criarEmprestimoEmAnalise(@PathVariable UUID propostaId)
@@ -100,5 +108,11 @@ public class PropostaAdminController
     {
         Page<PropostaHistoricoResponseDTO> historico = propostaService.getHistoricoProposta(propostaId, pageable);
         return ResponseEntity.ok(historico);
+    }
+
+    @GetMapping("/em-analise")
+    public ResponseEntity<Page<PropostaResponseDTO>> getPropostasEmAnalise(@RequestParam(required=false) UUID usuarioId, @PageableDefault(sort = "dataSolicitacao", direction = Sort.Direction.DESC) Pageable pageable)
+    {
+        return ResponseEntity.ok(propostaService.getPropostasEmAnalise(usuarioId, pageable));
     }
 }

@@ -4,26 +4,16 @@ import { useAuth } from '../../context/AuthContext';
 import { CheckBox } from 'react-native-elements';
 import { useRouter } from 'expo-router';
 import { Colors } from '@/constants/Colors';
-import { addChavePix, getTiposChavePix } from '@/services/clienteService';
-import { TipoChavePix } from '@/types/Cliente';
 
 export default function FinalizarCadastroScreen() {
     const { completeRegistration, onboardingData } = useAuth();
     const router = useRouter();
     
-    const [step, setStep] = useState(1);
-    
     const [senha, setSenha] = useState('');
     const [confirmarSenha, setConfirmarSenha] = useState('');
     const [aceitouTermos, setAceitouTermos] = useState(false);
     
-    const [tiposChave, setTiposChave] = useState<TipoChavePix[]>([]);
-    const [selectedTipo, setSelectedTipo] = useState<TipoChavePix | null>(null);
-    const [newChaveValor, setNewChaveValor] = useState('');
-    const [isPixAdded, setIsPixAdded] = useState(false);
-    
     const [isLoading, setIsLoading] = useState(false);
-    const [isAddingPix, setIsAddingPix] = useState(false);
     
     useEffect(() => {
         if (!onboardingData)
@@ -32,74 +22,10 @@ export default function FinalizarCadastroScreen() {
             return;
         }
 
-        const fetchTiposChave = async () => {
-            try 
-            {
-                const response = await getTiposChavePix();
-                setTiposChave(response);
-            } 
-            catch (error) 
-            {
-                console.error("Erro ao buscar tipos de chave:", error);
-            }
-        };
-
-        fetchTiposChave();
-
     }, [onboardingData, router]);
 
-    const handleContinueToPixStep = () => {
-        if (senha !== confirmarSenha)
-        {
-            Alert.alert('Erro', 'As senhas não conferem.');
-            return;
-        }
-        if (senha.length < 6)
-        {
-            Alert.alert('Erro', 'A senha deve ter no mínimo 6 caracteres.');
-            return;
-        }
-        if (!aceitouTermos)
-        {
-            Alert.alert('Erro', 'Você precisa aceitar os Termos de Uso.');
-            return;
-        }
-        setStep(2);
-    };
-
-    const handleAddChave = async () => {
-        if (!selectedTipo || !newChaveValor)
-        {
-            Alert.alert('Campo Obrigatório', 'Selecione um tipo de chave e preencha o valor.');
-            return;
-        }
-        setIsAddingPix(true);
-
-        try
-        {
-            await addChavePix(selectedTipo.id.toString(), newChaveValor, onboardingData!.usuarioId);
-            
-            setIsPixAdded(true);
-            Alert.alert('Sucesso!', 'Chave PIX adicionada. Agora clique em "Finalizar Cadastro".');
-            setNewChaveValor('');
-            setSelectedTipo(null);
-        }
-        catch (error: any)
-        {
-            Alert.alert('Erro ao Adicionar');
-        }
-        finally
-        {
-            setIsAddingPix(false);
-        }
-    }
 
     const handleFinishRegistration = async () => {
-        if (!isPixAdded) {
-            Alert.alert('Cadastro Incompleto', 'É obrigatório adicionar uma chave PIX para finalizar.');
-            return;
-        }
-
         setIsLoading(true);
         const result = await completeRegistration({
             usuarioId: onboardingData!.usuarioId,
@@ -120,79 +46,24 @@ export default function FinalizarCadastroScreen() {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>
-                {step === 1 ? 'Crie sua Senha' : 'Cadastre uma Chave PIX'}
+                {'Crie sua Senha'}
             </Text>
             <Text style={styles.subtitle}>
-                {step === 1 
-                    ? 'Estamos quase lá! Defina uma senha segura para acessar sua conta.' 
-                    : 'Para receber seus empréstimos, é obrigatório cadastrar uma chave PIX.'}
+                {'Estamos quase lá! Defina uma senha segura para acessar sua conta.' }
             </Text>
             
-            {
-                step === 1 && (
-                    <>
-                        <TextInput style={styles.input} placeholder="Senha" value={senha} onChangeText={setSenha} secureTextEntry placeholderTextColor={Colors.light.textSecondary} />
-                        <TextInput style={styles.input} placeholder="Confirmar Senha" value={confirmarSenha} onChangeText={setConfirmarSenha} secureTextEntry placeholderTextColor={Colors.light.textSecondary}/>
-                        <View style={styles.checkboxContainer}>
-                            <CheckBox checked={aceitouTermos} onPress={() => setAceitouTermos(!aceitouTermos)} containerStyle={[styles.checkbox]} checkedColor={Colors.light.primary} />
-                            <Text style={styles.label}>Li e aceito os termos de uso.</Text>
-                        </View>
-                        <TouchableOpacity style={styles.button} onPress={handleContinueToPixStep}>
-                            <Text style={styles.buttonText}>Continuar</Text>
-                        </TouchableOpacity>
-                    </>
-                )
-            }
-            {
-                step === 2 && (
-                    <>
-                        <Text style={styles.fieldLabel}>Selecione o tipo de chave:</Text>
-                        <View style={styles.tipoChaveContainer}>
-                            {tiposChave.map((tipo) => (
-                                <TouchableOpacity
-                                    key={tipo.id}
-                                    style={[
-                                        styles.tipoChaveButton,
-                                        selectedTipo?.id === tipo.id && styles.tipoChaveSelected
-                                    ]}
-                                    onPress={() => setSelectedTipo(tipo)}
-                                >
-                                    <Text style={[
-                                        styles.tipoChaveText,
-                                        selectedTipo?.id === tipo.id && styles.tipoChaveTextSelected
-                                    ]}>{tipo.nomeTipo}</Text>
-                                </TouchableOpacity>
-                            ))}
-                        </View>
+            <>
+                <TextInput style={styles.input} placeholder="Senha" value={senha} onChangeText={setSenha} secureTextEntry placeholderTextColor={Colors.light.textSecondary} />
+                <TextInput style={styles.input} placeholder="Confirmar Senha" value={confirmarSenha} onChangeText={setConfirmarSenha} secureTextEntry placeholderTextColor={Colors.light.textSecondary}/>
+                <View style={styles.checkboxContainer}>
+                    <CheckBox checked={aceitouTermos} onPress={() => setAceitouTermos(!aceitouTermos)} containerStyle={[styles.checkbox]} checkedColor={Colors.light.primary} />
+                    <Text style={styles.label}>Li e aceito os termos de uso.</Text>
+                </View>
+                <TouchableOpacity style={styles.button} onPress={handleFinishRegistration} disabled={isLoading}>
+                    <Text style={styles.buttonText}>Continuar</Text>
+                </TouchableOpacity>
+            </>
 
-                        {selectedTipo && (
-                            <>
-                                <TextInput
-                                    style={styles.input}
-                                    placeholder={`Digite sua chave ${selectedTipo.nomeTipo}`}
-                                    value={newChaveValor}
-                                    onChangeText={setNewChaveValor}
-                                    keyboardType={selectedTipo.nomeTipo === 'CPF' ? 'numeric' : 'default'}
-                                    placeholderTextColor={Colors.light.textSecondary}
-                                />
-                                <TouchableOpacity style={styles.addPixButton} onPress={handleAddChave} disabled={isAddingPix}>
-                                    {isAddingPix ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Adicionar Chave</Text>}
-                                </TouchableOpacity>
-                            </>
-                        )}
-                        
-                        <View style={styles.divider} />
-
-                        <TouchableOpacity 
-                            style={[styles.button, !isPixAdded && styles.disabledButton]} 
-                            onPress={handleFinishRegistration} 
-                            disabled={!isPixAdded || isLoading}
-                        >
-                            {isLoading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Finalizar Cadastro</Text>}
-                        </TouchableOpacity>
-                    </>
-                )
-            }
         </View>
     );
 }

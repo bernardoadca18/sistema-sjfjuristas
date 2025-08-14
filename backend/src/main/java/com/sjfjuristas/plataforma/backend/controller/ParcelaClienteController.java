@@ -14,6 +14,8 @@ import com.sjfjuristas.plataforma.backend.domain.Usuario;
 import com.sjfjuristas.plataforma.backend.dto.ParcelaEmprestimo.ParcelaEmprestimoResponseDTO;
 import com.sjfjuristas.plataforma.backend.service.ParcelaEmprestimoService;
 
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+
 
 @RestController
 @RequestMapping("/api/cliente/parcelas")
@@ -26,6 +28,15 @@ public class ParcelaClienteController
     public ResponseEntity<ParcelaEmprestimoResponseDTO> getParcelaById(@PathVariable UUID id, @AuthenticationPrincipal Usuario usuarioLogado)
     {
         ParcelaEmprestimoResponseDTO parcela = parcelaService.getParcelaDTOByIdAndUsuario(id, usuarioLogado.getId());
+        return ResponseEntity.ok(parcela);
+    }
+
+    
+
+    @GetMapping("/parcela/{id}/admin")
+    public ResponseEntity<ParcelaEmprestimoResponseDTO> getParcelaByIdForAdmin(@PathVariable UUID parcelaId, @RequestBody UUID usuarioId)
+    {
+        ParcelaEmprestimoResponseDTO parcela = parcelaService.getParcelaDTOByIdAndUsuario(parcelaId, usuarioId);
         return ResponseEntity.ok(parcela);
     }
 }

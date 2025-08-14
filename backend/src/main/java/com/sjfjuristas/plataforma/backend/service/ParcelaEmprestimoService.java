@@ -32,14 +32,17 @@ public class ParcelaEmprestimoService
     @Autowired
     private EmprestimoRepository emprestimoRepository;
 
-    @Autowired
-    private FileStorageService fileStorageService;
+    //@Autowired
+    //private FileStorageService fileStorageService;
+
+    //@Autowired
+    //private UsuarioRepository usuarioRepository;
 
     @Value("${pix.cobranca.expiracao-segundos}")
     private long expiracaoSegundos;
 
-    @Value("${minio.bucket.qrcodes}")
-    private String qrCodeBucketName;
+    //@Value("${minio.bucket.qrcodes}")
+    //private String qrCodeBucketName;
 
     @Value("${sjfjuristas.pix.empresa.nome}")
     private String nomeEmpresa;
@@ -73,7 +76,7 @@ public class ParcelaEmprestimoService
         return new ParcelaEmprestimoResponseDTO(parcelaEmprestimo);
     }
 
-
+    @Transactional(readOnly=true)
     public ParcelaEmprestimoResponseDTO getParcelaDTOByIdAndUsuario(UUID parcelaId, UUID usuarioId)
     {
         ParcelaEmprestimo parcela = parcelaRepository.findById(parcelaId).orElseThrow(() -> new EntityNotFoundException("Parcela não encontrada com o ID: " + parcelaId));

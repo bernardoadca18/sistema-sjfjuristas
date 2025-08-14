@@ -24,6 +24,7 @@ import com.sjfjuristas.plataforma.backend.domain.StatusEmprestimo;
 import com.sjfjuristas.plataforma.backend.domain.StatusPagamentoParcela;
 import com.sjfjuristas.plataforma.backend.domain.Usuario;
 import com.sjfjuristas.plataforma.backend.dto.Emprestimos.CondicoesAprovadasDTO;
+import com.sjfjuristas.plataforma.backend.dto.Emprestimos.EmprestimoAdminResponseDTO;
 import com.sjfjuristas.plataforma.backend.dto.Emprestimos.EmprestimoClienteResponseDTO;
 import com.sjfjuristas.plataforma.backend.dto.Emprestimos.EmprestimoSummaryDTO;
 import com.sjfjuristas.plataforma.backend.dto.ParcelaEmprestimo.ParcelaEmprestimoResponseDTO;
@@ -329,5 +330,23 @@ public class EmprestimoService
         }
 
         return parcelaRepository.findByEmprestimoAndNumeroParcelaIn(emprestimo, numerosParaBuscar);
+    }
+
+    @Transactional
+    public Page<EmprestimoAdminResponseDTO> getAllEmprestimosAdmin(UUID usuarioId, Pageable pageable)
+    {
+        Page<Emprestimo> emprestimosPage;
+
+        if (usuarioId != null)
+        {
+            Usuario usuario = usuarioRepository.findById(usuarioId).orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
+            emprestimosPage = emprestimoRepository.findByUsuarioIdUsuarios(usuario, pageable);
+        }
+        else
+        {
+            emprestimosPage = emprestimoRepository.findAll(pageable);
+        }
+        
+        return emprestimosPage.map(EmprestimoAdminResponseDTO::new);
     }
 }
