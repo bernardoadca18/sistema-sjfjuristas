@@ -1,47 +1,40 @@
 package com.sjfjuristas.plataforma.backend.service;
 
-import io.minio.BucketExistsArgs;
-import io.minio.MakeBucketArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import java.util.UUID;
 
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 @Service
 public class FileStorageService
 {
     @Autowired
-    private MinioClient minioClient;
+    private S3Client s3Client;
 
-    @Value("${minio.url}")
-    private String minioUrl;
+    @Value("${aws.s3.url}")
+    private String s3Url;
 
     public String uploadFile(String bucketName, MultipartFile file, String subfolder) 
     {
         try 
         {
-            boolean found = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
-            if (!found) 
-            {
-                minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
-            }
-
             String folderPath = (subfolder != null && !subfolder.isBlank()) ? subfolder + "/" : "";
             String fileName = folderPath + UUID.randomUUID() + "-" + file.getOriginalFilename();
 
-            minioClient.putObject(
-                    PutObjectArgs.builder()
-                            .bucket(bucketName)
-                            .object(fileName)
-                            .stream(file.getInputStream(), file.getSize(), -1)
-                            .contentType(file.getContentType())
-                            .build());
+            PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                .bucket(bucketName)
+                .key(fileName)
+                .contentType(file.getContentType())
+                .build();
 
-            return minioUrl + "/" + bucketName + "/" + fileName;
+            s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
 
+            return s3Url + "/" + bucketName + "/" + fileName;
         } 
         catch (Exception e)
         {
