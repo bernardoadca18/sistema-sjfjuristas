@@ -1,9 +1,7 @@
 package com.sjfjuristas.plataforma.backend.service.Auth;
 
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.sjfjuristas.plataforma.backend.dto.Admin.AdminAuthResponseDTO;
@@ -19,20 +17,12 @@ public class AdminAuthServiceImpl implements AdminAuthService
 {
     private final AdministradorRepository administradorRepository;
     private final JwtService jwtService;
-    private final PasswordEncoder passwordEncoder;
-    private final UserDetailsService adminDetailsServiceImpl;
+    private final AuthenticationManager authenticationManager;
 
-    @SuppressWarnings("deprecation")
     @Override
     public AdminAuthResponseDTO login(AdminLoginRequestDTO request)
     {
-
-        DaoAuthenticationProvider adminAuthProvider = new DaoAuthenticationProvider();
-        adminAuthProvider.setUserDetailsService(adminDetailsServiceImpl);
-        adminAuthProvider.setPasswordEncoder(passwordEncoder);
-
-        
-        adminAuthProvider.authenticate(
+        authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
                 request.getLogin(),
                 request.getSenha()

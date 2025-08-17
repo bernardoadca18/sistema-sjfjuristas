@@ -12,11 +12,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.sjfjuristas.plataforma.backend.repository.UsuarioRepository;
-//import org.springframework.security.core.userdetails.UserDetails;
-//import java.util.Collections;
-//import com.sjfjuristas.plataforma.backend.domain.Usuario;
-
+import com.sjfjuristas.plataforma.backend.repository.AdministradorRepository;
+import com.sjfjuristas.plataforma.backend.repository.UsuarioRepository; 
 
 @Configuration
 public class ApplicationConfig 
@@ -24,9 +21,20 @@ public class ApplicationConfig
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    @Autowired
+    private AdministradorRepository administradorRepository;
+
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> usuarioRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado: " + username));
+        return username -> {
+            var adminDetails = administradorRepository.findByUsername(username);
+            if (adminDetails.isPresent())
+            {
+                return adminDetails.get();
+            }
+
+            return usuarioRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado: " + username));
+        };
     }
 
     @Bean

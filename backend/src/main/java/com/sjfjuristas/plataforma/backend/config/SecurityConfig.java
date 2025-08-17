@@ -24,12 +24,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable).authorizeHttpRequests(auth -> auth
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 // ENDPOINTS PUBLICOS    
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/admin/auth/login").permitAll()
                 .requestMatchers("/api/senha/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/propostas").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/ocupacoes").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/propostas/*/documentos").permitAll()
                 .requestMatchers("/api/tipo-chave-pix/**").permitAll()
                 
                 // ENDPOINTS DE DOCUMENTAÇÃO SWAGGER

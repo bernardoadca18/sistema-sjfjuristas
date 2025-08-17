@@ -156,6 +156,3 @@ INSERT INTO schema_sjfjuristas.ocupacoes (nome_ocupacao) VALUES
 ('Web Designer'),
 ('Outros')
 ON CONFLICT (nome_ocupacao) DO NOTHING;
-
-INSERT INTO schema_sjfjuristas.administradores(nome_completo, username, email, hash_senha, telefone_contato, data_cadastro, ultimo_login, ativo, email_verificado, perfil_id_perfis_usuario, cargo_interno, departamento, matricula_funcionario)
-VALUES ('Bernardo Alves Aguiar da Cunha', 'bernardoalvesaguiar6', 'bernardoalvesaguiar16@gmail.com', '$2a$10$Ps0uEbYP.T6h9XTpWKXym.jE3M79kN94TqxNs/pQP9q8SIbyV7//K', '31988620039', '2025-08-13', '2025-08-13', true, true, '18b4037b-72c3-4e47-87c2-93123e002c79', 'Desenvolvedor do Sistema', 'DEV', 'bernardoalvesaguiar6');

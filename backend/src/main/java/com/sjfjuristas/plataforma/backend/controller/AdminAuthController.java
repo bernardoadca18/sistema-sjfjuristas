@@ -23,8 +23,6 @@ public class AdminAuthController
     @PostMapping("/login")
     public ResponseEntity<AdminAuthResponseDTO> login(@Valid @RequestBody AdminLoginRequestDTO request)
     {
-        System.out.println("Login: " + request.getLogin());
-        System.out.println("Senha: " + request.getSenha());
         return ResponseEntity.ok(adminAuthService.login(request));
     }
 }
