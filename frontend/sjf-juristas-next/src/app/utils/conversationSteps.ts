@@ -19,7 +19,7 @@ export interface IFormData
     propositoEmprestimo?: string;
     estadoCivil?: string;
     possuiImovelVeiculo?: boolean;
-    pixKeyType?: 'CPF' | 'CNPJ' | 'E-mail' | 'Telefone' | 'Chave Aleatória';
+    pixKeyType?: 'CPF' | 'CNPJ' | 'Email' | 'Telefone' | 'Aleatória';
     pixKey?: string;
 }
 

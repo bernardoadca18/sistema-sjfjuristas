@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.sjfjuristas.plataforma.backend.domain.Administrador;
@@ -27,6 +28,7 @@ public interface AdministradorRepository extends JpaRepository<Administrador, UU
     boolean existsByEmail(String email);
 
     boolean existsByMatriculaFuncionario(String matricula);
-
+    
+    @Query("SELECT a FROM Administrador a JOIN FETCH a.perfilIdPerfisusuario WHERE a.username = :username")
     Optional<Administrador> findByUsername(String username);
 }

@@ -13,6 +13,8 @@ interface Occupation
     nome: string;
 }
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
 const Chat = () => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [currentStep, setCurrentStep] = useState(0);
@@ -35,7 +37,7 @@ const Chat = () => {
     const fetchOccupations = async () => {
         try
         {
-            const response = await axios.get('/api/ocupacoes');
+            const response = await axios.get(`${apiUrl}/api/ocupacoes`);
 
             const sortedOccupations = response.data.sort((a: Occupation, b: Occupation) => {
                 if (a.nome === 'Outros') return -1;
@@ -94,6 +96,20 @@ const Chat = () => {
 
 
     const handleFinalSubmission = async (data: IFormData) => {
+        let pixKeyTypeVar;
+        if (data.pixKeyType === "Aleatória")
+        {
+            pixKeyTypeVar = "Chave Aleatória";
+        }
+        else if (data.pixKeyType === "Email")
+        {
+            pixKeyTypeVar = "E-mail"
+        }
+        else
+        {
+            pixKeyTypeVar = data.pixKeyType;
+        }
+
         const proposalPayload = {
             valorSolicitado: data.loanValue,
             nomeCompleto: data.fullName,
@@ -109,7 +125,7 @@ const Chat = () => {
             propositoEmprestimo: data.propositoEmprestimo,
             estadoCivil: data.estadoCivil,
             possuiImovelVeiculo: data.possuiImovelVeiculo,
-            tipoChavePix: data.pixKeyType,
+            tipoChavePix: pixKeyTypeVar,
             chavePix: data.pixKey,
         }
 
@@ -117,7 +133,7 @@ const Chat = () => {
 
         try
         {
-            const proposalResponse = await axios.post(`/api/propostas`, proposalPayload);
+            const proposalResponse = await axios.post(`${apiUrl}/api/propostas`, proposalPayload);
             const proposalId = proposalResponse.data.id;
 
             console.log('Proposta criada com sucesso! ID:', proposalId);
@@ -136,7 +152,7 @@ const Chat = () => {
                 {
                     console.log(`Enviando arquivos para a proposta ID: ${proposalId}`);
                     const fileResponse = await axios.post(
-                        `/api/propostas/${proposalId}/documentos`,
+                        `${apiUrl}/api/propostas/${proposalId}/documentos`,
                         fileFormData,
                         { headers: { 'Content-Type': 'multipart/form-data' } }
                     );
@@ -491,7 +507,7 @@ const Chat = () => {
                                 />
                             );
                             break;
-                        case 'E-mail':
+                        case 'Email':
                             placeholder = "Digite seu e-mail";
                             pixInputComponent = (
                                 <input
@@ -505,7 +521,7 @@ const Chat = () => {
                                 />
                             );
                             break;                       
-                        case 'Chave Aleatória':
+                        case 'Aleatória':
                             placeholder = "Digite sua chave aleatória";
                             pixInputComponent = (
                                 <input

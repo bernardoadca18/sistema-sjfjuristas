@@ -156,3 +156,28 @@ INSERT INTO schema_sjfjuristas.ocupacoes (nome_ocupacao) VALUES
 ('Web Designer'),
 ('Outros')
 ON CONFLICT (nome_ocupacao) DO NOTHING;
+
+INSERT INTO schema_sjfjuristas.administradores (
+    nome_completo,
+    username,
+    email,
+    hash_senha,
+    telefone_contato,
+    email_verificado,
+    perfil_id_perfis_usuario,
+    cargo_interno,
+    departamento,
+    matricula_funcionario
+)
+VALUES (
+    'Admin',
+    'admin',
+    'admin@admin.com',
+    'hash_senha',
+    '00000000000',
+    true,
+    (SELECT perfil_id FROM schema_sjfjuristas.perfis_usuario WHERE nome_perfil = 'Administrador'),
+    'Desenvolvedor do Sistema',
+    'DEV', 
+    'A000001'
+);
