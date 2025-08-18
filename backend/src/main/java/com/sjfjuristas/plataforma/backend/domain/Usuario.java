@@ -126,7 +126,7 @@ public class Usuario implements UserDetails
                inverseJoinColumns = @JoinColumn(name = "ocupacao_id_ocupacoes"))
     private Set<Ocupacao> ocupacoes = new LinkedHashSet<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "\"perfil_id_PerfisUsuario\"")
     private PerfilUsuario perfilIdPerfisusuario;
