@@ -1,9 +1,0 @@
-version: "2"
-web_addr: 0.0.0.0:4040
-tunnels:
-  frontend:
-    proto: http
-    addr: frontend:3000
-  backend:
-    proto: http
-    addr: backend:8080
