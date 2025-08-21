@@ -54,18 +54,20 @@ services:
     image: minio/mc
     depends_on:
       - minio
+    env_file:
+      - .env
     entrypoint: >
       /bin/sh -c "
       echo 'Esperando o Minio ficar pronto...';
-      until /usr/bin/mc alias set minio http://minio:9000 admin 12345678; do
+      until /usr/bin/mc alias set minio http://minio:9000 $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD; do
           echo '...ainda esperando' && sleep 1;
       done;
       echo 'Minio pronto! Criando buckets...';
-      /usr/bin/mc mb minio/propostas-documentos --ignore-existing;
-      /usr/bin/mc anonymous set public minio/propostas-documentos;
-      /usr/bin/mc mb minio/pix-qrcodes --ignore-existing;
-      /usr/bin/mc anonymous set public minio/pix-qrcodes;
-      /usr/bin/mc mb minio/comprovantes --ignore-existing
+      /usr/bin/mc mb minio/sjfjuristas-propostas-documentos --ignore-existing;
+      /usr/bin/mc anonymous set public minio/sjfjuristas-propostas-documentos;
+      /usr/bin/mc mb minio/sjfjuristas-pix-qrcodes --ignore-existing;
+      /usr/bin/mc anonymous set public minio/sjfjuristas-pix-qrcodes;
+      /usr/bin/mc mb minio/sjfjuristas-comprovantes --ignore-existing
 
       echo 'Buckets criados e políticas aplicadas com sucesso!';
       exit 0;
@@ -79,6 +81,8 @@ services:
     restart: unless-stopped
     env_file:
       - .env
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
     depends_on:
       - db
       - create-bucket
