@@ -35,7 +35,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/tipo-chave-pix/**").permitAll()
                 
                 // ENDPOINTS DE DOCUMENTAÇÃO SWAGGER
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").hasRole("ADMINISTRADOR")
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()//hasRole("ADMINISTRADOR")
 
                 // ENDPOINTS DE CLIENTES
                 .requestMatchers("/api/cliente/**").authenticated()
