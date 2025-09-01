@@ -1,0 +1,24 @@
+volumes:
+  pgadmin-data:
+    name: pgadmin_data
+
+networks:
+  sistema-sjfjuristas_sjf-network:
+    external: true
+
+services:
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: sjfjuristas-pgadmin
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - "8082:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    networks:
+      - sistema-sjfjuristas_sjf-network
