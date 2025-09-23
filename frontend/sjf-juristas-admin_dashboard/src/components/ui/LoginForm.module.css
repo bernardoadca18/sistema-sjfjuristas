@@ -1,0 +1,32 @@
+.signInButton
+{
+    background-color: var(--color-button-pr);
+    color: var(--color-text-on-primary);
+}
+
+.signInButton:hover
+{
+    background-color: var(--color-button-pr-hover);
+    cursor: pointer;
+}
+
+.forgotPasswordButton
+{
+    color: var(--color-primary);
+    font-weight: bold;
+}
+
+.forgotPasswordButton:hover
+{
+    cursor: pointer;
+}
+
+.cardItem div *
+{
+    border-color: rgb(209, 209, 209);
+}
+
+.secondaryText
+{
+    color: var(--color-text-secondary);
+}

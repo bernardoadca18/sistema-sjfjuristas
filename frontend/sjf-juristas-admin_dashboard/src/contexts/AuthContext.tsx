@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const checkAuth = async () => {
             try
             {
-                const response = await api.get('/auth/me');
+                const response = await api.get('/admin/profile/me');
 
                 if (response.status === 200)
                 {
