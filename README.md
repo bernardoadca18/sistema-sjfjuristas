@@ -8,7 +8,7 @@
 ![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
 
-## 📋 Sobre o Projeto
+## Sobre o Projeto
 
 O **Sistema SJF Juristas** é uma solução completa e robusta desenvolvida para a gestão, controle e operacionalização de empréstimos financeiros. A plataforma visa automatizar o fluxo de propostas, aprovações, desembolsos e acompanhamento de pagamentos, oferecendo interfaces específicas para administradores e clientes finais.
 
@@ -20,7 +20,7 @@ O ecossistema é composto por quatro pilares principais:
 
 ---
 
-## 🚀 Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 ### Backend (`/backend`)
 * **Linguagem:** Java 17+
@@ -50,7 +50,7 @@ O ecossistema é composto por quatro pilares principais:
 
 ---
 
-## ⚙️ Funcionalidades Principais
+## Funcionalidades Principais
 
 * **Gestão de Usuários:**
     * Cadastro de clientes e administradores.
@@ -72,7 +72,7 @@ O ecossistema é composto por quatro pilares principais:
 
 ---
 
-## 🔧 Pré-requisitos
+## Pré-requisitos
 
 Para executar o projeto localmente, você precisará ter instalado:
 
@@ -83,7 +83,7 @@ Para executar o projeto localmente, você precisará ter instalado:
 
 ---
 
-## 📦 Como Rodar o Projeto
+## Como Rodar o Projeto
 
 ### Opção 1: Via Docker Compose (Recomendado)
 
